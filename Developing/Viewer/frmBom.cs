@@ -53,7 +53,7 @@ namespace MvLocalProject.Viewer
             DataSet sourceDs;
 
             // get source data set
-            sourceDs = bo.GetBomInfoByDev(result, false).Copy();
+            sourceDs = bo.GetBomP07InfoByDev(result, false).Copy();
             DataTable sourceDt = sourceDs.Tables[result].Copy();
             DataTable filterDt = sourceDs.Tables[result + "_Filter"].Copy();
             DataTable mocDt;

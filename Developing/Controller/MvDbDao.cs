@@ -904,6 +904,245 @@ namespace MvLocalProject.Controller
             return majorData;
         }
 
+
+        /// <summary>
+        /// 取得多張bom list
+        /// </summary>
+        /// <param name="bomIdList"></param>
+        /// <returns></returns>
+        public static DataSet collectData_Bom07(string[] bomIdList)
+        {
+
+            DataSet ds = new DataSet("BomTables");
+
+            DataTable dt = null;
+            foreach (string bomId in bomIdList)
+            {
+                dt = null;
+                // BomP09跟BomP07的檢查邏輯相同, 所以直接引用
+                bool isExist = checkData_BomP09_BomInInvmb(bomId);
+                if (isExist == false)
+                {
+                    continue;
+                }
+                dt = collectData_BomP07(bomId, true);
+                ds.Tables.Add(dt);
+            }
+            return ds;
+        }
+
+
+        /// <summary>
+        /// 取得Bom資料by BomID for PD
+        /// </summary>
+        /// <param name="bomId"></param>
+        /// <returns></returns>
+        public static DataTable collectData_BomP07(string bomId, bool trimLv)
+        {
+
+            DataTable majorData = null;
+            DataTable tmpDt = null;
+            StringBuilder sb = new StringBuilder();
+
+            using (TransactionScope scope = new TransactionScope())
+            {
+                SqlConnection connection = MvDbConnector.Connection_ERPDB2_Dot_MACHVISION;
+                SqlCommand command = connection.CreateCommand();
+                try
+                {
+                    connection.Open();
+
+                    // 取得執行時間的字串
+                    // 為什麼是取3年前, 目前還不知道
+                    DateTime endDate = System.DateTime.Now;
+                    DateTime startDate = DateTime.Parse(endDate.AddMonths(-36).ToShortDateString());
+                    string executeDate = DateTime.Now.ToString("yyyyMMdd");
+
+
+                    // truncate tables
+                    sb.AppendLine("Truncate Table TEMP.dbo.TMP_BOMP07;")
+                        .AppendLine("Truncate Table TEMP.dbo.TMP_BOMP09_FOREIGN;")
+                        .AppendLine("Truncate Table TEMP.dbo.TMP_BOMP09_ONLY_ONE;");
+                    command.CommandText = sb.ToString();
+                    command.ExecuteNonQuery();
+
+                    //執行sql statement 抄寫到TEMP資料庫的Table
+                    sb.Clear();
+                    sb.AppendLine("INSERT INTO TEMP.dbo.TMP_BOMP09_FOREIGN(TD004, TC004) SELECT TD004, TC004 FROM PURTC, PURTD, PURMA WHERE TC001=TD001 AND TC002=TD002 AND TC004=MA001 AND MA057='2' AND TC014='Y' and TD018='Y' GROUP BY TC004, TD004;")
+                        .AppendLine("INSERT INTO TEMP.dbo.TMP_BOMP09_ONLY_ONE(TD004, TC004) SELECT TD004, TC004 FROM PURTC, PURTD, PURMA WHERE TC001=TD001 AND TC002=TD002 AND TC004=MA001 AND TC014='Y' and TD018='Y' GROUP BY TC004, TD004;")
+                        .Append("INSERT INTO TEMP.dbo.TMP_BOMP07(A1, A2, LV, MD006, MB025X, A2NAME, MB077X, A9, MD200X, MD201X, MD016X,  MO1, YN, MD011X,MD013X) ")
+                        .AppendLine(string.Format("SELECT MD001, MD003, '1', MD006, MB025, MB002, MB077, MD006, MD200,MD201,MD016, MD002, MD032, MD011, MD013 From MACHVISION..BOMMD, MACHVISION..INVMB WHERE MD003=MB001 and MD001='{0}' and MD017<>'4' and (MD012='' or MD012>= '{1}') AND MB017<>'Y';", bomId, executeDate))
+                        .Append("INSERT INTO TEMP.dbo.TMP_BOMP07(A1, A2, A3, LV, MD006, MB025X, A2NAME, MB077X, A9, MD200X, MD201X,MD016X, MO1, MO2, YN, MD011X,MD013X) ")
+                        .AppendLine(string.Format("Select '{0}', MD001, MD003, '2', MACHVISION.dbo.BOMMD.MD006, MB025, MB002, MB077, A9, MD200, MD201,MD016X, MO1, MD002, MD032, MD011, MD013  From TEMP..TMP_BOMP07, MACHVISION.dbo.BOMMD, MACHVISION.dbo.INVMB WHERE MD001=MB001 and A2=MACHVISION.dbo.BOMMD.MD001 and LV='1' and MD017<>'4' and (MD012='' or MD012>= '{1}') AND MB017<>'Y' AND MB025 <> 'Y';", bomId, executeDate))
+                        .Append("INSERT INTO TEMP.dbo.TMP_BOMP07(A1, A2, A3, A4, LV, MD006, MB025X, A2NAME, MB077X, A9, MD200X,  MD201X,MD016X,MO1,MO2,MO3, YN, MD011X,MD013X) ")
+                        .AppendLine(string.Format("Select A1, A2, MD001, MD003, '3', MACHVISION.dbo.BOMMD.MD006, MB025, MB002, MB077, A9, MD200, MD201,MD016X, MO1,MO2,MD002, MD032, MD011, MD013  From TEMP.dbo.TMP_BOMP07, MACHVISION.dbo.BOMMD, MACHVISION.dbo.INVMB WHERE MD001=MB001 and A3=MACHVISION.dbo.BOMMD.MD001 and LV='2' and MD017<>'4' and (MD012='' or MD012>= '{0}') AND MB017<>'Y' AND MB025 <> 'Y';", executeDate))
+                        .Append("INSERT INTO TEMP.dbo.TMP_BOMP07(A1, A2, A3, A4, A5,LV, MD006, MB025X, A2NAME, MB077X, A9, MD200X, MD201X, MD016X,MO1,MO2,MO3,MO4, YN, MD011X,MD013X) ")
+                        .AppendLine(string.Format("Select A1, A2, A3, MD001, MD003, '4', MACHVISION.dbo.BOMMD.MD006, MB025, MB002, MB077, A9, MD200, MD201,MD016, MO1,MO2,MO3,MD002, MD032, MD011, MD013  From TEMP.dbo.TMP_BOMP07, MACHVISION.dbo.BOMMD, MACHVISION.dbo.INVMB WHERE MD001=MB001 and A4=MACHVISION.dbo.BOMMD.MD001 AND LV='3' and MD017<>'4' and (MD012='' or MD012>= '{0}') AND MB017<>'Y' AND MB025 <> 'Y';", executeDate))
+                        .Append("INSERT INTO TEMP.dbo.TMP_BOMP07(A1, A2, A3, A4, A5,LV, MD006, MB025X, A2NAME, MB077X, A9, MD200X, MD201X,MD016X, MO1,MO2,MO3,MO4, MO5, YN, MD011X,MD013X) ")
+                        .AppendLine(string.Format("Select A1, A2, A3, MD001, MD003, '5', MACHVISION.dbo.BOMMD.MD006, MB025, MB002, MB077, A9, MD200, MD201,MD016, MO1,MO2,MO3,MO4, MD002, MD032, MD011, MD013  From TEMP..TMP_BOMP07,MACHVISION.dbo.BOMMD, MACHVISION.dbo.INVMB WHERE MD001=MB001 and A5=MACHVISION.dbo.BOMMD.MD001 AND LV='4' and MD017<>'4' and (MD012='' or MD012>= '{0}') AND MB017<>'Y' AND MB025 <> 'Y';", executeDate))
+                        .Append("INSERT INTO TEMP.dbo.TMP_BOMP07(A1, A2, A3, A4, A5, A6, LV, MD006, MB025X, A2NAME, MB077X, A9, MD200X, MD201X,MD016X, MO1,MO2,MO3,MO4, MO5,MO6, YN, MD011X,MD013X) ")
+                        .AppendLine(string.Format("Select A1, A2, A3, A4, MD001, MD003, '6', MACHVISION.dbo.BOMMD.MD006, MB025, MB002, MB077, A9, MD200, MD201,MD016, MO1,MO2,MO3,MO4, MO5, MD002, MD032, MD011, MD013  From TEMP..TMP_BOMP07, MACHVISION.dbo.BOMMD, MACHVISION.dbo.INVMB WHERE MD001=MB001 and A5=MACHVISION.dbo.BOMMD.MD001 AND LV='5' and MD017<>'4' and (MD012='' or MD012>= '{0}') AND MB017<>'Y' AND MB025 <> 'Y';", executeDate))
+                        .Append("INSERT INTO TEMP.dbo.TMP_BOMP07(A1, A2, A3, A4, A5, A6,A7,LV, MD006, MB025X, A2NAME, MB077X, A9, MD200X, MD201X,MD016X, MO1,MO2,MO3,MO4, MO5,MO6,MO7, YN, MD011X,MD013X) ")
+                        .AppendLine(string.Format("Select A1, A2, A3, A4, A5, MD001, MD003, '7', MACHVISION.dbo.BOMMD.MD006, MB025, MB002, MB077, A9, MD200, MD201,MD016, MO1,MO2,MO3,MO4, MO5, MO6,MD002, MD032, MD011, MD013  From TEMP.dbo.TMP_BOMP07, MACHVISION.dbo.BOMMD, MACHVISION.dbo.INVMB WHERE MD001=MB001 and A6=MACHVISION.dbo.BOMMD.MD001 AND LV='6' and MD017<>'4' and (MD012='' or MD012>= '{0}') AND MB017<>'Y' AND MB025 <> 'Y';", executeDate))
+                        .Append("INSERT INTO TEMP.dbo.TMP_BOMP07(A1, A2, A3, A4, A5, A6,A7,A8,LV, MD006, MB025X, A2NAME, MB077X, A9, MD200X, MD201X,MD016X, MO1,MO2,MO3,MO4, MO5,MO6, YN) ")
+                        .AppendLine(string.Format("Select A1, A2, A3, A4, A5, A6,MD001, MD003, '7', BOMMD.MD006, MB025, MB002, MB077, A9, MD200, MD201,MD016, MO1,MO2,MO3,MO4, MO5, MD002, MD032 From TEMP.dbo.TMP_BOMP07, MACHVISION.dbo.BOMMD, MACHVISION.dbo.INVMB WHERE MD001=MB001 and A7=MACHVISION.dbo.BOMMD.MD001 AND LV='7' and MD017<>'4' and (MD012='' or MD012>= '{0}') AND MB017<>'Y' AND MB025 <> 'Y';", executeDate));
+                    command.CommandText = sb.ToString();
+                    command.ExecuteNonQuery();
+
+                    sb.Clear();
+                    sb.AppendLine(string.Format("INSERT INTO TEMP..TMP_BOMP07(A1, LV,  MO1, MD006) VALUES('{0}', 0, '', 0 );", bomId))
+                        .AppendLine("UPDATE TEMP.dbo.TMP_BOMP07 SET A8=A2 WHERE A2<>'';")
+                        .AppendLine("UPDATE TEMP.dbo.TMP_BOMP07 SET A8=A3 WHERE A3<>'';")
+                        .AppendLine("UPDATE TEMP.dbo.TMP_BOMP07 SET A8=A4 WHERE A4<>'';")
+                        .AppendLine("UPDATE TEMP.dbo.TMP_BOMP07 SET A8=A5 WHERE A5<>'';")
+                        .AppendLine("UPDATE TEMP.dbo.TMP_BOMP07 SET A8=A6 WHERE A6<>'';")
+                        .AppendLine("UPDATE TEMP.dbo.TMP_BOMP07 SET A8=A7 WHERE A7<>'';")
+                        .AppendLine("UPDATE TEMP.dbo.TMP_BOMP07 SET MO9=MO1 WHERE MO1<>'';")
+                        .AppendLine("UPDATE TEMP.dbo.TMP_BOMP07 SET MO9=MO2 WHERE MO2<>'';")
+                        .AppendLine("UPDATE TEMP.dbo.TMP_BOMP07 SET MO9=MO3 WHERE MO3<>'';")
+                        .AppendLine("UPDATE TEMP.dbo.TMP_BOMP07 SET MO9=MO4 WHERE MO4<>'';")
+                        .AppendLine("UPDATE TEMP.dbo.TMP_BOMP07 SET MO9=MO5 WHERE MO5<>'';")
+                        .AppendLine("UPDATE TEMP.dbo.TMP_BOMP07 SET MO9=MO6 WHERE MO6<>'';")
+                        .AppendLine("UPDATE TEMP.dbo.TMP_BOMP07 SET MO9=MO7 WHERE MO7<>'';")
+                        .AppendLine("UPDATE TEMP.dbo.TMP_BOMP07 SET LV='.1' WHERE  LV='1';")
+                        .AppendLine("UPDATE TEMP.dbo.TMP_BOMP07 SET LV='..2' WHERE  LV='2';")
+                        .AppendLine("UPDATE TEMP.dbo.TMP_BOMP07 SET LV='...3' WHERE  LV='3';")
+                        .AppendLine("UPDATE TEMP.dbo.TMP_BOMP07 SET LV='....4' WHERE  LV='4';")
+                        .AppendLine("UPDATE TEMP.dbo.TMP_BOMP07 SET LV='.....5' WHERE  LV='5';")
+                        .AppendLine("UPDATE TEMP.dbo.TMP_BOMP07 SET LV='......6' WHERE  LV='6';")
+                        .AppendLine("UPDATE TEMP.dbo.TMP_BOMP07 SET LV='.......7' WHERE  LV='7';")
+                        .AppendLine("UPDATE TEMP.dbo.TMP_BOMP07 SET MB025X=MB025 FROM INVMB WHERE A8=MB001;")
+                        .AppendLine("UPDATE TEMP.dbo.TMP_BOMP07 SET MB025X='市購' WHERE  MB025X='P';")
+                        .AppendLine("UPDATE TEMP.dbo.TMP_BOMP07 SET MB025X='模組' WHERE  MB025X='M';")
+                        .AppendLine("UPDATE TEMP.dbo.TMP_BOMP07 SET MB025X='再製' WHERE  MB025X='S';")
+                        .AppendLine("UPDATE TEMP.dbo.TMP_BOMP07 SET MB025X='虛設' WHERE  MB025X='Y';")
+                        .AppendLine("UPDATE TEMP.dbo.TMP_BOMP07 SET MB025X='Feature件' WHERE MB025X='F';")
+                        .AppendLine("UPDATE TEMP.dbo.TMP_BOMP07 SET MB025X='選配' WHERE  MB025X='O' ;");
+                    command.CommandText = sb.ToString();
+                    command.ExecuteNonQuery();
+
+                    sb.Clear();
+                    sb.AppendLine("UPDATE TEMP.dbo.TMP_BOMP07 SET MD201X=MD201 FROM TEMP..MV_BOMMD_P WHERE A2=MD001 AND A8=MD003 AND A1=PROD;")
+                        .AppendLine("UPDATE TEMP.dbo.TMP_BOMP07 SET FOREIGN_YN='Y' FROM TEMP.dbo.TMP_BOMP09_FOREIGN WHERE Rtrim(A8)=Rtrim(TD004);")
+                        .AppendLine("UPDATE TEMP.dbo.TMP_BOMP07 SET ONLY_ONE='Y' FROM (SELECT TD004 TD4 FROM TEMP.dbo.TMP_BOMP09_ONLY_ONE Group By TD004 Having(Count(*))=1 )A WHERE Rtrim(A8)=Rtrim(A.TD4);");
+                    command.CommandText = sb.ToString();
+                    command.ExecuteNonQuery();
+
+                    // update 取替代料欄位資訊, SUBPN
+                    sb.Clear();
+                    sb.AppendLine("SELECT * FROM TEMP.dbo.TMP_BOMP07 ORDER BY A8");
+                    command.CommandText = sb.ToString();
+                    tmpDt = MvDbConnector.queryDataBySql(command);
+                    DataRowCollection drc = tmpDt.Rows;
+
+                    foreach (DataRow dr in drc)
+                    {
+                        sb.Clear();
+                        sb.AppendLine(string.Format("SELECT * FROM MACHVISION.dbo.BOMMB WHERE MB001='{0}' AND MB002='****************************************' ", dr["A8"]));
+                        command.CommandText = sb.ToString();
+                        tmpDt = MvDbConnector.queryDataBySql(command);
+
+                        // 如果沒有取替代料, 則不需再更新SUBPN 及S1~S5的欄位資料
+                        int rowCount = tmpDt.Rows.Count;
+                        if (rowCount == 0)
+                        {
+                            continue;
+                        }
+                        else if (rowCount > 1)
+                        {
+                            Console.WriteLine("test");
+                        }
+
+                        // 目前取替代料的排序最多5個, 所以先預設5個
+                        string finalSUBPN = string.Empty;
+                        string tmpSUBPN = string.Empty;
+                        string[] seqSUBPN = new string[Model.DefinedHeader.BomP07_MaxSUBPN];
+
+                        for (int i = 0; i < rowCount; i++)
+                        {
+                            //DataRow tmpDr1 = tmpDt.Rows[i];
+                            tmpSUBPN = tmpDt.Rows[i]["MB004"].ToString().Trim();
+                            seqSUBPN[i] = tmpSUBPN;
+                            finalSUBPN += tmpSUBPN + ";";
+                        }
+
+                        // 將finalSUBPN去除最尾的分號
+                        finalSUBPN = finalSUBPN.Remove(finalSUBPN.Length - 1, 1);
+                        // 組合update 取替代料的Sql
+                        sb.Clear();
+                        sb.Append(string.Format("UPDATE TEMP.dbo.TMP_BOMP07 SET SUBPN='{0}' ",finalSUBPN));
+                        int index = 0;
+                        for (int i = 0; i < rowCount; i++)
+                        {
+                            index = i + 1;
+                            sb.Append(string.Format(", S{0}='{1}' ", index, seqSUBPN[i]));
+                        }
+                        sb.Append(string.Format(" WHERE DATANO={0} ", dr["DATANO"]));
+                        // 執行取替代料作業
+                        command.CommandText = sb.ToString();
+                        command.ExecuteNonQuery();
+                    }
+
+                    sb.Clear();
+                    sb.AppendLine("UPDATE  TEMP.dbo.TMP_BOMP07 SET PN_NO1=MB004 FROM MACHVISION.dbo.BOMMB WHERE A8=MB001 AND MB010='Y';")
+                        .AppendLine("UPDATE  TEMP.dbo.TMP_BOMP07 SET PN_NO1=MB004 FROM MACHVISION.dbo.BOMMB WHERE S1=MB001 AND MB010='Y' AND MB004=A8;")
+                        .AppendLine("UPDATE  TEMP.dbo.TMP_BOMP07 SET PN_NO1=MB004 FROM MACHVISION.dbo.BOMMB WHERE S2=MB001 AND MB010='Y' AND MB004=A8;")
+                        .AppendLine("UPDATE  TEMP.dbo.TMP_BOMP07 SET PN_NO1=MB004 FROM MACHVISION.dbo.BOMMB WHERE S3=MB001 AND MB010='Y' AND MB004=A8;");
+                    command.CommandText = sb.ToString();
+                    command.ExecuteNonQuery();
+
+                    // get result to make excel report
+                    sb.Clear();
+                    sb.Append("SELECT LV, SUBPN, A8, MB025X, Rtrim(MB201), Rtrim(MB202), Rtrim(MB203), Rtrim(MB002), Rtrim(MB206),Rtrim(MB205), Rtrim(MB204), Rtrim(MB207), MB003, MB004, MD006, ")
+                        .Append("Rtrim(MD200X), Rtrim(MD201X), Rtrim(MD016X), YN, MB037, MB209, MB077, MD011X, MD013X, FOREIGN_YN, ONLY_ONE, Rtrim(PN_NO1) ")
+                        .Append("FROM TEMP.dbo.TMP_BOMP07 LEFT JOIN MACHVISION.dbo.INVMB ON A8=MB001 WHERE LV<>'0' ORDER BY MO1,MO2, MO3, MO4, MO5, MO6, MO7,LV ");
+                    command.CommandText = sb.ToString();
+                    majorData = MvDbConnector.queryDataBySql(command);
+                    majorData.TableName = bomId;
+
+                    // 取得資料後清除暫存table
+                    //sb.Clear();
+                    //sb.AppendLine("Truncate Table TEMP..TMP_BOMP07;")
+                    //    .AppendLine("Truncate Table TEMP..TMP_BOMP09_FOREIGN;")
+                    //    .AppendLine("Truncate Table TEMP..TMP_BOMP09_ONLY_ONE;");
+                    //command.CommandText = sb.ToString();
+                    //command.ExecuteNonQuery();
+
+                    //做完以後
+                    scope.Complete();
+                }
+                catch (SqlException se)
+                {
+                    //發生例外時，會自動rollback
+                    throw se;
+                }
+                finally
+                {
+                    command.Dispose();
+                    connection.Close();
+                    connection.Dispose();
+                }
+            }
+
+            // 20180424 , 加入一開始取值時就把LV給Trim空白的功能
+            if (trimLv == true)
+            {
+                foreach (DataRow dr in majorData.Rows)
+                {
+                    dr["LV"] = dr["LV"].ToString().Trim();
+                }
+            }
+
+
+            // release parameter
+            if (tmpDt != null) { tmpDt.Dispose(); }
+            tmpDt = null;
+            sb = null;
+
+            return majorData;
+        }
+
+
         #region IDisposable Support
         private bool disposedValue = false; // 偵測多餘的呼叫
 

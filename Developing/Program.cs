@@ -18,11 +18,15 @@ namespace MvLocalProject
             Application.SetCompatibleTextRenderingDefault(false);
             //Application.Run(new MvLocalProject.Viewer.frmLogin());
 
-            var start = new MvLocalProject.Viewer.frmLogin();
+            //var start = new MvLocalProject.Viewer.frmLogin();
             //var start = new MvLocalProject.Viewer.frmBomCompareDev();
+            var start = new MvLocalProject.Viewer.frmBom();
+            //var start = new MvLocalProject.Viewer.frmMoc();
+
             //var start = new MvLocalProject.Viewer.frmMainDev();
             //var start = new Viewer.frmItCisco();
             //var start = new Viewer.frmItMxMail();
+            //var start = new Viewer.frmTestMvDao();
             start.FormClosed += WindowClosed;
             start.Show();
             Application.Run();

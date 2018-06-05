@@ -7,7 +7,6 @@ using DevExpress.XtraGrid.Views.Grid;
 using DevExpress.XtraEditors;
 using System.Text;
 using System.IO;
-using MvLocalProject.Controller;
 
 namespace MvLocalProject.Viewer
 {
@@ -55,7 +54,6 @@ namespace MvLocalProject.Viewer
             gridView1.OptionsBehavior.Editable = false;
             gridView1.RefreshData();
         }
-
         private void frmItMxMail_Load(object sender, EventArgs e)
         {
             deStart.Properties.DisplayFormat.FormatString = "yyyy/MM/dd";
@@ -68,7 +66,6 @@ namespace MvLocalProject.Viewer
             this.sbExportLdap.Click += new EventHandler(buttonClickAction);
             this.sbExportAD.Click += new EventHandler(buttonClickAction);
         }
-
 
         private void buttonClickAction(object sender, EventArgs e)
         {

@@ -198,7 +198,7 @@ namespace MvLocalProject.Viewer
             DataSet tmpDs = new DataSet();
 
             MvBomCompareBo bo = new MvBomCompareBo();
-            sourceDs = bo.CollectSourceDsProcess(selectedList);
+            sourceDs = bo.CollectSourceDsBomP09Process(selectedList);
             if (sourceDs.Tables.Count <= 1)
             {
                 MessageBox.Show(string.Format("One or all data from bom's id is empty {0}Bom1 Id : {1}{0}Bom2 Id : {2}{0}", Environment.NewLine, selectedList[0], selectedList[1]));

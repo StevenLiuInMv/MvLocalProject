@@ -14,13 +14,22 @@ namespace MvLocalProject.Bo
 {
     class MvBomCompareBo
     {
-        internal DataSet CollectSourceDsProcess(string[] selectedList)
+        internal DataSet CollectSourceDsBomP09Process(string[] selectedList)
         {
             DataSet sourceDs = new DataSet();
 
             sourceDs = MvDbDao.collectData_Bom09(selectedList);
             return sourceDs;
         }
+
+        internal DataSet CollectSourceDsBomP07Process(string[] selectedList)
+        {
+            DataSet sourceDs = new DataSet();
+
+            sourceDs = MvDbDao.collectData_Bom07(selectedList);
+            return sourceDs;
+        }
+
 
         internal DataSet CollectBomThinDsProcess(string[] bomList)
         {
@@ -35,7 +44,7 @@ namespace MvLocalProject.Bo
         {
             // 取得Bom資料
             // 有任何錯誤, 回傳 -1
-            sourceDs = CollectSourceDsProcess(selectedList).Copy();
+            sourceDs = CollectSourceDsBomP09Process(selectedList).Copy();
             if (sourceDs.Tables.Count <= 1) { return -1; }
 
             // 取得比對結果 A -> B
@@ -376,7 +385,7 @@ namespace MvLocalProject.Bo
             return dr;
         }
 
-        public void filterColumnByRdRule(ref DataTable sourceDt)
+        public void filterBomP09ColumnByRdRule(ref DataTable sourceDt)
         {
             sourceDt.Columns.Remove("SUBPN");
             sourceDt.Columns.Remove("Column1");
@@ -396,6 +405,30 @@ namespace MvLocalProject.Bo
             sourceDt.Columns.Remove("FOREIGN_YN");
             sourceDt.Columns.Remove("ONLY_ONE");
             sourceDt.Columns.Remove("APP_CODE");
+        }
+
+        public void filterBomP07ColumnByRdRule(ref DataTable sourceDt)
+        {
+            sourceDt.Columns.Remove("SUBPN");
+            sourceDt.Columns.Remove("Column1");
+            sourceDt.Columns.Remove("Column2");
+            sourceDt.Columns.Remove("Column3");
+            sourceDt.Columns.Remove("Column5");
+            sourceDt.Columns.Remove("Column6");
+            sourceDt.Columns.Remove("Column7");
+            sourceDt.Columns.Remove("Column8");
+            sourceDt.Columns.Remove("Column10");
+            sourceDt.Columns.Remove("Column11");
+            sourceDt.Columns.Remove("Column12");
+            sourceDt.Columns.Remove("MB003");
+            sourceDt.Columns.Remove("YN");
+            sourceDt.Columns.Remove("MB037");
+            sourceDt.Columns.Remove("MB209");
+            sourceDt.Columns.Remove("MB077");
+            sourceDt.Columns.Remove("MD011X");
+            sourceDt.Columns.Remove("MD013X");
+            sourceDt.Columns.Remove("FOREIGN_YN");
+            sourceDt.Columns.Remove("ONLY_ONE");
         }
 
         public DataTable filterDataByRdRule(DataTable sourceDt, bool removeAmountIsZero)
@@ -542,6 +575,16 @@ namespace MvLocalProject.Bo
 
             return dt;
         }
+        /// <summary>
+        /// 擴增Space欄位
+        /// 擴增的條件是將每個經過的node記錄起來, 建制出node展開路徑
+        /// </summary>
+        /// <remarks>
+        /// 當品號屬性為"選配"時, 在計錄AmountSpace的部份不可列入計算
+        /// </remarks>
+        /// <param name="sourceBom"></param>
+        /// <param name="isIncludeLv1ModuleName"></param>
+        /// <returns>DataTable</returns>
         public DataTable extendBomNameSpace(DataTable sourceBom, bool isIncludeLv1ModuleName = false)
         {
             DataTable resultDt = sourceBom.Copy();
@@ -567,6 +610,8 @@ namespace MvLocalProject.Bo
             string nowNameVer = string.Empty;
             string nowNameSpace = string.Empty;
             string nowNameSpaceNoVer = string.Empty;
+            string nowBuyType = string.Empty;
+
 
             string nowAmount = string.Empty;
             string parentAmount = string.Empty;
@@ -587,6 +632,7 @@ namespace MvLocalProject.Bo
                 nowLv = int.Parse(dr["LV"].ToString().Trim().Replace(".", ""));
                 nowName = dr["A8"].ToString().Trim();
                 nowAmount = dr["MD006"].ToString().Trim();
+                nowBuyType = dr["MB025X"].ToString().Trim();
 
                 if (nowName.Equals("250E05ZC12A"))
                 {
@@ -651,7 +697,7 @@ namespace MvLocalProject.Bo
                     dr["NameSpace"] = nowNameSpace;
                     dr["NameSpaceNoVer"] = nowNameSpaceNoVer;
                     dr["AmountSpace"] = nowAmount;
-
+                    
                     nameSpaceList[nowLv] = nowNameSpace;
                     nameSpaceListNoVer[nowLv] = nowNameSpaceNoVer;
                     amountSpaceList[nowLv] = nowAmount;
@@ -1655,7 +1701,7 @@ namespace MvLocalProject.Bo
             MvBomCompareBo bo = new MvBomCompareBo();
 
             // Collect bom source by bom id
-            sourceDs = bo.CollectSourceDsProcess(selectedList.ToArray<string>()).Copy();
+            sourceDs = bo.CollectSourceDsBomP09Process(selectedList.ToArray<string>()).Copy();
             MvLogger.write("finished function CollectSourceDsProcess");
 
             DataTable sourceDt1 = sourceDs.Tables[0].Copy();
@@ -1664,8 +1710,8 @@ namespace MvLocalProject.Bo
             DataSet tmpDs = new DataSet();
 
             // filter data
-            bo.filterColumnByRdRule(ref sourceDt1);
-            bo.filterColumnByRdRule(ref sourceDt2);
+            bo.filterBomP09ColumnByRdRule(ref sourceDt1);
+            bo.filterBomP09ColumnByRdRule(ref sourceDt2);
             sourceDt1 = bo.filterDataByRdRule(sourceDt1, true);
             sourceDt2 = bo.filterDataByRdRule(sourceDt2, true);
 
@@ -1714,8 +1760,7 @@ namespace MvLocalProject.Bo
             return resultDs;
         }
 
-
-        public DataSet GetBomInfoByDev(string bomId, bool isExtendNameSpace)
+        public DataSet GetBomP07InfoByDev(string bomId, bool isExtendNameSpace)
         {
 
             MvLogger.write("run {0}.{1}", new object[] { System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name });
@@ -1725,14 +1770,58 @@ namespace MvLocalProject.Bo
             MvBomCompareBo bo = new MvBomCompareBo();
 
             // Collect bom source by bom id
-            sourceDs = bo.CollectSourceDsProcess(new string[] { bomId }).Copy();
+            sourceDs = bo.CollectSourceDsBomP07Process(new string[] { bomId }).Copy();
+            MvLogger.write("finished function CollectSourceDsProcess");
+
+            DataTable sourceDt1 = sourceDs.Tables[0].Copy();
+            DataTable filterDt = sourceDs.Tables[0].Copy();
+            // filter data
+            bo.filterBomP07ColumnByRdRule(ref sourceDt1);
+            bo.filterBomP07ColumnByRdRule(ref filterDt);
+            filterDt = bo.filterDataByRdRule(filterDt, true);
+            MvLogger.write("finished function filterDataByRdRule");
+
+            // extend namespace , get module LV and amount space
+            filterDt = bo.extendBomNameSpace(filterDt, true);
+            MvLogger.write("finished function extendBomNameSpace");
+            if (isExtendNameSpace == false)
+            {
+                filterDt.Columns.Remove("NameSpace");
+                filterDt.Columns.Remove("NameSpaceNoVer");
+            }
+            filterDt.TableName += "_Filter";
+
+            resultDs.Tables.Add(sourceDt1);
+            resultDs.Tables.Add(filterDt);
+            MvLogger.write("finished function add datatable to dataset");
+
+            // Release object
+            filterDt.Dispose(); sourceDt1.Dispose(); sourceDs.Dispose();
+
+            bo = null; filterDt = null; sourceDt1 = null; sourceDs = null;
+
+            return resultDs;
+        }
+
+
+        public DataSet GetBomP09InfoByDev(string bomId, bool isExtendNameSpace)
+        {
+
+            MvLogger.write("run {0}.{1}", new object[] { System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name });
+
+            DataSet resultDs = new DataSet("ResultSet");
+            DataSet sourceDs = new DataSet();
+            MvBomCompareBo bo = new MvBomCompareBo();
+
+            // Collect bom source by bom id
+            sourceDs = bo.CollectSourceDsBomP09Process(new string[] { bomId }).Copy();
             MvLogger.write("finished function CollectSourceDsProcess");
            
             DataTable sourceDt1 = sourceDs.Tables[0].Copy();
             DataTable filterDt = sourceDs.Tables[0].Copy();
             // filter data
-            bo.filterColumnByRdRule(ref sourceDt1);
-            bo.filterColumnByRdRule(ref filterDt);
+            bo.filterBomP09ColumnByRdRule(ref sourceDt1);
+            bo.filterBomP09ColumnByRdRule(ref filterDt);
             filterDt = bo.filterDataByRdRule(filterDt, true);
             MvLogger.write("finished function filterDataByRdRule");
 
@@ -1769,6 +1858,10 @@ namespace MvLocalProject.Bo
                 try
                 {
                     string expression = dr["AmountSpace"].ToString();
+                    if (expression.Length == 0)
+                    {
+                        expression = "0";
+                    }
                     Expression e = new Expression(expression);
                     if (!e.HasErrors())
                     {

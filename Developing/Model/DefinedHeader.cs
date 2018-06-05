@@ -56,6 +56,7 @@ namespace MvLocalProject.Model
         public static readonly string[] BomCompareReportHeaderAliasNameNoLv = new string[] { "項目", "新增", "刪除", "變更", "原料號", "變更/新增號", "品名", "原數量", "變更需求", "是否新建", "RD確認文件上傳", "負責人員", "模組", "備註" };
         public static readonly int Bom09MaxLv = 7;
         public static readonly int Bom09MinLv = 1;
+        public static readonly int BomP07_MaxSUBPN = 7;
     }
 
 

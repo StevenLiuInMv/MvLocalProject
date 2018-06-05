@@ -242,6 +242,12 @@
     <Compile Include="Viewer\frmTestExtract.Designer.cs">
       <DependentUpon>frmTestExtract.cs</DependentUpon>
     </Compile>
+    <Compile Include="Viewer\frmTestMvDao.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Viewer\frmTestMvDao.Designer.cs">
+      <DependentUpon>frmTestMvDao.cs</DependentUpon>
+    </Compile>
     <Compile Include="Viewer\frmTestMvSecurityScanBo.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -323,6 +329,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Viewer\frmTestExtract.resx">
       <DependentUpon>frmTestExtract.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Viewer\frmTestMvDao.resx">
+      <DependentUpon>frmTestMvDao.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Viewer\frmTestMvSecurityScanBo.resx">
       <DependentUpon>frmTestMvSecurityScanBo.cs</DependentUpon>
