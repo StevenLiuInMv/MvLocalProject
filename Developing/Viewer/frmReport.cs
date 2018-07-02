@@ -72,7 +72,7 @@ namespace MvLocalProject.Viewer
                     fileNameAndPath = string.Format("{0}{1}_{2}.xlsx", workingDirectory, DefinedReport.ErpReportType.MocP10Auto.ToString(), endDate.ToString("yyyyMMdd"));
 
                     Console.WriteLine(System.DateTime.Now.ToString("yyyy/MM/dd hh:mm:ss.fff") + " start report");
-                    ds = MvDbDao.collectData_MocP10Auto(System.DateTime.Now);
+                    ds = MvDbDao.collectData_MocP10Auto_VB6(System.DateTime.Now);
 
                     blnResult = report.generateMocP10Auto(fileNameAndPath, ds);
                     if (blnResult == false)
@@ -90,7 +90,7 @@ namespace MvLocalProject.Viewer
                         return;
                     }
 
-                    ds = MvDbDao.collectData_Bom09(new string[] { result });
+                    ds = MvDbDao.collectData_BomP09_VB6(new string[] { result });
                     fileNameAndPath = string.Format("{0}{1}_{2}.xlsx", workingDirectory, DefinedReport.ErpReportType.BomP09.ToString(), endDate.ToString("yyyyMMdd"));
                     blnResult = report.generateBomP09_NoPrice(fileNameAndPath, ds);
                     if (blnResult == false)
@@ -114,7 +114,7 @@ namespace MvLocalProject.Viewer
                         selectedList.Add(row["MC001"].ToString());
                     }
 
-                    ds = MvDbDao.collectData_Bom09(selectedList.ToArray<string>());
+                    ds = MvDbDao.collectData_BomP09_VB6(selectedList.ToArray<string>());
                     fileNameAndPath = string.Format("{0}{1}_{2}.xlsx", workingDirectory, DefinedReport.ErpReportType.BomP09_Multi.ToString(), endDate.ToString("yyyyMMdd"));
                     blnResult = report.generateBomP09_NoPrice(fileNameAndPath, ds);
 

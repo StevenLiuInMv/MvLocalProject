@@ -445,6 +445,120 @@ namespace MvLocalProject.Bo
             }
         }
 
+        public async Task<DataTable> getStatusTableIncludeMacAddress(string[] routerIps)
+        {
+            MvItCiscoBo bo = new MvItCiscoBo();
+
+            DataTable tmpDt = null;
+            DataTable finalDt = null;
+
+            tmpDt = await bo.getPortStatusTable(routerIps);
+            tmpDt.Columns.Remove("Duplex");
+            tmpDt.Columns.Remove("Speed");
+            tmpDt.Columns.Remove("Type");
+            tmpDt.Columns.Add("MacAddress");
+            tmpDt.Columns.Add("MaxPort");
+            finalDt = tmpDt.Clone();
+
+            string ip = string.Empty;
+            string port = string.Empty;
+            string name = string.Empty;
+            string vlan = string.Empty;
+            string macAddress = string.Empty;
+            string status = string.Empty;
+            string tmpString = string.Empty;
+            string[] tmpArrary = null;
+            int tmpIndex = 1;
+
+            foreach (DataRow dr in tmpDt.Copy().Rows)
+            {
+                tmpIndex = 1;
+
+                DataRow newDr = finalDt.NewRow();
+                newDr.ItemArray = dr.ItemArray.Clone() as object[];
+
+                ip = newDr["IP"].ToString();
+                port = newDr["Port"].ToString();
+                name = newDr["Name"].ToString();
+                status = newDr["Status"].ToString();
+                vlan = newDr["Vlan"].ToString();
+
+                // 目前只針對vlan 151 , 符合名稱長度4碼, 及狀態非disabled的才執行檢查
+                //if (!vlan.Equals("151") || name.Length != 4 || status.Equals("disabled"))
+                //{
+                //    newDr["MacAddress"] = "N/A";
+                //    newDr["MaxPort"] = "N/A";
+
+                //    finalDt.Rows.Add(newDr);
+                //    continue;
+                //}
+                macAddress = string.Empty;
+                tmpArrary = null;
+                tmpString = string.Empty;
+
+                macAddress = await bo.getMacAddressOnPortByTelnet(ip, port);
+                Console.WriteLine(macAddress);
+
+                // 先取出maximum number
+                tmpIndex = macAddress.IndexOf("maximum");
+                if (tmpIndex > 0)
+                {
+                    tmpString = macAddress.Substring(tmpIndex + 7);
+                    tmpArrary = tmpString.Split(new string[] { "\r\n" }, StringSplitOptions.None);
+                    tmpString = tmpArrary[0].Trim();
+                    newDr["MaxPort"] = tmpString;
+                }
+                else
+                {
+                    newDr["MaxPort"] = "0";
+                }
+
+                // 取出mac address
+                // 如果不存在就直接加入
+                tmpIndex = macAddress.IndexOf("mac-address");
+                if (tmpIndex < 0)
+                {
+                    newDr["MacAddress"] = string.Empty;
+                    finalDt.Rows.Add(newDr);
+                    continue;
+                }
+
+                // 如果存在mac-address 需取出各別的mac-address資訊
+                if (tmpArrary == null)
+                {
+                    // 代表沒有被設定過maximun mac-address數
+                    // 不需要再多長datarow
+                    tmpString = macAddress.Substring(tmpIndex + 11);
+                    tmpArrary = tmpString.Split(new string[] { "\r\n" }, StringSplitOptions.None);
+                    tmpString = tmpArrary[0].Trim();
+                    newDr["MacAddress"] = tmpString;
+
+                    finalDt.Rows.Add(newDr);
+                    continue;
+                }
+
+                // 如果tmpArray 不為null, 代表maxiumn已被設定 > 1
+                // 需要將所有mac 找出來並呈現
+                foreach (string tmpLine in tmpArrary)
+                {
+                    DataRow newDr1 = finalDt.NewRow();
+                    newDr1.ItemArray = newDr.ItemArray.Clone() as object[];
+
+                    tmpIndex = tmpLine.IndexOf("mac-address");
+                    if (tmpIndex >= 0)
+                    {
+                        tmpString = tmpLine.Substring(tmpIndex + 11);
+                        tmpString = tmpString.Replace("\r\n", "");
+                        newDr1["MacAddress"] = tmpString.Trim();
+                        finalDt.Rows.Add(newDr1);
+                    }
+                }
+            }
+
+            return finalDt;
+        }
+
+
         public void Dispose()
         {
             GC.SuppressFinalize(this);

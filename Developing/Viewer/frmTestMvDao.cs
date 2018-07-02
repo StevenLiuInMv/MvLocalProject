@@ -28,9 +28,9 @@ namespace MvLocalProject.Viewer
             SplashScreenManager.ShowDefaultWaitForm();
 
             DataTable dt = new DataTable();
-            //DataSet sourceDs = new DataSet();
 
-            dt = MvDbDao.collectData_BomP07(bomId, false);
+            //dt = MvDbDao.collectData_BomP07_VB6(bomId, false);
+            dt = MvDbDao.collectData_BomP07_Thin(bomId);
 
             gridControl1.DataSource = dt;
 

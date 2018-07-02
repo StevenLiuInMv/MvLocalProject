@@ -57,6 +57,7 @@ namespace MvLocalProject.Model
         public static readonly int Bom09MaxLv = 7;
         public static readonly int Bom09MinLv = 1;
         public static readonly int BomP07_MaxSUBPN = 7;
+        public static readonly string[] BomP07ReportHeaderAliasName = new string[] { "階次", "取替代料", "元件品號", "品號屬性", "品名", "單位", "數量", "SOP圖號", "優先耗用" };
     }
 
 

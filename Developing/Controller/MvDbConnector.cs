@@ -21,6 +21,11 @@ namespace MvLocalProject.Controller
             get { return ConfigurationManager.ConnectionStrings["ERPBK.mvWorkFlow"].ConnectionString; }
         }
 
+        private static string ConnectionString_ERPBK_Dot_IT
+        {
+            get { return ConfigurationManager.ConnectionStrings["ERPBK.IT"].ConnectionString; }
+        }
+
         private static string ConnectionString_ERPDB2_Dot_TEMP
         {
             get { return ConfigurationManager.ConnectionStrings["ERPDB2.TEMP"].ConnectionString; }
@@ -44,6 +49,11 @@ namespace MvLocalProject.Controller
         public static SqlConnection Connection_ERPBK_Dot_MvWorkFlow
         {
             get { return new SqlConnection(ConnectionString_ERPBK_Dot_MvWorkFlow); }
+        }
+
+        public static SqlConnection Connection_ERPBK_Dot_IT
+        {
+            get { return new SqlConnection(ConnectionString_ERPBK_Dot_IT); }
         }
 
         public static SqlConnection Connection_ERPDB2_Dot_TEMP
@@ -102,6 +112,23 @@ namespace MvLocalProject.Controller
             }
         }
 
+        public static bool hasRowsBySq1(SqlCommand sqlCommand)
+        {
+            using (SqlDataReader dataReader = sqlCommand.ExecuteReader())
+            {
+                return dataReader.HasRows;
+            }
+        }
+
+        public static bool hasRowsBySq1(SqlConnection connection, string command)
+        {
+            if (connection == null) return false;
+            using (SqlCommand sqlCommand = new SqlCommand(command, connection))
+            {
+                return hasRowsBySq1(sqlCommand);
+            }
+        }
+
         public static bool validateUserFromMvWorkFlow(string account, string password)
         {
             // 確認此帳號是否存在mvWorkFlow
@@ -111,11 +138,7 @@ namespace MvLocalProject.Controller
                 {
                     string command = "select * from ERPBK.mvWorkFlow.dbo.vwEmployee";
                     conn.Open();
-                    using (SqlCommand sqlCommand = new SqlCommand(command, conn))
-                    {
-                        SqlDataReader dataReader = sqlCommand.ExecuteReader();
-                        return dataReader.HasRows;
-                    }
+                    return hasRowsBySq1(conn, command);
                 }
             }
             catch (SqlException)
@@ -133,11 +156,7 @@ namespace MvLocalProject.Controller
                 {
                     string command = string.Format("select * from DSCSYS.dbo.DSCMA WHERE MA001 = '{0}'", account);
                     conn.Open();
-                    using (SqlCommand sqlCommand = new SqlCommand(command, conn))
-                    {
-                        SqlDataReader dataReader = sqlCommand.ExecuteReader();
-                        return dataReader.HasRows;
-                    }
+                    return hasRowsBySq1(conn, command);
                 }
             }
             catch (SqlException)

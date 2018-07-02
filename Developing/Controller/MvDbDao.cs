@@ -13,7 +13,7 @@ namespace MvLocalProject.Controller
     internal sealed class MvDbDao : IDisposable
     {
 
-        public static DataSet collectData_MocP10Auto(DateTime dateTime)
+        public static DataSet collectData_MocP10Auto_VB6(DateTime dateTime)
         {
 
             DataTable majorData = null;
@@ -47,7 +47,6 @@ namespace MvLocalProject.Controller
                 string wkFUNQTY = "";
                 string wkQTYUN = "";
                 string wkNoDelv = "";
-
 
                 // 將取得的rows先暫存
                 tmpDrc = majorData.Rows;
@@ -323,7 +322,6 @@ namespace MvLocalProject.Controller
                     {
                         return null;
                     }
-
                 }
                 catch (SqlException)
                 {
@@ -372,7 +370,7 @@ namespace MvLocalProject.Controller
         /// </summary>
         /// <param name="bomId"></param>
         /// <returns></returns>
-        public static DataTable collectData_BomP09(string bomId, bool trimLv, bool includePrice)
+        public static DataTable collectData_BomP09_VB6(string bomId, bool trimLv, bool includePrice)
         {
 
             DataTable majorData = null;
@@ -597,7 +595,7 @@ namespace MvLocalProject.Controller
         /// </summary>
         /// <param name="bomIdList"></param>
         /// <returns></returns>
-        public static DataSet collectData_Bom09(string[] bomIdList)
+        public static DataSet collectData_BomP09_VB6(string[] bomIdList)
         {
 
             DataSet ds = new DataSet("BomTables");
@@ -611,7 +609,7 @@ namespace MvLocalProject.Controller
                 {
                     continue;
                 }
-                dt = collectData_BomP09(bomId, true, false);
+                dt = collectData_BomP09_VB6(bomId, true, false);
                 ds.Tables.Add(dt);
             }
             return ds;
@@ -664,7 +662,7 @@ namespace MvLocalProject.Controller
             return majorData;
         }
 
-        public static DataTable collectData_BomThin(string bomId)
+        public static DataTable collectData_BomP09(string bomId)
         {
 
             DataTable majorData = null;
@@ -678,18 +676,7 @@ namespace MvLocalProject.Controller
                 {
                     connection.Open();
 
-                    sb.AppendLine(string.Format("DECLARE @BomID NVARCHAR(50)='{0}' ", bomId))
-                        .AppendLine("DECLARE @dtBom TABLE (LevelNo INT,LevelStr NVARCHAR(50),MD001 NVARCHAR(50),MD003 NVARCHAR(50), MD200 NVARCHAR(50), MD006 NUMERIC(16,1)) ")
-                        .AppendLine(";WITH CTE(LevelNo, LevelStr, MD001, MD003, MD200, MD006) ")
-                        .AppendLine("AS ")
-                        .AppendLine("(")
-                        .AppendLine("    SELECT 1 AS LevelNo ,CONVERT(varchar(20),ROW_NUMBER() OVER(ORDER BY MD003)) as LevelStr, MD001, RTRIM(MD003), MD200, MD006 FROM MACHVISION.dbo.BOMMD where MD001=@BomID AND MD017<>'4' AND (MD012='' OR CONVERT(DATETIME,MD012,111)>=GETDATE()) ")
-                        .AppendLine("    UNION ALL ")
-                        .AppendLine("    SELECT LevelNo+1, CONVERT(varchar(20),LevelStr+'.'+CONVERT(VARCHAR(3),ROW_NUMBER() OVER(ORDER BY b.MD003))), b.MD001, RTRIM(b.MD003), b.MD200, b.MD006 FROM MACHVISION.dbo.BOMMD AS b INNER JOIN CTE AS c ON b.MD001=c.MD003 WHERE b.MD017<>'4' AND (b.MD012='' OR CONVERT(DATETIME,b.MD012,111)>=GETDATE()) ")
-                        .AppendLine(")")
-                        .AppendLine("INSERT INTO @dtBom SELECT LevelNo, LevelStr, MD001, MD003, MD200, MD006 FROM CTE OPTION (MAXRECURSION 30);")
-                        .AppendLine("SELECT bom.LevelNo as LV, bom.MD003 as A8, mb.MB077 as MB025X, mb.MB002 as Column4, mb.MB004, bom.MD006, bom.MD200 as Column9 FROM @dtBom bom INNER JOIN MACHVISION..INVMB mb ON bom.MD003=mb.MB001 ORDER BY bom.LevelStr ");
-
+                    sb.AppendLine(string.Format(@"SELECT LV, MD003 as A8, MB025 as MB025X, MB002 as Column4, MB004, MD006, MD200 as Column9 FROM MACHVISION.dbo.GetBomPartList('{0}')", bomId));
                     command.CommandText = sb.ToString();
                     majorData = MvDbConnector.queryDataBySql(command);
                     majorData.TableName = bomId;
@@ -716,7 +703,7 @@ namespace MvLocalProject.Controller
             return majorData;
         }
 
-        public static DataSet collectData_BomThin(string[] bomIdList)
+        public static DataSet collectData_BomP09(string[] bomIdList)
         {
 
             DataSet ds = new DataSet("BomTables");
@@ -730,7 +717,7 @@ namespace MvLocalProject.Controller
                 {
                     continue;
                 }
-                dt = collectData_BomThin(bomId);
+                dt = collectData_BomP09(bomId);
                 ds.Tables.Add(dt);
             }
             return ds;
@@ -806,7 +793,7 @@ namespace MvLocalProject.Controller
 
                     sb.AppendLine("SELECT TA024+'-'+TA025 '母製令', TB001+'-'+TB002 '子製令',TA006 '模組', TB003 '品號', TB012 '品名', TB013'規格', Convert(int,TB004) '需領用量', Convert(int,TB005) '已領用量', MB077 '類別' ")
                         .AppendLine("FROM ERPDB2.MACHVISION.dbo.MOCTA A, ERPDB2.MACHVISION.dbo.MOCTB B, ERPDB2.MACHVISION.dbo.INVMB MB ")
-                        .AppendLine(string.Format("WHERE TA024 = '{0}' AND TA025 = '{1}' AND A.TA001 = B.TB001 AND A.TA002 = B.TB002 AND TB003 = MB001 AND TB018 <> 'V'", mocType, mocNumber));
+                        .AppendLine(string.Format("WHERE TA024 = '{0}' AND TA025 = '{1}' AND A.TA001 = B.TB001 AND A.TA002 = B.TB002 AND TB003 = MB001 AND TB018 <> 'V'", mocType.ToUpper(), mocNumber));
 
                     command.CommandText = sb.ToString();
                     majorData = MvDbConnector.queryDataBySql(command);
@@ -910,7 +897,7 @@ namespace MvLocalProject.Controller
         /// </summary>
         /// <param name="bomIdList"></param>
         /// <returns></returns>
-        public static DataSet collectData_Bom07(string[] bomIdList)
+        public static DataSet collectData_BomP07_VB6(string[] bomIdList)
         {
 
             DataSet ds = new DataSet("BomTables");
@@ -925,7 +912,8 @@ namespace MvLocalProject.Controller
                 {
                     continue;
                 }
-                dt = collectData_BomP07(bomId, true);
+                dt = collectData_BomP07_VB6(bomId, false);
+                
                 ds.Tables.Add(dt);
             }
             return ds;
@@ -937,7 +925,7 @@ namespace MvLocalProject.Controller
         /// </summary>
         /// <param name="bomId"></param>
         /// <returns></returns>
-        public static DataTable collectData_BomP07(string bomId, bool trimLv)
+        public static DataTable collectData_BomP07_VB6(string bomId, bool trimLv)
         {
 
             DataTable majorData = null;
@@ -1142,6 +1130,228 @@ namespace MvLocalProject.Controller
             return majorData;
         }
 
+        /// <summary>
+        /// 取得多張bom list
+        /// </summary>
+        /// <param name="bomIdList"></param>
+        /// <returns></returns>
+        public static DataSet collectData_BomP07_Thin(string[] bomIdList)
+        {
+
+            DataSet ds = new DataSet("BomTables");
+
+            DataTable dt = null;
+            foreach (string bomId in bomIdList)
+            {
+                dt = null;
+                // BomP09跟BomP07的檢查邏輯相同, 所以直接引用
+                bool isExist = checkData_BomP09_BomInInvmb(bomId);
+                if (isExist == false)
+                {
+                    continue;
+                }
+                dt = collectData_BomP07_Thin(bomId);
+
+                ds.Tables.Add(dt);
+            }
+            return ds;
+        }
+
+        /// <summary>
+        /// 取得BomP07 for PD使用, 含取替代料及優先耗用
+        /// </summary>
+        /// <param name="bomId"></param>
+        /// <returns></returns>
+        public static DataTable collectData_BomP07_Thin(string bomId)
+        {
+
+            DataTable majorData = null;
+            StringBuilder sb = new StringBuilder();
+
+            using (TransactionScope scope = new TransactionScope())
+            {
+                SqlConnection connection = MvDbConnector.Connection_ERPDB2_Dot_MACHVISION;
+                SqlCommand command = connection.CreateCommand();
+                try
+                {
+                    connection.Open();
+
+                    sb.AppendLine("SELECT LV, LVNo, MD001, MD003, MB002, MB077, MB025, MB004, MD006, MD200, ")
+                        .AppendLine("(SELECT SUBSTRING((SELECT ';'+RTRIM(MB004) FROM MACHVISION.dbo.BOMMB AS mb WHERE mb.MB001=bom.MD003 ORDER BY MB009 FOR XML PATH('')),2,4000)) AS MB004_REPLACED,			--取替代料 ")
+                        .AppendLine("(SELECT TOP 1 CASE WHEN mb.MB010='N' THEN RTRIM(mb.MB001) ELSE RTRIM(mb.MB004) END FROM MACHVISION..BOMMB AS mb WHERE mb.MB001=bom.MD003 ORDER BY MB009) AS MB004_FIRST		--優先耗用 ")
+                        .AppendLine(string.Format(@"FROM MACHVISION.dbo.GetBomPartList('{0}') AS bom ", bomId));
+
+                    command.CommandText = sb.ToString();
+                    majorData = MvDbConnector.queryDataBySql(command);
+                    majorData.TableName = bomId;
+
+                    //做完以後
+                    scope.Complete();
+                }
+                catch (SqlException se)
+                {
+                    //發生例外時，會自動rollback
+                    throw se;
+                }
+                finally
+                {
+                    command.Dispose();
+                    connection.Close();
+                    connection.Dispose();
+                }
+            }
+
+            // release parameter
+            sb = null;
+
+            return majorData;
+        }
+
+
+        public static bool checkData_hasIllegalItemInInvmb(string[] itemList)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append("DECLARE @dtTempTable TABLE (MB001 NVARCHAR(50));");
+            foreach(string item in itemList)
+            {
+                sb.Append(string.Format("INSERT INTO @dtTempTable (MB001) VALUES ('{0}');", item));
+            }
+            sb.Append("SELECT DISTINCT(MB001) FROM @dtTempTable temp WHERE NOT EXISTS (SELECT MB001 FROM MACHVISION.dbo.INVMB source WHERE source.MB001 = temp.MB001);");
+
+            using (SqlConnection connection = MvDbConnector.Connection_ERPDB2_Dot_MACHVISION)
+            {
+                try
+                {
+                    connection.Open();
+                    return MvDbConnector.hasRowsBySq1(connection, sb.ToString());
+                }
+                catch (SqlException se)
+                {
+                    // do nothing
+                    throw se;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 取得IT.dbo.NetworkDevice內的所有資料
+        /// </summary>
+        /// <returns></returns>
+        public static DataTable collectData_ItNetworkDevice(string serverIp = "")
+        {
+            DataTable majorData = null;
+            StringBuilder sb = new StringBuilder();
+
+            using (SqlConnection connection = MvDbConnector.Connection_ERPBK_Dot_IT)
+            {
+                sb.Clear();
+                sb.Append("SELECT * FROM IT.dbo.NetworkDevice ");
+                if (serverIp.Length != 0)
+                {
+                    sb.Append(string.Format("WHERE DeviceIP = '{0}'", serverIp));
+                }
+
+                try
+                {
+                    connection.Open();
+                    majorData = MvDbConnector.queryDataBySql(connection, sb.ToString());
+                }
+                catch (SqlException se)
+                {
+                    // do nothing
+                    throw se;
+                }
+            }
+            return majorData;
+        }
+
+        public static DataTable collectData_Cmsmq()
+        {
+            DataTable majorData = null;
+            StringBuilder sb = new StringBuilder();
+
+            using (SqlConnection connection = MvDbConnector.Connection_ERPDB2_Dot_MACHVISION)
+            {
+                sb.Clear();
+                sb.Append("select * FROM MACHVISION.dbo.CMSMQ ORDER BY MQ001 ");
+
+                try
+                {
+                    connection.Open();
+                    majorData = MvDbConnector.queryDataBySql(connection, sb.ToString());
+                }
+                catch (SqlException se)
+                {
+                    // do nothing
+                    throw se;
+                }
+            }
+            return majorData;
+        }
+
+        public static DataTable collectData_GetOrderTypeSummary(string orderType, string startDate, string endDate)
+        {
+            DataTable majorData = null;
+            StringBuilder sb = new StringBuilder();
+            string[] inDisabledOrderType = new string[] { "31", "330A", "330S", "33CE", "A339" };
+            string[] inTablePURTA = new string[] { "3101", "3102", "3103", "3104", "3105", "3109", "310X", "31X4" };
+            string[] inTablePURTC = new string[] { "3301", "3302", "3303", "3304", "3305", "3309" };
+
+            bool isInDisableOrderType = false;
+            bool isInTablePURTA = false;
+            bool isInTablePURTC = false;
+
+            isInDisableOrderType = Array.Exists(inDisabledOrderType, element => element == orderType);
+            isInTablePURTA = Array.Exists(inTablePURTA, element => element == orderType);
+            isInTablePURTC = Array.Exists(inTablePURTC, element => element == orderType);
+
+            if (isInDisableOrderType == true)
+            {
+                return null;
+            }
+            else if (isInTablePURTA == true)
+            {
+                sb.AppendLine(@"SELECT TA.CREATE_DATE, TA.TA001 ""TA001"", TA.TA002 ""TA002"", TB.TB039 ""TB039"", COUNT(*) ""SUMMARY"" ")
+                    .AppendLine(" FROM MACHVISION.dbo.PURTA TA, MACHVISION.dbo.PURTB TB ")
+                    .AppendLine(string.Format("WHERE CONVERT(nvarchar, CONVERT(datetime, TA.CREATE_DATE), 111) >= '{0}' AND CONVERT(nvarchar, CONVERT(datetime, TA.CREATE_DATE), 111) < '{1}' ", startDate, endDate))
+                    .AppendLine("  AND TA.TA001 = TB.TB001 ")
+                    .AppendLine("  AND TA.TA002 = TB.TB002 ")
+                    .AppendLine("  AND TA.TA007 <> 'V' ")
+                    .AppendLine(string.Format("  AND TA.TA001 = '{0}' ", orderType))
+                    .AppendLine("GROUP BY TA.CREATE_DATE, TA.TA001, TA.TA002, TB.TB039 ");
+            }
+            else if(isInTablePURTC == true)
+            {
+                sb.AppendLine(@"SELECT TC.CREATE_DATE, TC.TC001 ""TC001"", TC.TC002 ""TC002"", TD.TD016 ""TD016"", COUNT(*) ""SUMMARY"" ")
+                    .AppendLine(" FROM MACHVISION.dbo.PURTC TC, MACHVISION.dbo.PURTD TD ")
+                    .AppendLine(string.Format("WHERE  CONVERT(nvarchar, CONVERT(datetime, TC.CREATE_DATE), 111) >= '{0}' AND CONVERT(nvarchar, CONVERT(datetime, TC.CREATE_DATE), 111) < '{1}' ", startDate, endDate))
+                    .AppendLine("  AND TC.TC001 = TD.TD001 ")
+                    .AppendLine("  AND TC.TC002 = TD.TD002 ")
+                    .AppendLine("  AND TC.TC014 <> 'V' ")
+                    .AppendLine(string.Format("  AND TC.TC001 = '{0}' ", orderType))
+                    .AppendLine("GROUP BY TC.CREATE_DATE, TC.TC001, TC.TC002, TD.TD016 ");
+            }
+            else
+            {
+                // un support order type
+                return null;
+            }
+
+            using (SqlConnection connection = MvDbConnector.Connection_ERPDB2_Dot_MACHVISION)
+            {
+                try
+                {
+                    connection.Open();
+                    majorData = MvDbConnector.queryDataBySql(connection, sb.ToString());
+                }
+                catch (SqlException se)
+                {
+                    // do nothing
+                    throw se;
+                }
+            }
+            return majorData;
+        }
 
         #region IDisposable Support
         private bool disposedValue = false; // 偵測多餘的呼叫

@@ -32,6 +32,7 @@
             this.btnGetPorts = new System.Windows.Forms.Button();
             this.gridControl1 = new DevExpress.XtraGrid.GridControl();
             this.gridView1 = new DevExpress.XtraGrid.Views.Grid.GridView();
+            this.cardView1 = new DevExpress.XtraGrid.Views.Card.CardView();
             this.teIp = new DevExpress.XtraEditors.TextEdit();
             this.labelControl1 = new DevExpress.XtraEditors.LabelControl();
             this.labelControl2 = new DevExpress.XtraEditors.LabelControl();
@@ -55,8 +56,12 @@
             this.groupMacNumberEdit = new DevExpress.XtraEditors.GroupControl();
             this.btnSetMacNumber = new System.Windows.Forms.Button();
             this.teMacNumber = new DevExpress.XtraEditors.TextEdit();
+            this.btnGetPortsIncludeMac = new System.Windows.Forms.Button();
+            this.btnGetPortsFromDB = new System.Windows.Forms.Button();
+            this.btnExportToExcel = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.cardView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.teIp.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tePort.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.teName.Properties)).BeginInit();
@@ -99,7 +104,8 @@
             this.gridControl1.Size = new System.Drawing.Size(1162, 498);
             this.gridControl1.TabIndex = 5;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
-            this.gridView1});
+            this.gridView1,
+            this.cardView1});
             // 
             // gridView1
             // 
@@ -107,6 +113,13 @@
             this.gridView1.Name = "gridView1";
             this.gridView1.OptionsBehavior.Editable = false;
             this.gridView1.RowClick += new DevExpress.XtraGrid.Views.Grid.RowClickEventHandler(this.gridView1_RowClick);
+            this.gridView1.RowStyle += new DevExpress.XtraGrid.Views.Grid.RowStyleEventHandler(this.gridView1_RowStyle);
+            // 
+            // cardView1
+            // 
+            this.cardView1.FocusedCardTopFieldIndex = 0;
+            this.cardView1.GridControl = this.gridControl1;
+            this.cardView1.Name = "cardView1";
             // 
             // teIp
             // 
@@ -320,11 +333,47 @@
             this.teMacNumber.Size = new System.Drawing.Size(153, 20);
             this.teMacNumber.TabIndex = 17;
             // 
+            // btnGetPortsIncludeMac
+            // 
+            this.btnGetPortsIncludeMac.Location = new System.Drawing.Point(964, 1);
+            this.btnGetPortsIncludeMac.Name = "btnGetPortsIncludeMac";
+            this.btnGetPortsIncludeMac.Size = new System.Drawing.Size(65, 32);
+            this.btnGetPortsIncludeMac.TabIndex = 20;
+            this.btnGetPortsIncludeMac.Text = "GetPortsIncludeMac";
+            this.btnGetPortsIncludeMac.UseVisualStyleBackColor = true;
+            this.btnGetPortsIncludeMac.Visible = false;
+            this.btnGetPortsIncludeMac.Click += new System.EventHandler(this.btnGetPortsIncludeMac_Click);
+            // 
+            // btnGetPortsFromDB
+            // 
+            this.btnGetPortsFromDB.Location = new System.Drawing.Point(893, 1);
+            this.btnGetPortsFromDB.Name = "btnGetPortsFromDB";
+            this.btnGetPortsFromDB.Size = new System.Drawing.Size(65, 32);
+            this.btnGetPortsFromDB.TabIndex = 21;
+            this.btnGetPortsFromDB.Text = "GetPortsFromDB";
+            this.btnGetPortsFromDB.UseVisualStyleBackColor = true;
+            this.btnGetPortsFromDB.Visible = false;
+            this.btnGetPortsFromDB.Click += new System.EventHandler(this.btnGetPortsFromDB_Click);
+            // 
+            // btnExportToExcel
+            // 
+            this.btnExportToExcel.Location = new System.Drawing.Point(822, 1);
+            this.btnExportToExcel.Name = "btnExportToExcel";
+            this.btnExportToExcel.Size = new System.Drawing.Size(65, 32);
+            this.btnExportToExcel.TabIndex = 22;
+            this.btnExportToExcel.Text = "ExportToExcel";
+            this.btnExportToExcel.UseVisualStyleBackColor = true;
+            this.btnExportToExcel.Visible = false;
+            this.btnExportToExcel.Click += new System.EventHandler(this.btnExportToExcel_Click);
+            // 
             // frmItCisco
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1183, 667);
+            this.Controls.Add(this.btnExportToExcel);
+            this.Controls.Add(this.btnGetPortsFromDB);
+            this.Controls.Add(this.btnGetPortsIncludeMac);
             this.Controls.Add(this.groupMacNumberEdit);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.groupMacEdit);
@@ -344,6 +393,7 @@
             this.Load += new System.EventHandler(this.frmItCisco_Load);
             ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.cardView1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.teIp.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.tePort.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.teName.Properties)).EndInit();
@@ -369,7 +419,6 @@
         private System.Windows.Forms.RichTextBox richTextBox1;
         private System.Windows.Forms.Button btnGetPorts;
         private DevExpress.XtraGrid.GridControl gridControl1;
-        private DevExpress.XtraGrid.Views.Grid.GridView gridView1;
         private DevExpress.XtraEditors.TextEdit teIp;
         private DevExpress.XtraEditors.LabelControl labelControl1;
         private DevExpress.XtraEditors.LabelControl labelControl2;
@@ -393,5 +442,10 @@
         private DevExpress.XtraEditors.GroupControl groupMacNumberEdit;
         private System.Windows.Forms.Button btnSetMacNumber;
         private DevExpress.XtraEditors.TextEdit teMacNumber;
+        private System.Windows.Forms.Button btnGetPortsIncludeMac;
+        private System.Windows.Forms.Button btnGetPortsFromDB;
+        private DevExpress.XtraGrid.Views.Card.CardView cardView1;
+        private DevExpress.XtraGrid.Views.Grid.GridView gridView1;
+        private System.Windows.Forms.Button btnExportToExcel;
     }
 }

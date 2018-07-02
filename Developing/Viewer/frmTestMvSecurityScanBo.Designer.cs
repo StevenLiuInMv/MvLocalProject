@@ -71,6 +71,7 @@
             this.Controls.Add(this.btnTestScanAllFiles);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "frmTestMvSecurityScanBo";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "frmTestMvSecurityScanBo";

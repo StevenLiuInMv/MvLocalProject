@@ -20,13 +20,15 @@ namespace MvLocalProject
 
             //var start = new MvLocalProject.Viewer.frmLogin();
             //var start = new MvLocalProject.Viewer.frmBomCompareDev();
-            var start = new MvLocalProject.Viewer.frmBom();
+            //var start = new MvLocalProject.Viewer.frmBom();
             //var start = new MvLocalProject.Viewer.frmMoc();
 
             //var start = new MvLocalProject.Viewer.frmMainDev();
             //var start = new Viewer.frmItCisco();
             //var start = new Viewer.frmItMxMail();
             //var start = new Viewer.frmTestMvDao();
+            var start = new MvLocalProject.Viewer.frmTestParser();
+            //var start = new MvLocalProject.Viewer.frmTestMisGetBom();
             start.FormClosed += WindowClosed;
             start.Show();
             Application.Run();

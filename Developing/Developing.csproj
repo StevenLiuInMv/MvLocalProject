@@ -56,9 +56,12 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="DevExpress.Data.v17.2, Version=17.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.Docs.v17.2, Version=17.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
     <Reference Include="DevExpress.Images.v17.2, Version=17.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.Office.v17.2.Core, Version=17.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
     <Reference Include="DevExpress.Printing.v17.2.Core, Version=17.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
     <Reference Include="DevExpress.Sparkline.v17.2.Core, Version=17.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.Spreadsheet.v17.2.Core, Version=17.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
     <Reference Include="DevExpress.Utils.v17.2, Version=17.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
     <Reference Include="DevExpress.XtraBars.v17.2, Version=17.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
     <Reference Include="DevExpress.XtraEditors.v17.2, Version=17.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
@@ -242,6 +245,12 @@
     <Compile Include="Viewer\frmTestExtract.Designer.cs">
       <DependentUpon>frmTestExtract.cs</DependentUpon>
     </Compile>
+    <Compile Include="Viewer\frmTestMisGetBom.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Viewer\frmTestMisGetBom.Designer.cs">
+      <DependentUpon>frmTestMisGetBom.cs</DependentUpon>
+    </Compile>
     <Compile Include="Viewer\frmTestMvDao.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -253,6 +262,12 @@
     </Compile>
     <Compile Include="Viewer\frmTestMvSecurityScanBo.Designer.cs">
       <DependentUpon>frmTestMvSecurityScanBo.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Viewer\frmTestParser.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Viewer\frmTestParser.Designer.cs">
+      <DependentUpon>frmTestParser.cs</DependentUpon>
     </Compile>
     <Compile Include="Viewer\frmTestProcessBar.cs">
       <SubType>Form</SubType>
@@ -330,11 +345,17 @@
     <EmbeddedResource Include="Viewer\frmTestExtract.resx">
       <DependentUpon>frmTestExtract.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Viewer\frmTestMisGetBom.resx">
+      <DependentUpon>frmTestMisGetBom.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Viewer\frmTestMvDao.resx">
       <DependentUpon>frmTestMvDao.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Viewer\frmTestMvSecurityScanBo.resx">
       <DependentUpon>frmTestMvSecurityScanBo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Viewer\frmTestParser.resx">
+      <DependentUpon>frmTestParser.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Viewer\frmTestProcessBar.resx">
       <DependentUpon>frmTestProcessBar.cs</DependentUpon>

@@ -53,7 +53,8 @@ namespace MvLocalProject.Viewer
             DataSet sourceDs;
 
             // get source data set
-            sourceDs = bo.GetBomP07InfoByDev(result, false).Copy();
+            //sourceDs = bo.GetBomP07InfoByDev(result, false).Copy();
+            sourceDs = bo.GetBomP07ThinInfoByDev(result, false).Copy();
             DataTable sourceDt = sourceDs.Tables[result].Copy();
             DataTable filterDt = sourceDs.Tables[result + "_Filter"].Copy();
             DataTable mocDt;
@@ -76,7 +77,8 @@ namespace MvLocalProject.Viewer
             filterDt.Columns.Remove("AmountSpace");
             treeList2.DataSource = filterDt.Clone();
             hashTreeListBackColor[1].Clear();
-            showTreeListByLevel(treeList2, filterDt, ref hashTreeListBackColor[1], true);
+            //showTreeListByLevel(treeList2, filterDt, ref hashTreeListBackColor[1], true);
+            showTreeListByLevel(treeList2, filterDt, ref hashTreeListBackColor[1], false);
             setColumnsCaption(ref treeList2);
 
             // 第3個Table的特別處理
@@ -85,7 +87,8 @@ namespace MvLocalProject.Viewer
             mocDt.Columns["ModuleLv1"].SetOrdinal(7);
             treeList3.DataSource = mocDt.Clone();
             hashTreeListBackColor[2].Clear();
-            showTreeListByLevel(treeList3, mocDt, ref hashTreeListBackColor[2], true);
+            //showTreeListByLevel(treeList3, mocDt, ref hashTreeListBackColor[2], true);
+            showTreeListByLevel(treeList3, mocDt, ref hashTreeListBackColor[2], false);
             setColumnsCaption(ref treeList3);
 
             xtraTabControl1.TabPages[0].Text = sourceDt.TableName;

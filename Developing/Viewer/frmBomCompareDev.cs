@@ -192,7 +192,7 @@ namespace MvLocalProject.Viewer
 
         private void btnCompare_Click(object sender, EventArgs e)
         {
-            btnCompare_Click_org(sender, e);
+            btnCompare_Click_thin(sender, e);
         }
 
         private void btnCompare_Click_org(object sender, EventArgs e)
@@ -322,7 +322,7 @@ namespace MvLocalProject.Viewer
             SplashScreenManager.CloseForm(false);
         }
 
-        private void btnCompare_Click_new(object sender, EventArgs e)
+        private void btnCompare_Click_thin(object sender, EventArgs e)
         {
             DataTable tmpDt = new DataTable();
             if (isInitialBomList == true)
@@ -457,8 +457,9 @@ namespace MvLocalProject.Viewer
             treeList2.OptionsBehavior.Editable = false;
             treeList3.OptionsBehavior.Editable = false;
             treeList4.OptionsBehavior.Editable = false;
+            treeList5.OptionsBehavior.Editable = false;
+            treeList6.OptionsBehavior.Editable = false;
 
-            Console.WriteLine("test");
             //Close Wait Form
             SplashScreenManager.CloseForm(false);
         }

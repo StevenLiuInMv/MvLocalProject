@@ -18,7 +18,7 @@ namespace MvLocalProject.Bo
         {
             DataSet sourceDs = new DataSet();
 
-            sourceDs = MvDbDao.collectData_Bom09(selectedList);
+            sourceDs = MvDbDao.collectData_BomP09_VB6(selectedList);
             return sourceDs;
         }
 
@@ -26,7 +26,15 @@ namespace MvLocalProject.Bo
         {
             DataSet sourceDs = new DataSet();
 
-            sourceDs = MvDbDao.collectData_Bom07(selectedList);
+            sourceDs = MvDbDao.collectData_BomP07_VB6(selectedList);
+            return sourceDs;
+        }
+
+        internal DataSet CollectSourceDsBomP07ThinProcess(string[] selectedList)
+        {
+            DataSet sourceDs = new DataSet();
+
+            sourceDs = MvDbDao.collectData_BomP07_Thin(selectedList);
             return sourceDs;
         }
 
@@ -35,7 +43,7 @@ namespace MvLocalProject.Bo
         {
             DataSet sourceDs = new DataSet();
 
-            sourceDs = MvDbDao.collectData_BomThin(bomList);
+            sourceDs = MvDbDao.collectData_BomP09(bomList);
             return sourceDs;
 
         }
@@ -409,7 +417,30 @@ namespace MvLocalProject.Bo
 
         public void filterBomP07ColumnByRdRule(ref DataTable sourceDt)
         {
-            sourceDt.Columns.Remove("SUBPN");
+            if (sourceDt.Columns.Contains("SUBPN")) { sourceDt.Columns.Remove("SUBPN"); }
+            if (sourceDt.Columns.Contains("Column1")) { sourceDt.Columns.Remove("Column1"); }
+            if (sourceDt.Columns.Contains("Column2")) { sourceDt.Columns.Remove("Column2"); }
+            if (sourceDt.Columns.Contains("Column3")) { sourceDt.Columns.Remove("Column3"); }
+            if (sourceDt.Columns.Contains("Column5")) { sourceDt.Columns.Remove("Column5"); }
+            if (sourceDt.Columns.Contains("Column6")) { sourceDt.Columns.Remove("Column6"); }
+            if (sourceDt.Columns.Contains("Column7")) { sourceDt.Columns.Remove("Column7"); }
+            if (sourceDt.Columns.Contains("Column8")) { sourceDt.Columns.Remove("Column8"); }
+            if (sourceDt.Columns.Contains("Column10")) { sourceDt.Columns.Remove("Column10"); }
+            if (sourceDt.Columns.Contains("Column11")) { sourceDt.Columns.Remove("Column11"); }
+            //            sourceDt.Columns.Remove("Column12");
+            if (sourceDt.Columns.Contains("MB003")) { sourceDt.Columns.Remove("MB003"); }
+            if (sourceDt.Columns.Contains("YN")) { sourceDt.Columns.Remove("YN"); }
+            if (sourceDt.Columns.Contains("MB037")) { sourceDt.Columns.Remove("MB037"); }
+            if (sourceDt.Columns.Contains("MB209")) { sourceDt.Columns.Remove("MB209"); }
+            if (sourceDt.Columns.Contains("MB077")) { sourceDt.Columns.Remove("MB077"); }
+            if (sourceDt.Columns.Contains("MD011X")) { sourceDt.Columns.Remove("MD011X"); }
+            if (sourceDt.Columns.Contains("MD013X")) { sourceDt.Columns.Remove("MD013X"); }
+            if (sourceDt.Columns.Contains("FOREIGN_YN")) { sourceDt.Columns.Remove("FOREIGN_YN"); }
+            if (sourceDt.Columns.Contains("ONLY_ONE")) { sourceDt.Columns.Remove("ONLY_ONE"); }
+        }
+
+        public void filterBomP07ColumnByPdRule(ref DataTable sourceDt)
+        {
             sourceDt.Columns.Remove("Column1");
             sourceDt.Columns.Remove("Column2");
             sourceDt.Columns.Remove("Column3");
@@ -419,7 +450,6 @@ namespace MvLocalProject.Bo
             sourceDt.Columns.Remove("Column8");
             sourceDt.Columns.Remove("Column10");
             sourceDt.Columns.Remove("Column11");
-            sourceDt.Columns.Remove("Column12");
             sourceDt.Columns.Remove("MB003");
             sourceDt.Columns.Remove("YN");
             sourceDt.Columns.Remove("MB037");
@@ -612,7 +642,6 @@ namespace MvLocalProject.Bo
             string nowNameSpaceNoVer = string.Empty;
             string nowBuyType = string.Empty;
 
-
             string nowAmount = string.Empty;
             string parentAmount = string.Empty;
 
@@ -628,7 +657,6 @@ namespace MvLocalProject.Bo
 
             foreach (DataRow dr in resultDt.Rows)
             {
-
                 nowLv = int.Parse(dr["LV"].ToString().Trim().Replace(".", ""));
                 nowName = dr["A8"].ToString().Trim();
                 nowAmount = dr["MD006"].ToString().Trim();
@@ -662,6 +690,13 @@ namespace MvLocalProject.Bo
                     amountSpaceList[preLv] = string.Empty;
                     nameSpaceList[nowLv] = nowName;
                     nameSpaceListNoVer[nowLv] = nowNameNoVer;
+                    // 當為選配時, 不可以列入AmountSpace計算
+                    // 否則會double count
+                    if (nowBuyType.Equals("選配") == true)
+                    {
+                        //nowAmount = "1";
+                        nowAmount = getOptionalCountByNcalc(nowAmount);
+                    }
                     amountSpaceList[nowLv] = nowAmount;
                     dr["NameSpace"] = nowName;
                     dr["NameSpaceNoVer"] = nowNameNoVer;
@@ -676,7 +711,19 @@ namespace MvLocalProject.Bo
                     parentAmount = amountSpaceList[preLv];
                     nowNameSpace = string.Format("{0}.{1}", parentName, nowName);
                     nowNameSpaceNoVer = string.Format("{0}.{1}", parentNameNoVer, nowNameNoVer);
-                    nowAmount = string.Format("{0}*{1}", parentAmount, nowAmount);
+                    // 當為選配時, 不可以列入AmountSpace計算
+                    // 否則會double count
+                    if (nowBuyType.Equals("選配") == true)
+                    {
+                        //nowAmount = string.Format("{0}*{1}", parentAmount, "1");
+                        nowAmount = getOptionalCountByNcalc(nowAmount);
+                        nowAmount = string.Format("{0}*{1}", parentAmount, nowAmount);
+                    }
+                    else
+                    {
+                        nowAmount = string.Format("{0}*{1}", parentAmount, nowAmount);
+                    }
+
                     dr["NameSpace"] = nowNameSpace;
                     dr["NameSpaceNoVer"] = nowNameSpaceNoVer;
                     dr["AmountSpace"] = nowAmount;
@@ -693,7 +740,18 @@ namespace MvLocalProject.Bo
                     parentAmount = amountSpaceList[nowLv - 1];
                     nowNameSpace = string.Format("{0}.{1}", parentName, nowName);
                     nowNameSpaceNoVer = string.Format("{0}.{1}", parentNameNoVer, nowNameNoVer);
-                    nowAmount = string.Format("{0}*{1}", parentAmount, nowAmount);
+                    // 當為選配時, 不可以列入AmountSpace計算
+                    // 否則會double count
+                    if (nowBuyType.Equals("選配") == true)
+                    {
+                        //nowAmount = string.Format("{0}*{1}", parentAmount, "1");
+                        nowAmount = getOptionalCountByNcalc(nowAmount);
+                        nowAmount = string.Format("{0}*{1}", parentAmount, nowAmount);
+                    }
+                    else
+                    {
+                        nowAmount = string.Format("{0}*{1}", parentAmount, nowAmount);
+                    }
                     dr["NameSpace"] = nowNameSpace;
                     dr["NameSpaceNoVer"] = nowNameSpaceNoVer;
                     dr["AmountSpace"] = nowAmount;
@@ -710,7 +768,19 @@ namespace MvLocalProject.Bo
                     parentAmount = amountSpaceList[nowLv - 1];
                     nowNameSpace = string.Format("{0}.{1}", parentName, nowName);
                     nowNameSpaceNoVer = string.Format("{0}.{1}", parentNameNoVer, nowNameNoVer);
-                    nowAmount = string.Format("{0}*{1}", parentAmount, nowAmount);
+                    // 當為選配時, 不可以列入AmountSpace計算
+                    // 否則會double count
+                    if (nowBuyType.Equals("選配") == true)
+                    {
+                        //nowAmount = string.Format("{0}*{1}", parentAmount, "1");
+                        nowAmount = getOptionalCountByNcalc(nowAmount);
+                        nowAmount = string.Format("{0}*{1}", parentAmount, nowAmount);
+                    }
+                    else
+                    {
+                        nowAmount = string.Format("{0}*{1}", parentAmount, nowAmount);
+                    }
+                        
                     dr["NameSpace"] = nowNameSpace;
                     dr["NameSpaceNoVer"] = nowNameSpaceNoVer;
                     dr["AmountSpace"] = nowAmount;
@@ -902,7 +972,6 @@ namespace MvLocalProject.Bo
                         {
                             Console.WriteLine("debug1");
                         }
-
 
                         // 最後一定會找到的
                         if (itemNameBSpaceNoVer.Equals(searchPattern) == false)
@@ -1778,7 +1847,50 @@ namespace MvLocalProject.Bo
             // filter data
             bo.filterBomP07ColumnByRdRule(ref sourceDt1);
             bo.filterBomP07ColumnByRdRule(ref filterDt);
-            filterDt = bo.filterDataByRdRule(filterDt, true);
+            filterDt = bo.filterDataByRdRule(filterDt, false);
+            MvLogger.write("finished function filterDataByRdRule");
+
+            // extend namespace , get module LV and amount space
+            filterDt = bo.extendBomNameSpace(filterDt, true);
+            MvLogger.write("finished function extendBomNameSpace");
+            if (isExtendNameSpace == false)
+            {
+                filterDt.Columns.Remove("NameSpace");
+                filterDt.Columns.Remove("NameSpaceNoVer");
+            }
+            filterDt.TableName += "_Filter";
+
+            resultDs.Tables.Add(sourceDt1);
+            resultDs.Tables.Add(filterDt);
+            MvLogger.write("finished function add datatable to dataset");
+
+            // Release object
+            filterDt.Dispose(); sourceDt1.Dispose(); sourceDs.Dispose();
+
+            bo = null; filterDt = null; sourceDt1 = null; sourceDs = null;
+
+            return resultDs;
+        }
+
+        public DataSet GetBomP07ThinInfoByDev(string bomId, bool isExtendNameSpace)
+        {
+
+            MvLogger.write("run {0}.{1}", new object[] { System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name });
+
+            DataSet resultDs = new DataSet("ResultSet");
+            DataSet sourceDs = new DataSet();
+            MvBomCompareBo bo = new MvBomCompareBo();
+
+            // Collect bom source by bom id
+            sourceDs = bo.CollectBomThinDsProcess(new string[] { bomId }).Copy();
+            MvLogger.write("finished function CollectSourceDsProcess");
+
+            DataTable sourceDt1 = sourceDs.Tables[0].Copy();
+            DataTable filterDt = sourceDs.Tables[0].Copy();
+            // filter data
+            bo.filterBomP07ColumnByRdRule(ref sourceDt1);
+            bo.filterBomP07ColumnByRdRule(ref filterDt);
+            filterDt = bo.filterDataByRdRule(filterDt, false);
             MvLogger.write("finished function filterDataByRdRule");
 
             // extend namespace , get module LV and amount space
@@ -1875,6 +1987,47 @@ namespace MvLocalProject.Bo
             }
 
             return resultDt;
+        }
+
+        private string getOptionalCountByNcalc(string amount)
+        {
+            // 如果amount為null或空值, 不做任何異動
+            if (amount == null || amount.Length == 0)
+            {
+                return amount;
+            }
+
+            try
+            {
+                string expression = amount;
+                Expression e = new Expression(expression);
+
+                if (e.HasErrors())
+                {
+                    return amount;
+                }
+
+                // 如果result判斷 == 0, 回傳值為0
+                // 如果result判斷 > 1, 回傳值為1
+                // 否則, 不改變原值
+                int result = int.Parse(e.Evaluate().ToString());
+                if (result == 0)
+                {
+                    return "0";
+                }
+                else if (result >= 1)
+                {
+                    return "1";
+                }
+                else
+                {
+                    return amount;
+                }
+            }
+            catch (EvaluationException)
+            {
+                return amount;
+            }
         }
     }
 }

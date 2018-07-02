@@ -102,9 +102,9 @@ namespace MvLocalProject.Viewer
             bool isFindRole = false;
 
             // 如果是Admin 全開
-            foreach (string misHost in DefinedParameter.MvAdminPcHostName)
+            foreach (string host in DefinedParameter.MvAdminPcHostName)
             {
-                if (misHost.Equals(localHost))
+                if (host.Equals(localHost))
                 {
                     enableMenuForAdmin();
                     isFindRole = true;
@@ -113,9 +113,9 @@ namespace MvLocalProject.Viewer
 
             // MvMis權限
             if (isFindRole == true) { return; }
-            foreach (string misHost in DefinedParameter.MvMisPcHostName)
+            foreach (string host in DefinedParameter.MvMisPcHostName)
             {
-                if (misHost.Equals(localHost))
+                if (host.Equals(localHost))
                 {
                     enableMenuForMis();
                     isFindRole = true;
@@ -124,11 +124,22 @@ namespace MvLocalProject.Viewer
 
             // RD權限
             if (isFindRole == true) { return; }
-            foreach (string misHost in DefinedParameter.MvRdPcHostName)
+            foreach (string host in DefinedParameter.MvRdPcHostName)
             {
-                if (misHost.Equals(localHost))
+                if (host.Equals(localHost))
                 {
                     enableMenuForRd();
+                    isFindRole = true;
+                }
+            }
+
+            // 料控權限
+            if (isFindRole == true) { return; }
+            foreach (string host in DefinedParameter.MvMcPcHostName)
+            {
+                if (host.Equals(localHost))
+                {
+                    enableMenuForMc();
                     isFindRole = true;
                 }
             }
@@ -170,6 +181,14 @@ namespace MvLocalProject.Viewer
         private void enableMenuForRd()
         {
             nbpErpReport.Visible = true;
+            nbgErpFoms.Visible = true;
+            nbgItTools.Visible = false;
+            nbgTesting.Visible = false;
+        }
+
+        private void enableMenuForMc()
+        {
+            nbpErpReport.Visible = false;
             nbgErpFoms.Visible = true;
             nbgItTools.Visible = false;
             nbgTesting.Visible = false;
