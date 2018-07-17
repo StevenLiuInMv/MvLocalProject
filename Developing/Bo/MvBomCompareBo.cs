@@ -14,7 +14,7 @@ namespace MvLocalProject.Bo
 {
     class MvBomCompareBo
     {
-        internal DataSet CollectSourceDsBomP09Process(string[] selectedList)
+        internal DataSet CollectSourceDsProcess_BomP09_VB6(string[] selectedList)
         {
             DataSet sourceDs = new DataSet();
 
@@ -22,7 +22,7 @@ namespace MvLocalProject.Bo
             return sourceDs;
         }
 
-        internal DataSet CollectSourceDsBomP07Process(string[] selectedList)
+        internal DataSet CollectSourceDsProcess_BomP07_VB6(string[] selectedList)
         {
             DataSet sourceDs = new DataSet();
 
@@ -30,7 +30,7 @@ namespace MvLocalProject.Bo
             return sourceDs;
         }
 
-        internal DataSet CollectSourceDsBomP07ThinProcess(string[] selectedList)
+        internal DataSet CollectSourceDsProcess_BomP07_Thin(string[] selectedList)
         {
             DataSet sourceDs = new DataSet();
 
@@ -39,11 +39,11 @@ namespace MvLocalProject.Bo
         }
 
 
-        internal DataSet CollectBomThinDsProcess(string[] bomList)
+        internal DataSet CollectSourceDsProcess_BomP09_Thin(string[] bomList)
         {
             DataSet sourceDs = new DataSet();
 
-            sourceDs = MvDbDao.collectData_BomP09(bomList);
+            sourceDs = MvDbDao.collectData_BomP09_Thin(bomList);
             return sourceDs;
 
         }
@@ -52,7 +52,7 @@ namespace MvLocalProject.Bo
         {
             // 取得Bom資料
             // 有任何錯誤, 回傳 -1
-            sourceDs = CollectSourceDsBomP09Process(selectedList).Copy();
+            sourceDs = CollectSourceDsProcess_BomP09_VB6(selectedList).Copy();
             if (sourceDs.Tables.Count <= 1) { return -1; }
 
             // 取得比對結果 A -> B
@@ -437,6 +437,7 @@ namespace MvLocalProject.Bo
             if (sourceDt.Columns.Contains("MD013X")) { sourceDt.Columns.Remove("MD013X"); }
             if (sourceDt.Columns.Contains("FOREIGN_YN")) { sourceDt.Columns.Remove("FOREIGN_YN"); }
             if (sourceDt.Columns.Contains("ONLY_ONE")) { sourceDt.Columns.Remove("ONLY_ONE"); }
+            //if (sourceDt.Columns.Contains("MD013")) { sourceDt.Columns.Remove("MD013"); }
         }
 
         public void filterBomP07ColumnByPdRule(ref DataTable sourceDt)
@@ -621,6 +622,9 @@ namespace MvLocalProject.Bo
             resultDt.Columns.Add("NameSpace");
             resultDt.Columns.Add("NameSpaceNoVer");
             resultDt.Columns.Add("AmountSpace");
+            resultDt.Columns.Add("RowId");
+
+
 
             if (isIncludeLv1ModuleName == true)
             {
@@ -630,7 +634,7 @@ namespace MvLocalProject.Bo
             string[] nameSpaceList = new string[7];
             string[] nameSpaceListNoVer = new string[7];
             string[] amountSpaceList = new string[7];
-
+            int rowId = 0;
             int preLv = -1;
             int nowLv = -1;
             string parentName = string.Empty;
@@ -806,7 +810,13 @@ namespace MvLocalProject.Bo
                     }
                 }
                 preLv = nowLv;
+
+                // 加入RowId
+                dr["RowId"] = rowId;
+                rowId++;
             }
+
+            
             return resultDt;
         }
 
@@ -1099,385 +1109,7 @@ namespace MvLocalProject.Bo
 
         }
 
-        internal DataSet compareBomByRuleRd_v1(DataTable tableA, DataTable tableB, bool isDefineAdd)
-        {
-            DataSet majorSet = new DataSet("CompareResult");
-            DataTable tSame = new DataTable("Same");
-            DataTable tDiff = new DataTable("Different");
-
-            Hashtable hashUsedTableB = new Hashtable();
-
-            // 設定table header
-            foreach (string header in DefinedHeader.BomCompareHeaderName)
-            {
-                tSame.Columns.Add(header);
-                tDiff.Columns.Add(header);
-            }
-
-            // 複製tableA的columns
-
-            string itemNameA = string.Empty;
-            string itemNameANoVer = string.Empty;
-            string itemNameASpaceNoVer = string.Empty;
-            int amountA = 0;
-            int itemLvA = 0;
-            string itemNameB = string.Empty;
-            string itemNameBNoVer = string.Empty;
-            string itemNameBSpaceNoVer = string.Empty;
-            int amountB = 0;
-            int itemLvB = 0;
-            string tmpNameSpace = string.Empty;
-
-            bool isIncludeVersion = false;
-            DataRow tempDr = null;
-
-            foreach (DataRow rowA in tableA.Rows)
-            {
-                // 取得Table A品號
-                itemNameA = rowA["A8"].ToString().Trim();
-                itemNameANoVer = itemNameA;
-                itemNameASpaceNoVer = rowA["NameSpaceNoVer"].ToString();
-                amountA = Convert.ToInt32(rowA["MD006"]);
-                itemLvA = int.Parse(rowA["LV"].ToString().Trim().Replace(".", ""));
-
-
-                if (itemNameA.Equals("250E05BC67B"))
-                {
-                    Console.WriteLine("debug1");
-                }
-
-                isIncludeVersion = false;
-                bool isMatchSearch = false;
-                // 判斷是否為合法品名
-                // 目前沒有長度>12 的品名, 直接跳過
-                if (itemNameA.Length > 12)
-                {
-                    continue;
-                }
-                else if (itemNameA.Length == 11) // 當長度為11碼時, 需額外處理
-                {
-                    itemNameANoVer = itemNameANoVer.Substring(0, itemNameANoVer.Length - 1);
-                    isIncludeVersion = true;
-                }
-
-
-                // 先組出要尋找的name space
-                if (itemLvA <= 2)
-                {
-                    tmpNameSpace = itemNameASpaceNoVer;
-                }
-                else
-                {
-                    // 當LV > 2, 往後取最後兩層當比對的Namespace
-                    tmpNameSpace = itemNameASpaceNoVer.Substring(itemNameASpaceNoVer.Substring(0, itemNameASpaceNoVer.LastIndexOf(".")).LastIndexOf(".") + 1);
-                }
-
-                for (int hashIndex = 0; hashIndex < tableB.Rows.Count; hashIndex++)
-                {
-                    DataRow rowB = tableB.Rows[hashIndex];
-
-                    // 已被使用過的, 直接跳過
-                    if (hashUsedTableB.Contains(hashIndex) == true)
-                    {
-                        continue;
-                    }
-
-                    itemNameB = rowB["A8"].ToString().Trim();
-                    itemNameBNoVer = itemNameB;
-                    itemNameBSpaceNoVer = rowB["NameSpaceNoVer"].ToString();
-                    amountB = Convert.ToInt32(rowB["MD006"]);
-                    itemLvB = int.Parse(rowB["LV"].ToString().Trim().Replace(".", ""));
-
-                    if (itemNameB.Equals("250E05BC67C"))
-                    {
-                        Console.WriteLine("debug1");
-                    }
-
-
-                    if (itemNameB.Length > 12)
-                    {
-                        continue;
-                    }
-                    else if (itemNameB.Length == 11) // 當長度為11碼時, 需額外處理
-                    {
-                        itemNameBNoVer = itemNameBNoVer.Substring(0, itemNameBNoVer.Length - 1);
-                    }
-
-                    // 比對是否存在於itemB的namespace內
-                    if (itemNameBSpaceNoVer.LastIndexOf(tmpNameSpace) < 0)
-                    {
-                        continue;
-                    }
-
-                    // 先用ItemA品名長度決定是完全比對, 或是比對前10碼
-                    if (isIncludeVersion == false)
-                    {
-                        // 品名為8-10碼, 完全比對
-                        if (itemNameA.Equals(itemNameB) == false)
-                        {
-                            // 不符合, 繼續下一筆
-                            continue;
-                        }
-
-                        bool tmpAmount = (amountA == amountB);
-                        bool tmpLv = (itemLvA == itemLvB);
-
-                        if (tmpAmount == true && tmpLv == true)
-                        {
-                            // 代表資料完全一樣
-                            // 比對上一層是否相同, 如果也相同, 才視為完全相同
-                            if (itemNameASpaceNoVer.Equals(itemNameBSpaceNoVer))
-                            {
-                                tempDr = convertNewItemToResultTalbeByRd(tSame, rowA, rowB, isIncludeVersion, true, true, true, isDefineAdd);
-                                tSame.Rows.Add(tempDr);
-                                // 已被使用過的要記錄
-                                hashUsedTableB.Add(hashIndex, true);
-                                isMatchSearch = true;
-                                break;
-                            }
-                            else
-                            {
-                                // 比對上一層不相同, 不是同一個模組, 繼續搜尋
-                                continue;
-                            }
-                        }
-
-                        if (itemNameASpaceNoVer.Equals(itemNameBSpaceNoVer))
-                        {
-                            tempDr = convertNewItemToResultTalbeByRd(tSame, rowA, rowB, isIncludeVersion, true, true, true, isDefineAdd);
-                            tSame.Rows.Add(tempDr);
-                            // 已被使用過的要記錄
-                            hashUsedTableB.Add(hashIndex, true);
-                            isMatchSearch = true;
-                            break;
-                        }
-                        tempDr = convertNewItemToResultTalbeByRd(tDiff, rowA, rowB, isIncludeVersion, tmpLv, true, tmpAmount, isDefineAdd);
-                        tDiff.Rows.Add(tempDr);
-                        // 已被使用的要記錄
-                        hashUsedTableB.Add(hashIndex, true);
-                        isMatchSearch = true;
-                        break;
-                    }
-                    else
-                    {
-                        // 品為為11碼, 含完全比對及模糊比對
-                        // 先用完全比對
-                        bool tmpItem = itemNameA.Equals(itemNameB);
-                        int tmpItemNoVer = itemNameANoVer.CompareTo(itemNameB);
-                        if (tmpItem == false && tmpItemNoVer != 0)
-                        {
-                            // 不符合, 繼續下一筆
-                            continue;
-                        }
-                        bool tmpAmount = (amountA == amountB);
-                        bool tmpLv = (itemLvA == itemLvB);
-                        if (tmpItem == true && tmpAmount == true && tmpLv == true)
-                        {
-                            // 完全比對有符合項目, 含數量及LV均相同
-                            tempDr = convertNewItemToResultTalbeByRd(tSame, rowA, rowB, false, true, true, true, isDefineAdd);
-                            tSame.Rows.Add(tempDr);
-                        }
-                        else if (tmpItem == true)
-                        {
-                            // 完全比對有符合項目, 但數量或LV不相同
-                            tempDr = convertNewItemToResultTalbeByRd(tDiff, rowA, rowB, isIncludeVersion, tmpLv, true, tmpAmount, isDefineAdd);
-                            tDiff.Rows.Add(tempDr);
-                        }
-                        else if (tmpItemNoVer == 0)
-                        {
-                            // 前10碼比對有相符項目
-                            tempDr = convertNewItemToResultTalbeByRd(tDiff, rowA, rowB, isIncludeVersion, tmpLv, false, tmpAmount, isDefineAdd);
-                            tDiff.Rows.Add(tempDr);
-                        }
-                        // 已被使用的要記錄
-                        hashUsedTableB.Add(hashIndex, true);
-                        isMatchSearch = true;
-                        break;
-                    }
-                }
-
-                // 不在上述條件, 才會走到此流程
-                if (isMatchSearch == false)
-                {
-                    // 不在上述條件的, 一律為新增
-                    tDiff.Rows.Add(convertNewItemToResultTalbeByRd(tDiff, rowA, rowA, false, false, false, false, isDefineAdd));
-                    continue;
-                }
-
-            }
-
-            majorSet.Tables.Add(tSame);
-            majorSet.Tables.Add(tDiff);
-
-            return majorSet;
-
-        }
-
-        internal DataSet compareBomByRuleRd_Org(DataTable tableA, DataTable tableB, bool isDefineAdd)
-        {
-            DataSet majorSet = new DataSet("CompareResult");
-            DataTable tSame = new DataTable("Same");
-            DataTable tDiff = new DataTable("Different");
-
-            Hashtable hashUsedTableB = new Hashtable();
-
-            // 設定table header
-            foreach (string header in DefinedHeader.BomCompareHeaderName)
-            {
-                tSame.Columns.Add(header);
-                tDiff.Columns.Add(header);
-            }
-
-            // 複製tableA的columns
-
-            string itemNameA = string.Empty;
-            string itemNameANoVer = string.Empty;
-            int amountA = 0;
-            int itemLvA = 0;
-            string itemNameB = string.Empty;
-            string itemNameBNoVer = string.Empty;
-            int amountB = 0;
-            int itemLvB = 0;
-
-            bool isIncludeVersion = false;
-            DataRow tempDr = null;
-
-            foreach (DataRow rowA in tableA.Rows)
-            {
-                // 取得Table A品號
-                itemNameA = rowA["A8"].ToString().Trim();
-                itemNameANoVer = itemNameA;
-                amountA = Convert.ToInt32(rowA["MD006"]);
-                itemLvA = int.Parse(rowA["LV"].ToString().Trim().Replace(".", ""));
-
-
-                if (itemNameA.Equals("250E05BC40C"))
-                {
-                    Console.WriteLine("debug1");
-                }
-
-                isIncludeVersion = false;
-                bool isMatchSearch = false;
-                // 判斷是否為合法品名
-                // 目前沒有長度>12 的品名, 直接跳過
-                if (itemNameA.Length > 12)
-                {
-                    continue;
-                }
-                else if (itemNameA.Length == 11) // 當長度為11碼時, 需額外處理
-                {
-                    itemNameANoVer = itemNameANoVer.Substring(0, itemNameANoVer.Length - 1);
-                    isIncludeVersion = true;
-                }
-
-                for (int hashIndex = 0; hashIndex < tableB.Rows.Count; hashIndex++)
-                {
-                    DataRow rowB = tableB.Rows[hashIndex];
-
-                    // 已被使用過的, 直接跳過
-                    if (hashUsedTableB.Contains(hashIndex) == true)
-                    {
-                        continue;
-                    }
-
-                    itemNameB = rowB["A8"].ToString().Trim();
-                    itemNameBNoVer = itemNameB;
-                    amountB = Convert.ToInt32(rowB["MD006"]);
-                    itemLvB = int.Parse(rowB["LV"].ToString().Trim().Replace(".", ""));
-                    if (itemNameB.Length > 12)
-                    {
-                        continue;
-                    }
-                    else if (itemNameB.Length == 11) // 當長度為11碼時, 需額外處理
-                    {
-                        itemNameBNoVer = itemNameBNoVer.Substring(0, itemNameBNoVer.Length - 1);
-                    }
-
-                    // 先用ItemA品名長度決定是完全比對, 或是比對前10碼
-                    if (isIncludeVersion == false)
-                    {
-                        // 品名為8-10碼, 完全比對
-                        if (itemNameA.Equals(itemNameB) == false)
-                        {
-                            // 不符合, 繼續下一筆
-                            continue;
-                        }
-
-                        bool tmpAmount = (amountA == amountB);
-                        bool tmpLv = (itemLvA == itemLvB);
-
-                        if (tmpAmount == true && tmpLv == true)
-                        {
-                            // 代表資料完全一樣
-                            tempDr = convertNewItemToResultTalbeByRd(tSame, rowA, rowB, isIncludeVersion, true, true, true, isDefineAdd);
-                            tSame.Rows.Add(tempDr);
-                            // 已被使用過的要記錄
-                            hashUsedTableB.Add(hashIndex, true);
-                            isMatchSearch = true;
-                            break;
-                        }
-                        tempDr = convertNewItemToResultTalbeByRd(tDiff, rowA, rowB, isIncludeVersion, tmpLv, true, tmpAmount, isDefineAdd);
-                        tDiff.Rows.Add(tempDr);
-                        // 已被使用的要記錄
-                        hashUsedTableB.Add(hashIndex, true);
-                        isMatchSearch = true;
-                        break;
-                    }
-                    else
-                    {
-                        // 品為為11碼, 含完全比對及模糊比對
-                        // 先用完全比對
-                        bool tmpItem = itemNameA.Equals(itemNameB);
-                        int tmpItemNoVer = itemNameANoVer.CompareTo(itemNameB);
-                        if (tmpItem == false && tmpItemNoVer != 0)
-                        {
-                            // 不符合, 繼續下一筆
-                            continue;
-                        }
-                        bool tmpAmount = (amountA == amountB);
-                        bool tmpLv = (itemLvA == itemLvB);
-                        if (tmpItem == true && tmpAmount == true && tmpLv == true)
-                        {
-                            // 完全比對有符合項目, 含數量及LV均相同
-                            tempDr = convertNewItemToResultTalbeByRd(tSame, rowA, rowB, false, true, true, true, isDefineAdd);
-                            tSame.Rows.Add(tempDr);
-                        }
-                        else if (tmpItem == true)
-                        {
-                            // 完全比對有符合項目, 但數量或LV不相同
-                            tempDr = convertNewItemToResultTalbeByRd(tDiff, rowA, rowB, isIncludeVersion, tmpLv, true, tmpAmount, isDefineAdd);
-                            tDiff.Rows.Add(tempDr);
-                        }
-                        else if (tmpItemNoVer == 0)
-                        {
-                            // 前10碼比對有相符項目
-                            tempDr = convertNewItemToResultTalbeByRd(tDiff, rowA, rowB, isIncludeVersion, tmpLv, false, tmpAmount, isDefineAdd);
-                            tDiff.Rows.Add(tempDr);
-                        }
-                        // 已被使用的要記錄
-                        hashUsedTableB.Add(hashIndex, true);
-                        isMatchSearch = true;
-                        break;
-                    }
-                }
-
-                // 不在上述條件, 才會走到此流程
-                if (isMatchSearch == false)
-                {
-                    // 不在上述條件的, 一律為新增
-                    tDiff.Rows.Add(convertNewItemToResultTalbeByRd(tDiff, rowA, rowA, false, false, false, false, isDefineAdd));
-                    continue;
-                }
-
-            }
-
-            majorSet.Tables.Add(tSame);
-            majorSet.Tables.Add(tDiff);
-
-            return majorSet;
-
-        }
-
+        
         private DataRow convertNewItemToResultTalbeByRd(DataTable targetTable, DataRow source, DataRow target, bool needConsideVer, bool isSameLv, bool isSameItemName, bool isSameAmount, bool isDefineAdd)
         {
             DataRow dr = targetTable.NewRow();
@@ -1770,7 +1402,7 @@ namespace MvLocalProject.Bo
             MvBomCompareBo bo = new MvBomCompareBo();
 
             // Collect bom source by bom id
-            sourceDs = bo.CollectSourceDsBomP09Process(selectedList.ToArray<string>()).Copy();
+            sourceDs = bo.CollectSourceDsProcess_BomP09_VB6(selectedList.ToArray<string>()).Copy();
             MvLogger.write("finished function CollectSourceDsProcess");
 
             DataTable sourceDt1 = sourceDs.Tables[0].Copy();
@@ -1829,7 +1461,7 @@ namespace MvLocalProject.Bo
             return resultDs;
         }
 
-        public DataSet GetBomP07InfoByDev(string bomId, bool isExtendNameSpace)
+        public DataSet GetDevDataSet_BomP07_VB6(string bomId, bool isExtendNameSpace)
         {
 
             MvLogger.write("run {0}.{1}", new object[] { System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name });
@@ -1839,7 +1471,7 @@ namespace MvLocalProject.Bo
             MvBomCompareBo bo = new MvBomCompareBo();
 
             // Collect bom source by bom id
-            sourceDs = bo.CollectSourceDsBomP07Process(new string[] { bomId }).Copy();
+            sourceDs = bo.CollectSourceDsProcess_BomP07_VB6(new string[] { bomId }).Copy();
             MvLogger.write("finished function CollectSourceDsProcess");
 
             DataTable sourceDt1 = sourceDs.Tables[0].Copy();
@@ -1872,7 +1504,7 @@ namespace MvLocalProject.Bo
             return resultDs;
         }
 
-        public DataSet GetBomP07ThinInfoByDev(string bomId, bool isExtendNameSpace)
+        public DataSet GetDevDataSet_BomP09_Thin(string bomId, bool isExtendNameSpace)
         {
 
             MvLogger.write("run {0}.{1}", new object[] { System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name });
@@ -1882,7 +1514,7 @@ namespace MvLocalProject.Bo
             MvBomCompareBo bo = new MvBomCompareBo();
 
             // Collect bom source by bom id
-            sourceDs = bo.CollectBomThinDsProcess(new string[] { bomId }).Copy();
+            sourceDs = bo.CollectSourceDsProcess_BomP09_Thin(new string[] { bomId }).Copy();
             MvLogger.write("finished function CollectSourceDsProcess");
 
             DataTable sourceDt1 = sourceDs.Tables[0].Copy();
@@ -1916,9 +1548,8 @@ namespace MvLocalProject.Bo
         }
 
 
-        public DataSet GetBomP09InfoByDev(string bomId, bool isExtendNameSpace)
+        public DataSet GetDevDataSet_BomP09_VB6(string bomId, bool isExtendNameSpace)
         {
-
             MvLogger.write("run {0}.{1}", new object[] { System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name });
 
             DataSet resultDs = new DataSet("ResultSet");
@@ -1926,7 +1557,7 @@ namespace MvLocalProject.Bo
             MvBomCompareBo bo = new MvBomCompareBo();
 
             // Collect bom source by bom id
-            sourceDs = bo.CollectSourceDsBomP09Process(new string[] { bomId }).Copy();
+            sourceDs = bo.CollectSourceDsProcess_BomP09_VB6(new string[] { bomId }).Copy();
             MvLogger.write("finished function CollectSourceDsProcess");
            
             DataTable sourceDt1 = sourceDs.Tables[0].Copy();
@@ -1964,7 +1595,10 @@ namespace MvLocalProject.Bo
         {
             DataTable resultDt = bomTable.Copy();
 
-            resultDt.Columns.Add("RealAmount");
+            if (resultDt.Columns.Contains("RealAmount") == false)
+            {
+                resultDt.Columns.Add("RealAmount");
+            }
             foreach(DataRow dr in resultDt.Rows)
             {
                 try
@@ -1985,6 +1619,62 @@ namespace MvLocalProject.Bo
                     dr["RealAmount"] = "";
                 }
             }
+
+            return resultDt;
+        }
+
+        public DataTable convertBomToVirturlMoc(DataTable bomTable)
+        {
+
+            DataTable sourceDt = bomTable.Copy();   //因為要加欄位, 所以要用copy, 避免影響到原有資料
+            DataTable tempDt = null;
+            DataTable resultDt = null;
+            DataRow tempDr = null;
+            DataRow[] tempDrList = null;
+            DataRow[] tempModuleList = null;
+
+            sourceDt.Columns.Add("VirtualMocNo");
+            tempDt = sourceDt.Clone();
+            resultDt = sourceDt.Clone();
+
+            // 先找出第一階, convert出母製令
+            tempDrList = sourceDt.Select("LV='1'");
+            foreach (DataRow dr1 in tempDrList)
+            {
+                tempDr = tempDt.NewRow();
+                tempDr.ItemArray = dr1.ItemArray.Clone() as object[];
+                tempDr["VirtualMocNo"] = "Moc_" + sourceDt.TableName;
+                tempDt.Rows.Add(tempDr);
+            }
+
+            tempDt = convertBomToMoc(tempDt);
+            resultDt.Merge(tempDt);
+
+            // 再找出所有的模組, convert子製令
+            tempModuleList = resultDt.Select("MB025X in ('模組','選配')");
+            foreach (DataRow dr1 in tempModuleList)
+            {
+                tempDrList = sourceDt.Select(string.Format("LV<>'1' AND ModuleLv1='{0}'", dr1["A8"]));
+                tempDt.Clear();
+                foreach (DataRow dr2 in tempDrList)
+                {
+                    // 非第一階的模組, 展開製令後, 直接向下展開散料
+                    if(dr2["MB025X"].ToString().Equals("模組") == true)
+                    {
+                        continue;
+                    }
+                    tempDr = tempDt.NewRow();
+                    tempDr.ItemArray = dr2.ItemArray.Clone() as object[];
+                    tempDr["VirtualMocNo"] = "Moc_" + dr1["A8"].ToString();
+                    tempDt.Rows.Add(tempDr);
+                }
+                tempDt = convertBomToMoc(tempDt);
+                resultDt.Merge(tempDt);
+            }
+
+            // 選配的問題, 還沒有解決
+            // 看是要一開始就從Bom移除, 還是在最後展開時再來執行filter
+            // 移除的動作要加log
 
             return resultDt;
         }
@@ -2010,6 +1700,7 @@ namespace MvLocalProject.Bo
                 // 如果result判斷 == 0, 回傳值為0
                 // 如果result判斷 > 1, 回傳值為1
                 // 否則, 不改變原值
+                
                 int result = int.Parse(e.Evaluate().ToString());
                 if (result == 0)
                 {
@@ -2029,5 +1720,125 @@ namespace MvLocalProject.Bo
                 return amount;
             }
         }
+
+        public DataSet compareProcessByVirtualMoc(DataTable vMocA, DataTable mocB)
+        {
+            // 比對條件
+            // 1. 判斷模組是不是在同一層
+            //    如果不是同一層, 列為不合法的資料
+            // 2. 哪些是可以忽略的資料 --> 或許可以放在跟不合法是同一層資料
+            // 3. 開始判斷在同一層的資料裡, 數量是不是相同
+            //    列出差異, 只存在Source , 只存在pattern, 兩者皆存在, 數量上不同
+
+            DataTable sameDt = new DataTable("Same");
+            DataTable diffDt = new DataTable("Different");
+            sameDt.Columns.Add("ModuleLv1");
+            sameDt.Columns.Add("Item");
+            sameDt.Columns.Add("Count");
+            sameDt.Columns.Add("Status");
+            sameDt.Columns.Add("MocNo");
+
+            diffDt = sameDt.Clone();
+
+            string mNameA = string.Empty;
+            string itemA = string.Empty;
+            string countA = string.Empty;
+            string mNameB = string.Empty;
+            string itemB = string.Empty;
+            string countB = string.Empty;
+            bool hasFindRow = false;
+
+            foreach(DataRow vDrA in vMocA.Rows)
+            {
+                hasFindRow = false;
+                mNameA = vDrA["ModuleLv1"].ToString();
+                itemA = vDrA["A8"].ToString();
+                // 已使用Ncalc算過, 不需要再重算
+                countA = vDrA["RealAmount"].ToString();
+
+                foreach (DataRow drB in mocB.Rows)
+                {
+                    mNameB = drB["TA006"].ToString();
+                    itemB = drB["TB003"].ToString();
+                    //countB = getOptionalCountByNcalc(drB["TB004"].ToString());
+                    countB = drB["TB004"].ToString();
+
+                    // 1. 只要ModuleName 不合法, 不用再往下尋找
+                    if (mNameA.Equals(mNameB) == false)
+                    {
+                        continue;
+                    }
+
+                    // 2. 只要品號相同, 再繼續比對數字, 如果沒有找到相同的品號
+                    if (itemA.Equals(itemB) == false)
+                    {
+                        continue;
+                    }
+
+                    // 3. 當品號相同時, 比對數字是否相同
+                    // 相同, 記錄到相同
+                    // 不同, 記錄到相異的DataSet
+                    hasFindRow = true;
+                    if (countA.Equals(countB) == false)
+                    {
+                        Console.WriteLine(string.Format("Diff Moudle : {0}, Item : {1}, Cnt : {2} <> {3}", mNameA, itemA, countA, countB));
+                    }
+                    else
+                    {
+                        Console.WriteLine(string.Format("Same Moudle : {0}, Item : {1}, Cnt : {2}", mNameA, itemA, countA));
+                    }
+                    break;
+                }
+                if (hasFindRow == false)
+                {
+                    Console.WriteLine(string.Format("Not Found Moudle : {0}, Item : {1}, Cnt : {2}", mNameA, itemA, countA));
+                }
+            }
+
+            return null;
+        }
+
+        public DataTable getOptionalItem(DataTable sourceDt)
+        {
+            DataTable resultDt = sourceDt.Clone();
+
+            if (resultDt.Columns.Contains("OrgLV") == false)
+            {
+                resultDt.Columns.Add("OrgLV");
+            }
+
+            DataRow[] drList = sourceDt.Select("MB025X='選配'");
+            DataRow[] tempDrList = null;
+            DataRow tempDr = null;
+            string childCondition = string.Empty;
+            int orgLV = 0;
+
+            foreach(DataRow dr in drList)
+            {
+                tempDr = resultDt.NewRow();
+                tempDr.ItemArray = dr.ItemArray.Clone() as object[];
+                // 先記得該層的LV, 找childLv
+                orgLV = int.Parse(dr["LV"].ToString());
+                tempDr["OrgLV"] = dr["LV"];
+                orgLV += 1;
+                tempDr["LV"] = "1";
+                resultDt.Rows.Add(tempDr);
+                // 再找optional 的下一層
+                childCondition = string.Format("LV={0} AND NameSpace LIKE '{1}%'", orgLV, dr["NameSpace"]);
+                tempDrList = sourceDt.Select(childCondition);
+                foreach(DataRow dr1 in tempDrList)
+                {
+                    tempDr = resultDt.NewRow();
+                    tempDr.ItemArray = dr1.ItemArray.Clone() as object[];
+                    tempDr["OrgLV"] = orgLV;
+                    tempDr["LV"] = "2";
+                    resultDt.Rows.Add(tempDr);
+                }
+            }
+
+            return resultDt;
+        }
+
     }
 }
+

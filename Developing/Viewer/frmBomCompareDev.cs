@@ -8,12 +8,9 @@ using MvLocalProject.Model;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace MvLocalProject.Viewer
@@ -137,7 +134,7 @@ namespace MvLocalProject.Viewer
         private void btnGetBomList_Click(object sender, EventArgs e)
         {
             DataTable tmpDt = null;
-            tmpDt = MvDbDao.collectData_BomP09_BomList();
+            tmpDt = MvDbDao.collectData_BomList();
             cboBomType.DataSource = tmpDt;
             cboBomType.ValueMember = "MC001";
             cboBomType.DisplayMember = "MB0012";
@@ -192,17 +189,17 @@ namespace MvLocalProject.Viewer
 
         private void btnCompare_Click(object sender, EventArgs e)
         {
-            btnCompare_Click_thin(sender, e);
+            btnCompare_Click_Thin(sender, e);
         }
 
-        private void btnCompare_Click_org(object sender, EventArgs e)
+        private void btnCompare_Click_VB6(object sender, EventArgs e)
         {
             DataTable tmpDt = new DataTable();
             if (isInitialBomList == true)
             {
                 // 第一次取得BomList
 
-                tmpDt = MvDbDao.collectData_BomP09_BomList();
+                tmpDt = MvDbDao.collectData_BomList();
                 cboBomType.DataSource = tmpDt;
                 cboBomType.ValueMember = "MC001";
                 cboBomType.DisplayMember = "MB0012";
@@ -322,14 +319,14 @@ namespace MvLocalProject.Viewer
             SplashScreenManager.CloseForm(false);
         }
 
-        private void btnCompare_Click_thin(object sender, EventArgs e)
+        private void btnCompare_Click_Thin(object sender, EventArgs e)
         {
             DataTable tmpDt = new DataTable();
             if (isInitialBomList == true)
             {
                 // 第一次取得BomList
 
-                tmpDt = MvDbDao.collectData_BomP09_BomList();
+                tmpDt = MvDbDao.collectData_BomList();
                 cboBomType.DataSource = tmpDt;
                 cboBomType.ValueMember = "MC001";
                 cboBomType.DisplayMember = "MB0012";
@@ -365,7 +362,7 @@ namespace MvLocalProject.Viewer
 
             DataSet sourceDs = new DataSet();
             MvBomCompareBo bo = new MvBomCompareBo();
-            sourceDs = bo.CollectBomThinDsProcess(selectedList.ToArray<string>()).Copy();
+            sourceDs = bo.CollectSourceDsProcess_BomP09_Thin(selectedList.ToArray<string>()).Copy();
 
             // filter data
             DataTable sourceDt1 = sourceDs.Tables[0].Copy();

@@ -18,6 +18,7 @@ namespace MvLocalProject.Viewer
     public partial class frmBom : Form
     {
         bool isInitialBomList = true;
+        DataTable tmpMocDt = null;
         Hashtable[] hashTreeListBackColor = new Hashtable[3];
         public frmBom()
         {
@@ -30,7 +31,7 @@ namespace MvLocalProject.Viewer
             {
                 // 第一次取得BomList
                 DataTable tmpDt = null;
-                tmpDt = MvDbDao.collectData_BomP09_BomList();
+                tmpDt = MvDbDao.collectData_BomList();
                 cboBomType.DataSource = tmpDt;
                 cboBomType.ValueMember = "MC001";
                 cboBomType.DisplayMember = "MB0012";
@@ -54,13 +55,14 @@ namespace MvLocalProject.Viewer
 
             // get source data set
             //sourceDs = bo.GetBomP07InfoByDev(result, false).Copy();
-            sourceDs = bo.GetBomP07ThinInfoByDev(result, false).Copy();
+            sourceDs = bo.GetDevDataSet_BomP09_Thin(result, false).Copy();
             DataTable sourceDt = sourceDs.Tables[result].Copy();
             DataTable filterDt = sourceDs.Tables[result + "_Filter"].Copy();
             DataTable mocDt;
 
             // convert bom to moc
             mocDt = bo.convertBomToMoc(filterDt);
+            tmpMocDt = mocDt.Clone();
 
             // initial hash tables
             for (int i = 0; i < hashTreeListBackColor.Length; i++)
@@ -68,6 +70,7 @@ namespace MvLocalProject.Viewer
                 hashTreeListBackColor[i] = new Hashtable();
             }
 
+            // 第1個Table的特別處理
             treeList1.DataSource = sourceDt.Clone();
             hashTreeListBackColor[0].Clear();
             showTreeListByLevel(treeList1, sourceDt, ref hashTreeListBackColor[0], false);
@@ -77,7 +80,6 @@ namespace MvLocalProject.Viewer
             filterDt.Columns.Remove("AmountSpace");
             treeList2.DataSource = filterDt.Clone();
             hashTreeListBackColor[1].Clear();
-            //showTreeListByLevel(treeList2, filterDt, ref hashTreeListBackColor[1], true);
             showTreeListByLevel(treeList2, filterDt, ref hashTreeListBackColor[1], false);
             setColumnsCaption(ref treeList2);
 
@@ -87,14 +89,20 @@ namespace MvLocalProject.Viewer
             mocDt.Columns["ModuleLv1"].SetOrdinal(7);
             treeList3.DataSource = mocDt.Clone();
             hashTreeListBackColor[2].Clear();
-            //showTreeListByLevel(treeList3, mocDt, ref hashTreeListBackColor[2], true);
             showTreeListByLevel(treeList3, mocDt, ref hashTreeListBackColor[2], false);
             setColumnsCaption(ref treeList3);
 
             xtraTabControl1.TabPages[0].Text = sourceDt.TableName;
-            xtraTabControl1.TabPages[1].Text = sourceDt.TableName + "_標準製令";
+            xtraTabControl1.TabPages[1].Text = sourceDt.TableName + "_虛擬製令";
 
             // Sheet1,2 不開放編輯功能, treeList 1,2,3
+            treeList1.Columns["MD013"].Visible = false;
+            treeList2.Columns["MD013"].Visible = false;
+
+            treeList1.OptionsView.AutoWidth = false;
+            treeList2.OptionsView.AutoWidth = false;
+            treeList3.OptionsView.AutoWidth = false;
+
             treeList1.OptionsBehavior.ReadOnly = true;
             treeList2.OptionsBehavior.ReadOnly = true;
             treeList3.OptionsBehavior.ReadOnly = true;
@@ -105,7 +113,6 @@ namespace MvLocalProject.Viewer
 
             //Close Wait Form
             SplashScreenManager.CloseForm(false);
-
         }
 
         private void showTreeListByLevel(TreeList tl, DataTable dt, ref Hashtable hashTreeListBackColor, bool isChangeLv)
@@ -335,6 +342,84 @@ namespace MvLocalProject.Viewer
         private void frmBom_FormClosed(object sender, FormClosedEventArgs e)
         {
             Application.Exit();
+        }
+
+        private void treeList1_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                popupMenu1.ShowPopup(Control.MousePosition);
+            }
+        }
+
+        private void treeList2_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                popupMenu1.ShowPopup(Control.MousePosition);
+            }
+        }
+
+        private void treeList3_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                popupMenu1.ShowPopup(Control.MousePosition);
+            }
+        }
+
+        private void barCopyCell_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            TreeList treeList = null;
+
+            if (treeList1.Focused == true)
+            {
+                treeList = treeList1;
+            }
+            else if (treeList2.Focused == true)
+            {
+                treeList = treeList2;
+            }
+            else if (treeList3.Focused == true)
+            {
+                treeList = treeList3;
+            }
+
+            if (treeList == null) return;
+            Clipboard.SetText(treeList.FocusedNode.GetDisplayText(treeList.FocusedColumn));
+            textBox1.Text = Clipboard.GetText();
+        }
+
+        private void barExpandAll_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            if (treeList1.Focused == true)
+            {
+                treeList1.ExpandAll();
+            }
+            else if (treeList2.Focused == true)
+            {
+                treeList2.ExpandAll();
+            }
+            else if (treeList3.Focused == true)
+            {
+                treeList3.ExpandAll();
+            }
+        }
+
+        private void barCollapseAll_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            if (treeList1.Focused == true)
+            {
+                treeList1.CollapseAll();
+            }
+            else if (treeList2.Focused == true)
+            {
+                treeList2.CollapseAll();
+            }
+            else if (treeList3.Focused == true)
+            {
+                treeList3.CollapseAll();
+            }
         }
     }
 }

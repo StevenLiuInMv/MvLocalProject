@@ -66,7 +66,7 @@ namespace MvLocalProject.Viewer
                         sqlConnection.Dispose();
                     }
                 }
-                //
+                // 
                 cboRpt.DataSource = machineTypeMappingTable;
                 cboRpt.ValueMember = "MachTypeID";
                 cboRpt.DisplayMember = "Value.DisplayName";

@@ -35,6 +35,10 @@ namespace MvLocalProject.Controller
         {
             get { return ConfigurationManager.ConnectionStrings["ERPDB2.MACHVISION"].ConnectionString; }
         }
+        private static string ConnectionString_ERPDB2_Dot_MVTEST
+        {
+            get { return ConfigurationManager.ConnectionStrings["ERPDB2.MVTEST"].ConnectionString; }
+        }
 
         public static SqlConnection Connection_ERPBK_DEMO
         {
@@ -64,6 +68,11 @@ namespace MvLocalProject.Controller
         public static SqlConnection Connection_ERPDB2_Dot_MACHVISION
         {
             get { return new SqlConnection(ConnectionString_ERPDB2_Dot_MACHVISION); }
+        }
+
+        public static SqlConnection Connection_ERPDB2_Dot_MVTEST
+        {
+            get { return new SqlConnection(ConnectionString_ERPDB2_Dot_MVTEST); }
         }
 
         public static DataTable queryDataBySql(SqlCommand sqlCommand)

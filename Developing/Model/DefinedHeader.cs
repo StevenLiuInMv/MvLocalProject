@@ -75,4 +75,63 @@ namespace MvLocalProject.Model
         public static readonly MvHeader MD006 = new MvHeader("MD006", "數量");
         public static readonly List<MvHeader> Values = new List<MvHeader>() { CompareLV, CompareA8, CompareMD006, LV, A8, Column4, Column8, MB003, MB004, MD006 };
     }
+
+    public class MvErpDataModule_A121
+    {
+        private string ta004 = string.Empty;        // 部門代號
+        private string ta005 = string.Empty;        // 備註
+        private string ta008 = string.Empty;        // 廠別代號
+        private string ta015 = string.Empty;        // 確認者
+        private string tb004 = string.Empty;        // 品號
+        private int tb007 = int.MinValue;           // 數量
+        private string tb008 = string.Empty;        // 單位
+        private string tb012 = string.Empty;        // 轉出庫
+        private string tb013 = string.Empty;        // 轉入庫
+
+        /// <summary>
+        /// 部門代號
+        /// </summary>
+        public string TA004
+        { get { return ta004; } set { ta004 = value; } }
+        /// <summary>
+        /// 備註
+        /// </summary>
+        public string TA005
+        { get { return ta005; } set { ta005 = value; } }
+        /// <summary>
+        /// 廠別代號
+        /// </summary>
+        public string TA008
+        { get { return ta008; } set { ta008 = value; } }
+        /// <summary>
+        /// 確認者
+        /// </summary>
+        public string TA015
+        { get { return ta015; } set { ta015 = value; } }
+        /// <summary>
+        /// 品號
+        /// </summary>
+        public string TB004
+        { get { return tb004; } set { tb004 = value; } }
+        /// <summary>
+        /// 數量
+        /// </summary>
+        public int TB007
+        { get { return tb007; } set { tb007 = value; } }
+        /// <summary>
+        /// 單位
+        /// </summary>
+        public string TB008
+        { get { return tb008; } set { tb008 = value; } }
+        /// <summary>
+        /// 轉出庫
+        /// </summary>
+        public string TB012
+        { get { return tb012; } set { tb012 = value; } }
+        /// <summary>
+        /// 轉入庫
+        /// </summary>
+        public string TB013
+        { get { return tb013; } set { tb013 = value; } }
+    }
 }

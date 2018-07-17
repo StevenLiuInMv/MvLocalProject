@@ -31,7 +31,6 @@
             this.components = new System.ComponentModel.Container();
             this.lblBom = new DevExpress.XtraEditors.LabelControl();
             this.sbtnGetBomList = new DevExpress.XtraEditors.SimpleButton();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.cboBomType = new System.Windows.Forms.ComboBox();
             this.treeList1 = new DevExpress.XtraTreeList.TreeList();
             this.treeList2 = new DevExpress.XtraTreeList.TreeList();
@@ -41,14 +40,18 @@
             this.barDockControlBottom = new DevExpress.XtraBars.BarDockControl();
             this.barDockControlLeft = new DevExpress.XtraBars.BarDockControl();
             this.barDockControlRight = new DevExpress.XtraBars.BarDockControl();
-            this.barButtonItem1 = new DevExpress.XtraBars.BarButtonItem();
-            this.barButtonItem2 = new DevExpress.XtraBars.BarButtonItem();
-            this.barButtonItem3 = new DevExpress.XtraBars.BarButtonItem();
+            this.barCopyCell = new DevExpress.XtraBars.BarButtonItem();
+            this.barExpandAll = new DevExpress.XtraBars.BarButtonItem();
+            this.barCollapseAll = new DevExpress.XtraBars.BarButtonItem();
             this.xtraTabControl1 = new DevExpress.XtraTab.XtraTabControl();
             this.xtraTabPage1 = new DevExpress.XtraTab.XtraTabPage();
             this.xtraTabPage2 = new DevExpress.XtraTab.XtraTabPage();
             this.treeList3 = new DevExpress.XtraTreeList.TreeList();
-            this.groupBox1.SuspendLayout();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
+            this.groupControl1 = new DevExpress.XtraEditors.GroupControl();
+            this.groupControl2 = new DevExpress.XtraEditors.GroupControl();
+            this.popupMenu1 = new DevExpress.XtraBars.PopupMenu(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.treeList1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.treeList2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.barManager1)).BeginInit();
@@ -57,43 +60,36 @@
             this.xtraTabPage1.SuspendLayout();
             this.xtraTabPage2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.treeList3)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.groupControl1)).BeginInit();
+            this.groupControl1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.groupControl2)).BeginInit();
+            this.groupControl2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.popupMenu1)).BeginInit();
             this.SuspendLayout();
             // 
             // lblBom
             // 
-            this.lblBom.Location = new System.Drawing.Point(6, 23);
+            this.lblBom.Location = new System.Drawing.Point(5, 34);
             this.lblBom.Name = "lblBom";
-            this.lblBom.Size = new System.Drawing.Size(48, 14);
+            this.lblBom.Size = new System.Drawing.Size(31, 14);
             this.lblBom.TabIndex = 0;
-            this.lblBom.Text = "Bom編號";
+            this.lblBom.Text = "Name";
             // 
             // sbtnGetBomList
             // 
-            this.sbtnGetBomList.Location = new System.Drawing.Point(556, 7);
+            this.sbtnGetBomList.Location = new System.Drawing.Point(448, 30);
             this.sbtnGetBomList.Name = "sbtnGetBomList";
-            this.sbtnGetBomList.Size = new System.Drawing.Size(41, 45);
+            this.sbtnGetBomList.Size = new System.Drawing.Size(41, 23);
             this.sbtnGetBomList.TabIndex = 2;
             this.sbtnGetBomList.Text = "Get";
             this.sbtnGetBomList.Click += new System.EventHandler(this.sbtnGetBomList_Click);
             // 
-            // groupBox1
-            // 
-            this.groupBox1.Controls.Add(this.cboBomType);
-            this.groupBox1.Controls.Add(this.lblBom);
-            this.groupBox1.Controls.Add(this.sbtnGetBomList);
-            this.groupBox1.Location = new System.Drawing.Point(12, 32);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(597, 52);
-            this.groupBox1.TabIndex = 3;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Bom專區";
-            // 
             // cboBomType
             // 
             this.cboBomType.FormattingEnabled = true;
-            this.cboBomType.Location = new System.Drawing.Point(60, 21);
+            this.cboBomType.Location = new System.Drawing.Point(42, 30);
             this.cboBomType.Name = "cboBomType";
-            this.cboBomType.Size = new System.Drawing.Size(490, 20);
+            this.cboBomType.Size = new System.Drawing.Size(400, 22);
             this.cboBomType.TabIndex = 3;
             this.cboBomType.KeyDown += new System.Windows.Forms.KeyEventHandler(this.cboBomType_KeyDown);
             // 
@@ -105,6 +101,7 @@
             this.treeList1.Size = new System.Drawing.Size(639, 476);
             this.treeList1.TabIndex = 4;
             this.treeList1.NodeCellStyle += new DevExpress.XtraTreeList.GetCustomNodeCellStyleEventHandler(this.treeList1_NodeCellStyle);
+            this.treeList1.MouseUp += new System.Windows.Forms.MouseEventHandler(this.treeList1_MouseUp);
             // 
             // treeList2
             // 
@@ -114,10 +111,11 @@
             this.treeList2.Size = new System.Drawing.Size(639, 476);
             this.treeList2.TabIndex = 5;
             this.treeList2.NodeCellStyle += new DevExpress.XtraTreeList.GetCustomNodeCellStyleEventHandler(this.treeList2_NodeCellStyle);
+            this.treeList2.MouseUp += new System.Windows.Forms.MouseEventHandler(this.treeList2_MouseUp);
             // 
             // btnExportExcel
             // 
-            this.btnExportExcel.Location = new System.Drawing.Point(1243, 32);
+            this.btnExportExcel.Location = new System.Drawing.Point(1244, 4);
             this.btnExportExcel.Name = "btnExportExcel";
             this.btnExportExcel.Size = new System.Drawing.Size(63, 33);
             this.btnExportExcel.TabIndex = 6;
@@ -134,10 +132,10 @@
             this.barManager1.DockControls.Add(this.barDockControlRight);
             this.barManager1.Form = this;
             this.barManager1.Items.AddRange(new DevExpress.XtraBars.BarItem[] {
-            this.barButtonItem1,
-            this.barButtonItem2,
-            this.barButtonItem3});
-            this.barManager1.MaxItemId = 3;
+            this.barCopyCell,
+            this.barExpandAll,
+            this.barCollapseAll});
+            this.barManager1.MaxItemId = 8;
             // 
             // barDockControlTop
             // 
@@ -171,25 +169,26 @@
             this.barDockControlRight.Manager = this.barManager1;
             this.barDockControlRight.Size = new System.Drawing.Size(0, 616);
             // 
-            // barButtonItem1
+            // barCopyCell
             // 
-            this.barButtonItem1.ActAsDropDown = true;
-            this.barButtonItem1.ButtonStyle = DevExpress.XtraBars.BarButtonStyle.DropDown;
-            this.barButtonItem1.Caption = "Export";
-            this.barButtonItem1.Id = 0;
-            this.barButtonItem1.Name = "barButtonItem1";
+            this.barCopyCell.Caption = "CopyCell";
+            this.barCopyCell.Id = 5;
+            this.barCopyCell.Name = "barCopyCell";
+            this.barCopyCell.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.barCopyCell_ItemClick);
             // 
-            // barButtonItem2
+            // barExpandAll
             // 
-            this.barButtonItem2.Caption = "barButtonItem2";
-            this.barButtonItem2.Id = 1;
-            this.barButtonItem2.Name = "barButtonItem2";
+            this.barExpandAll.Caption = "ExpandAll";
+            this.barExpandAll.Id = 6;
+            this.barExpandAll.Name = "barExpandAll";
+            this.barExpandAll.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.barExpandAll_ItemClick);
             // 
-            // barButtonItem3
+            // barCollapseAll
             // 
-            this.barButtonItem3.Caption = "barButtonItem3";
-            this.barButtonItem3.Id = 2;
-            this.barButtonItem3.Name = "barButtonItem3";
+            this.barCollapseAll.Caption = "CollapseAll";
+            this.barCollapseAll.Id = 7;
+            this.barCollapseAll.Name = "barCollapseAll";
+            this.barCollapseAll.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.barCollapseAll_ItemClick);
             // 
             // xtraTabControl1
             // 
@@ -225,15 +224,53 @@
             this.treeList3.Size = new System.Drawing.Size(1286, 476);
             this.treeList3.TabIndex = 5;
             this.treeList3.NodeCellStyle += new DevExpress.XtraTreeList.GetCustomNodeCellStyleEventHandler(this.treeList3_NodeCellStyle);
+            this.treeList3.MouseUp += new System.Windows.Forms.MouseEventHandler(this.treeList3_MouseUp);
+            // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(5, 28);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(188, 22);
+            this.textBox1.TabIndex = 22;
+            // 
+            // groupControl1
+            // 
+            this.groupControl1.Controls.Add(this.textBox1);
+            this.groupControl1.Location = new System.Drawing.Point(1109, 53);
+            this.groupControl1.Name = "groupControl1";
+            this.groupControl1.Size = new System.Drawing.Size(198, 59);
+            this.groupControl1.TabIndex = 27;
+            this.groupControl1.Text = "Cell Selected";
+            // 
+            // groupControl2
+            // 
+            this.groupControl2.Controls.Add(this.sbtnGetBomList);
+            this.groupControl2.Controls.Add(this.cboBomType);
+            this.groupControl2.Controls.Add(this.lblBom);
+            this.groupControl2.Location = new System.Drawing.Point(12, 25);
+            this.groupControl2.Name = "groupControl2";
+            this.groupControl2.Size = new System.Drawing.Size(497, 59);
+            this.groupControl2.TabIndex = 28;
+            this.groupControl2.Text = "Bom Selection";
+            // 
+            // popupMenu1
+            // 
+            this.popupMenu1.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
+            new DevExpress.XtraBars.LinkPersistInfo(this.barCopyCell),
+            new DevExpress.XtraBars.LinkPersistInfo(this.barExpandAll),
+            new DevExpress.XtraBars.LinkPersistInfo(this.barCollapseAll)});
+            this.popupMenu1.Manager = this.barManager1;
+            this.popupMenu1.Name = "popupMenu1";
             // 
             // frmBom
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1318, 616);
+            this.Controls.Add(this.groupControl2);
+            this.Controls.Add(this.groupControl1);
             this.Controls.Add(this.xtraTabControl1);
             this.Controls.Add(this.btnExportExcel);
-            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.barDockControlLeft);
             this.Controls.Add(this.barDockControlRight);
             this.Controls.Add(this.barDockControlBottom);
@@ -246,8 +283,6 @@
             this.Text = "frmBom";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.frmBom_FormClosed);
             this.Load += new System.EventHandler(this.frmBom_Load);
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.treeList1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.treeList2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.barManager1)).EndInit();
@@ -256,6 +291,13 @@
             this.xtraTabPage1.ResumeLayout(false);
             this.xtraTabPage2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.treeList3)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.groupControl1)).EndInit();
+            this.groupControl1.ResumeLayout(false);
+            this.groupControl1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.groupControl2)).EndInit();
+            this.groupControl2.ResumeLayout(false);
+            this.groupControl2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.popupMenu1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -265,22 +307,26 @@
 
         private DevExpress.XtraEditors.LabelControl lblBom;
         private DevExpress.XtraEditors.SimpleButton sbtnGetBomList;
-        private System.Windows.Forms.GroupBox groupBox1;
         private DevExpress.XtraTreeList.TreeList treeList1;
         private System.Windows.Forms.ComboBox cboBomType;
         private DevExpress.XtraTreeList.TreeList treeList2;
         private System.Windows.Forms.Button btnExportExcel;
         private DevExpress.XtraBars.BarManager barManager1;
-        private DevExpress.XtraBars.BarButtonItem barButtonItem1;
         private DevExpress.XtraBars.BarDockControl barDockControlTop;
         private DevExpress.XtraBars.BarDockControl barDockControlBottom;
         private DevExpress.XtraBars.BarDockControl barDockControlLeft;
         private DevExpress.XtraBars.BarDockControl barDockControlRight;
-        private DevExpress.XtraBars.BarButtonItem barButtonItem2;
-        private DevExpress.XtraBars.BarButtonItem barButtonItem3;
         private DevExpress.XtraTab.XtraTabControl xtraTabControl1;
         private DevExpress.XtraTab.XtraTabPage xtraTabPage1;
         private DevExpress.XtraTab.XtraTabPage xtraTabPage2;
         private DevExpress.XtraTreeList.TreeList treeList3;
+        private System.Windows.Forms.TextBox textBox1;
+        private System.ComponentModel.BackgroundWorker backgroundWorker1;
+        private DevExpress.XtraEditors.GroupControl groupControl1;
+        private DevExpress.XtraEditors.GroupControl groupControl2;
+        private DevExpress.XtraBars.PopupMenu popupMenu1;
+        private DevExpress.XtraBars.BarButtonItem barCopyCell;
+        private DevExpress.XtraBars.BarButtonItem barExpandAll;
+        private DevExpress.XtraBars.BarButtonItem barCollapseAll;
     }
 }

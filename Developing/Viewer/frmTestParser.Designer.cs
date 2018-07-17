@@ -52,6 +52,7 @@
             this.textBox4 = new System.Windows.Forms.TextBox();
             this.textBox5 = new System.Windows.Forms.TextBox();
             this.textBox6 = new System.Windows.Forms.TextBox();
+            this.sbCreateA121 = new DevExpress.XtraEditors.SimpleButton();
             ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.groupControl1)).BeginInit();
@@ -124,7 +125,7 @@
             // 
             // sbCheckInvmb
             // 
-            this.sbCheckInvmb.Location = new System.Drawing.Point(388, 12);
+            this.sbCheckInvmb.Location = new System.Drawing.Point(282, 12);
             this.sbCheckInvmb.Name = "sbCheckInvmb";
             this.sbCheckInvmb.Size = new System.Drawing.Size(76, 20);
             this.sbCheckInvmb.TabIndex = 7;
@@ -277,11 +278,21 @@
             this.textBox6.Size = new System.Drawing.Size(223, 22);
             this.textBox6.TabIndex = 17;
             // 
+            // sbCreateA121
+            // 
+            this.sbCreateA121.Location = new System.Drawing.Point(388, 12);
+            this.sbCreateA121.Name = "sbCreateA121";
+            this.sbCreateA121.Size = new System.Drawing.Size(76, 20);
+            this.sbCreateA121.TabIndex = 18;
+            this.sbCreateA121.Text = "create_A121";
+            this.sbCreateA121.Click += new System.EventHandler(this.sbCreateA121_Click);
+            // 
             // frmTestParser
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1077, 628);
+            this.Controls.Add(this.sbCreateA121);
             this.Controls.Add(this.textBox6);
             this.Controls.Add(this.textBox5);
             this.Controls.Add(this.textBox4);
@@ -343,5 +354,6 @@
         private System.Windows.Forms.TextBox textBox4;
         private System.Windows.Forms.TextBox textBox5;
         private System.Windows.Forms.TextBox textBox6;
+        private DevExpress.XtraEditors.SimpleButton sbCreateA121;
     }
 }

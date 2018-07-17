@@ -22,7 +22,7 @@ namespace MvLocalProject.Viewer
         {
             DataTable dt = new DataTable();
 
-            dt = MvDbDao.collectData_PurP17("20180508");
+            dt = MvDbDao.collectData_PurP17_VB6("20180508");
             treeList1.DataSource = dt;
 
         }

@@ -6,12 +6,9 @@ using MvLocalProject.Controller;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace MvLocalProject.Viewer
@@ -32,7 +29,7 @@ namespace MvLocalProject.Viewer
             {
                 // 第一次取得BomList
                 DataTable tmpDt = null;
-                tmpDt = MvDbDao.collectData_BomP09_BomList();
+                tmpDt = MvDbDao.collectData_BomList();
                 cboBomType.DataSource = tmpDt;
                 cboBomType.ValueMember = "MC001";
                 cboBomType.DisplayMember = "MB0012";
@@ -61,7 +58,7 @@ namespace MvLocalProject.Viewer
 
             // get source data set
             DataSet sourceDs;
-            sourceDs = bo.GetBomP07InfoByDev(result, false).Copy();
+            sourceDs = bo.GetDevDataSet_BomP07_VB6(result, false).Copy();
             DataTable sourceDt = sourceDs.Tables[result].Copy();
 
             treeList1.DataSource = sourceDt.Clone();
@@ -71,7 +68,7 @@ namespace MvLocalProject.Viewer
 
             // get source data set by 易全哥
             DataSet sourceDsThin;
-            sourceDsThin = bo.GetBomP07ThinInfoByDev(result, false).Copy();
+            sourceDsThin = bo.GetDevDataSet_BomP09_Thin(result, false).Copy();
             DataTable sourceDtThin = sourceDsThin.Tables[result].Copy();
 
             treeList2.DataSource = sourceDtThin.Clone();
@@ -97,7 +94,7 @@ namespace MvLocalProject.Viewer
             {
                 // 第一次取得BomList
                 DataTable tmpDt = null;
-                tmpDt = MvDbDao.collectData_BomP09_BomList();
+                tmpDt = MvDbDao.collectData_BomList();
                 cboBomType.DataSource = tmpDt;
                 cboBomType.ValueMember = "MC001";
                 cboBomType.DisplayMember = "MB0012";
@@ -126,7 +123,7 @@ namespace MvLocalProject.Viewer
 
             // get source data set by stored procedure
             DataSet sourceDs;
-            sourceDs = bo.GetBomP07ThinInfoByDev(result, false).Copy();
+            sourceDs = bo.GetDevDataSet_BomP09_Thin(result, false).Copy();
             DataTable sourceDt = sourceDs.Tables[result].Copy();
 
             treeList1.DataSource = sourceDt.Clone();
@@ -136,7 +133,7 @@ namespace MvLocalProject.Viewer
 
             // get source data set by optional data
             DataSet sourceDsOptional;
-            sourceDsOptional = bo.GetBomP07ThinInfoByDev(result, false).Copy();
+            sourceDsOptional = bo.GetDevDataSet_BomP09_Thin(result, false).Copy();
             DataTable sourceDtOptional = sourceDsOptional.Tables[result].Copy();
 
             treeList2.DataSource = sourceDtOptional.Clone();
@@ -308,6 +305,23 @@ namespace MvLocalProject.Viewer
                 showNodes(node);
             }
             return;
+        }
+
+        private void treeList2_KeyDown(object sender, KeyEventArgs e)
+        {
+            //if (e.Control && e.KeyCode == Keys.C)
+            //{
+            //    TreeList treeList = (TreeList)sender;
+            //    Clipboard.SetText(treeList.FocusedNode.GetDisplayText(treeList.FocusedColumn));
+            //    e.Handled = true;
+            //}
+        }
+
+        private void sbCopyCell_Click(object sender, EventArgs e)
+        {
+            TreeList treeList = treeList2;
+            Clipboard.SetText(treeList.FocusedNode.GetDisplayText(treeList.FocusedColumn));
+            textBox1.Text = Clipboard.GetText();
         }
     }
 }

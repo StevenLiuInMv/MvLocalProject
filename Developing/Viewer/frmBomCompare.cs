@@ -55,7 +55,7 @@ namespace MvLocalProject.Viewer
         private void btnGetBomList_Click(object sender, EventArgs e)
         {
             DataTable tmpDt = null;
-            tmpDt = MvDbDao.collectData_BomP09_BomList();
+            tmpDt = MvDbDao.collectData_BomList();
             cboBomType.DataSource = tmpDt;
             cboBomType.ValueMember = "MC001";
             cboBomType.DisplayMember = "MB0012";
@@ -198,7 +198,7 @@ namespace MvLocalProject.Viewer
             DataSet tmpDs = new DataSet();
 
             MvBomCompareBo bo = new MvBomCompareBo();
-            sourceDs = bo.CollectSourceDsBomP09Process(selectedList);
+            sourceDs = bo.CollectSourceDsProcess_BomP09_VB6(selectedList);
             if (sourceDs.Tables.Count <= 1)
             {
                 MessageBox.Show(string.Format("One or all data from bom's id is empty {0}Bom1 Id : {1}{0}Bom2 Id : {2}{0}", Environment.NewLine, selectedList[0], selectedList[1]));

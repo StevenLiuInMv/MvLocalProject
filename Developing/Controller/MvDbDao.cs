@@ -13,6 +13,41 @@ namespace MvLocalProject.Controller
     internal sealed class MvDbDao : IDisposable
     {
 
+        #region IDisposable Support
+        private bool disposedValue = false; // 偵測多餘的呼叫
+
+        void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    // TODO: 處置 Managed 狀態 (Managed 物件)。
+                }
+
+                // TODO: 釋放 Unmanaged 資源 (Unmanaged 物件) 並覆寫下方的完成項。
+                // TODO: 將大型欄位設為 null。
+
+                disposedValue = true;
+            }
+        }
+
+        // TODO: 僅當上方的 Dispose(bool disposing) 具有會釋放 Unmanaged 資源的程式碼時，才覆寫完成項。
+        // ~MvDbDao() {
+        //   // 請勿變更這個程式碼。請將清除程式碼放入上方的 Dispose(bool disposing) 中。
+        //   Dispose(false);
+        // }
+
+        // 加入這個程式碼的目的在正確實作可處置的模式。
+        public void Dispose()
+        {
+            // 請勿變更這個程式碼。請將清除程式碼放入上方的 Dispose(bool disposing) 中。
+            Dispose(true);
+            // TODO: 如果上方的完成項已被覆寫，即取消下行的註解狀態。
+            // GC.SuppressFinalize(this);
+        }
+        #endregion
+
         public static DataSet collectData_MocP10Auto_VB6(DateTime dateTime)
         {
 
@@ -303,7 +338,7 @@ namespace MvLocalProject.Controller
         /// 取得BomP09 要顯示的產品編號
         /// </summary>
         /// <returns></returns>
-        public static DataTable collectData_BomP09_BomList()
+        public static DataTable collectData_BomList()
         {
             DataTable majorData = null;
             StringBuilder sb = new StringBuilder();
@@ -335,7 +370,7 @@ namespace MvLocalProject.Controller
             return majorData;
         }
 
-        public static bool checkData_BomP09_BomInInvmb(string pattern)
+        public static bool checkData_BomInInvmb(string pattern)
         {
             StringBuilder sb = new StringBuilder();
             DataTable majorData = null;
@@ -604,7 +639,7 @@ namespace MvLocalProject.Controller
             foreach (string bomId in bomIdList)
             {
                 dt = null;
-                bool isExist = checkData_BomP09_BomInInvmb(bomId);
+                bool isExist = checkData_BomInInvmb(bomId);
                 if (isExist == false)
                 {
                     continue;
@@ -662,7 +697,7 @@ namespace MvLocalProject.Controller
             return majorData;
         }
 
-        public static DataTable collectData_BomP09(string bomId)
+        public static DataTable collectData_BomP09_Thin(string bomId)
         {
 
             DataTable majorData = null;
@@ -676,7 +711,7 @@ namespace MvLocalProject.Controller
                 {
                     connection.Open();
 
-                    sb.AppendLine(string.Format(@"SELECT LV, MD003 as A8, MB025 as MB025X, MB002 as Column4, MB004, MD006, MD200 as Column9 FROM MACHVISION.dbo.GetBomPartList('{0}')", bomId));
+                    sb.AppendLine(string.Format(@"SELECT LV, MD003 as A8, MB025 as MB025X, MB002 as Column4, MB004, MD006, RTRIM(MD200) as Column9, MD013 FROM MACHVISION.dbo.GetBomPartList('{0}')", bomId));
                     command.CommandText = sb.ToString();
                     majorData = MvDbConnector.queryDataBySql(command);
                     majorData.TableName = bomId;
@@ -703,7 +738,7 @@ namespace MvLocalProject.Controller
             return majorData;
         }
 
-        public static DataSet collectData_BomP09(string[] bomIdList)
+        public static DataSet collectData_BomP09_Thin(string[] bomIdList)
         {
 
             DataSet ds = new DataSet("BomTables");
@@ -712,18 +747,18 @@ namespace MvLocalProject.Controller
             foreach (string bomId in bomIdList)
             {
                 dt = null;
-                bool isExist = checkData_BomP09_BomInInvmb(bomId);
+                bool isExist = checkData_BomInInvmb(bomId);
                 if (isExist == false)
                 {
                     continue;
                 }
-                dt = collectData_BomP09(bomId);
+                dt = collectData_BomP09_Thin(bomId);
                 ds.Tables.Add(dt);
             }
             return ds;
         }
 
-        public static DataTable collectData_PurP17(string dateTime)
+        public static DataTable collectData_PurP17_VB6(string dateTime)
         {
             DataTable majorData = null;
             StringBuilder sb = new StringBuilder();
@@ -791,9 +826,10 @@ namespace MvLocalProject.Controller
                 {
                     connection.Open();
 
-                    sb.AppendLine("SELECT TA024+'-'+TA025 '母製令', TB001+'-'+TB002 '子製令',TA006 '模組', TB003 '品號', TB012 '品名', TB013'規格', Convert(int,TB004) '需領用量', Convert(int,TB005) '已領用量', MB077 '類別' ")
+                    //sb.AppendLine("SELECT TA024+'-'+TA025 '母製令', TB001+'-'+TB002 '子製令',TA006 '模組', TB003 '品號', TB012 '品名', TB013'規格', Convert(int,TB004) '需領用量', Convert(int,TB005) '已領用量', MB077 '類別' ")
+                    sb.AppendLine("SELECT TA024+'-'+TA025 'ParentMoc', TB001+'-'+TB002 'ChildMoc', RTRIM(TA006) TA006, RTRIM(TB003) TB003, TB012, TB013, Convert(int,TB004) 'TB004', Convert(int,TB005) 'TB005', MB077 ")
                         .AppendLine("FROM ERPDB2.MACHVISION.dbo.MOCTA A, ERPDB2.MACHVISION.dbo.MOCTB B, ERPDB2.MACHVISION.dbo.INVMB MB ")
-                        .AppendLine(string.Format("WHERE TA024 = '{0}' AND TA025 = '{1}' AND A.TA001 = B.TB001 AND A.TA002 = B.TB002 AND TB003 = MB001 AND TB018 <> 'V'", mocType.ToUpper(), mocNumber));
+                        .AppendLine(string.Format("WHERE TA024 = '{0}' AND TA025 = '{1}' AND A.TA001 = B.TB001 AND A.TA002 = B.TB002 AND TB003 = MB001 AND TB018 <> 'V' ORDER BY B.TB001, B.TB002", mocType.ToUpper(), mocNumber));
 
                     command.CommandText = sb.ToString();
                     majorData = MvDbConnector.queryDataBySql(command);
@@ -907,7 +943,7 @@ namespace MvLocalProject.Controller
             {
                 dt = null;
                 // BomP09跟BomP07的檢查邏輯相同, 所以直接引用
-                bool isExist = checkData_BomP09_BomInInvmb(bomId);
+                bool isExist = checkData_BomInInvmb(bomId);
                 if (isExist == false)
                 {
                     continue;
@@ -1145,7 +1181,7 @@ namespace MvLocalProject.Controller
             {
                 dt = null;
                 // BomP09跟BomP07的檢查邏輯相同, 所以直接引用
-                bool isExist = checkData_BomP09_BomInInvmb(bomId);
+                bool isExist = checkData_BomInInvmb(bomId);
                 if (isExist == false)
                 {
                     continue;
@@ -1353,39 +1389,11 @@ namespace MvLocalProject.Controller
             return majorData;
         }
 
-        #region IDisposable Support
-        private bool disposedValue = false; // 偵測多餘的呼叫
 
-        void Dispose(bool disposing)
+        public void createErpNote_A121(DateTime noteDate)
         {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    // TODO: 處置 Managed 狀態 (Managed 物件)。
-                }
 
-                // TODO: 釋放 Unmanaged 資源 (Unmanaged 物件) 並覆寫下方的完成項。
-                // TODO: 將大型欄位設為 null。
-
-                disposedValue = true;
-            }
         }
 
-        // TODO: 僅當上方的 Dispose(bool disposing) 具有會釋放 Unmanaged 資源的程式碼時，才覆寫完成項。
-        // ~MvDbDao() {
-        //   // 請勿變更這個程式碼。請將清除程式碼放入上方的 Dispose(bool disposing) 中。
-        //   Dispose(false);
-        // }
-
-        // 加入這個程式碼的目的在正確實作可處置的模式。
-        public void Dispose()
-        {
-            // 請勿變更這個程式碼。請將清除程式碼放入上方的 Dispose(bool disposing) 中。
-            Dispose(true);
-            // TODO: 如果上方的完成項已被覆寫，即取消下行的註解狀態。
-            // GC.SuppressFinalize(this);
-        }
-        #endregion
     }
 }

@@ -36,6 +36,8 @@
             this.treeList2 = new DevExpress.XtraTreeList.TreeList();
             this.sbDebug = new DevExpress.XtraEditors.SimpleButton();
             this.sbConvertToMoc = new DevExpress.XtraEditors.SimpleButton();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.sbCopyCell = new DevExpress.XtraEditors.SimpleButton();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.treeList1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.treeList2)).BeginInit();
@@ -114,11 +116,29 @@
             this.sbConvertToMoc.Text = "DebugCheck";
             this.sbConvertToMoc.Click += new System.EventHandler(this.sbConvertToMoc_Click);
             // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(768, 35);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(160, 22);
+            this.textBox1.TabIndex = 8;
+            // 
+            // sbCopyCell
+            // 
+            this.sbCopyCell.Location = new System.Drawing.Point(934, 27);
+            this.sbCopyCell.Name = "sbCopyCell";
+            this.sbCopyCell.Size = new System.Drawing.Size(61, 32);
+            this.sbCopyCell.TabIndex = 4;
+            this.sbCopyCell.Text = "CopyCell";
+            this.sbCopyCell.Click += new System.EventHandler(this.sbCopyCell_Click);
+            // 
             // frmTestMisGetBom
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1477, 635);
+            this.Controls.Add(this.sbCopyCell);
+            this.Controls.Add(this.textBox1);
             this.Controls.Add(this.sbConvertToMoc);
             this.Controls.Add(this.sbDebug);
             this.Controls.Add(this.treeList2);
@@ -136,6 +156,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.treeList1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.treeList2)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -149,5 +170,7 @@
         private DevExpress.XtraTreeList.TreeList treeList2;
         private DevExpress.XtraEditors.SimpleButton sbDebug;
         private DevExpress.XtraEditors.SimpleButton sbConvertToMoc;
+        private System.Windows.Forms.TextBox textBox1;
+        private DevExpress.XtraEditors.SimpleButton sbCopyCell;
     }
 }

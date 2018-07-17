@@ -193,7 +193,7 @@ namespace MvLocalProject.Viewer
                     break;
                 case DefinedReport.ErpReportType.BomP09:
                     // initial button value
-                    tmpDt = MvDbDao.collectData_BomP09_BomList();
+                    tmpDt = MvDbDao.collectData_BomList();
                     cboBomType.DataSource = tmpDt;
                     cboBomType.ValueMember = "MC001";
                     cboBomType.DisplayMember = "MB0012";
@@ -204,7 +204,7 @@ namespace MvLocalProject.Viewer
                     break;
                 case DefinedReport.ErpReportType.BomP09_Multi:
                     // initial button value
-                    tmpDt = MvDbDao.collectData_BomP09_BomList();
+                    tmpDt = MvDbDao.collectData_BomList();
                     chkBomListBox.DataSource = tmpDt;
                     chkBomListBox.ValueMember = "MC001";
                     chkBomListBox.DisplayMember = "MB0012";

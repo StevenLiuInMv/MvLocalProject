@@ -15,6 +15,8 @@ using MvLocalProject.Controller;
 using DevExpress.XtraGrid.Views.Grid;
 using MvLocalProject.Model;
 using System.Collections;
+using System.Transactions;
+using System.Data.SqlClient;
 
 namespace MvLocalProject.Viewer
 {
@@ -168,7 +170,7 @@ namespace MvLocalProject.Viewer
             MvBomCompareBo bo = new MvBomCompareBo();
 
             // collect bom source by bom id and show
-            sourceDs = bo.CollectSourceDsBomP07ThinProcess(new string[] { bomId }).Copy();
+            sourceDs = bo.CollectSourceDsProcess_BomP07_Thin(new string[] { bomId }).Copy();
             DataTable sourceDt1 = sourceDs.Tables[0].Copy();
             //bo.filterBomP07ColumnByPdRule(ref sourceDt1);
             gridControl1.DataSource = sourceDt1;
@@ -195,7 +197,7 @@ namespace MvLocalProject.Viewer
         {
             // 第一次取得BomList
             DataTable tmpDt = null;
-            tmpDt = MvDbDao.collectData_BomP09_BomList();
+            tmpDt = MvDbDao.collectData_BomList();
             cboBomType.DataSource = tmpDt.Copy();
             cboBomType.ValueMember = "MC001";
             cboBomType.DisplayMember = "MB0012";
@@ -330,6 +332,44 @@ namespace MvLocalProject.Viewer
             gridControl1.DataSource = dt;
             // close Wait Form
             SplashScreenManager.CloseForm(false);
+        }
+
+        private void sbCreateA121_Click(object sender, EventArgs e)
+        {
+            DataTable majorData = null;
+            StringBuilder sb = new StringBuilder();
+
+            using (TransactionScope scope = new TransactionScope())
+            {
+                SqlConnection connection = MvDbConnector.Connection_ERPDB2_Dot_MVTEST;
+                SqlCommand command = connection.CreateCommand();
+                try
+                {
+                    connection.Open();
+
+                    sb.AppendLine(string.Format(@"SELECT LV, MD003 as A8, MB025 as MB025X, MB002 as Column4, MB004, MD006, RTRIM(MD200) as Column9, MD013 FROM MACHVISION.dbo.GetBomPartList('{0}')", "21506066V01"));
+                    command.CommandText = sb.ToString();
+                    majorData = MvDbConnector.queryDataBySql(command);
+                    majorData.TableName = "Test";
+
+                    //做完以後
+                    scope.Complete();
+                }
+                catch (SqlException se)
+                {
+                    //發生例外時，會自動rollback
+                    throw se;
+                }
+                finally
+                {
+                    command.Dispose();
+                    connection.Close();
+                    connection.Dispose();
+                }
+            }
+
+            // release parameter
+            sb = null;
         }
     }
 }
