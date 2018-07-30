@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data;
 using System.Transactions;
+using MvLocalProject.Model;
 
 namespace MvLocalProject.Controller
 {
@@ -857,7 +858,7 @@ namespace MvLocalProject.Controller
             return majorData;
         }
 
-        public static DataTable collectData_ItMxMail(string startDate , string endDate)
+        public static DataTable collectData_ItMxMail(string startDate, string endDate)
         {
             DataTable majorData = null;
             StringBuilder sb = new StringBuilder();
@@ -949,7 +950,7 @@ namespace MvLocalProject.Controller
                     continue;
                 }
                 dt = collectData_BomP07_VB6(bomId, false);
-                
+
                 ds.Tables.Add(dt);
             }
             return ds;
@@ -1094,7 +1095,7 @@ namespace MvLocalProject.Controller
                         finalSUBPN = finalSUBPN.Remove(finalSUBPN.Length - 1, 1);
                         // 組合update 取替代料的Sql
                         sb.Clear();
-                        sb.Append(string.Format("UPDATE TEMP.dbo.TMP_BOMP07 SET SUBPN='{0}' ",finalSUBPN));
+                        sb.Append(string.Format("UPDATE TEMP.dbo.TMP_BOMP07 SET SUBPN='{0}' ", finalSUBPN));
                         int index = 0;
                         for (int i = 0; i < rowCount; i++)
                         {
@@ -1248,7 +1249,7 @@ namespace MvLocalProject.Controller
         {
             StringBuilder sb = new StringBuilder();
             sb.Append("DECLARE @dtTempTable TABLE (MB001 NVARCHAR(50));");
-            foreach(string item in itemList)
+            foreach (string item in itemList)
             {
                 sb.Append(string.Format("INSERT INTO @dtTempTable (MB001) VALUES ('{0}');", item));
             }
@@ -1356,7 +1357,7 @@ namespace MvLocalProject.Controller
                     .AppendLine(string.Format("  AND TA.TA001 = '{0}' ", orderType))
                     .AppendLine("GROUP BY TA.CREATE_DATE, TA.TA001, TA.TA002, TB.TB039 ");
             }
-            else if(isInTablePURTC == true)
+            else if (isInTablePURTC == true)
             {
                 sb.AppendLine(@"SELECT TC.CREATE_DATE, TC.TC001 ""TC001"", TC.TC002 ""TC002"", TD.TD016 ""TD016"", COUNT(*) ""SUMMARY"" ")
                     .AppendLine(" FROM MACHVISION.dbo.PURTC TC, MACHVISION.dbo.PURTD TD ")
@@ -1395,5 +1396,207 @@ namespace MvLocalProject.Controller
 
         }
 
+
+        public static bool validData_INVTA(DataTable dt)
+        {
+            if (dt.Columns.Count != ErpDbTableColumsCount.INVTA) return false;
+            if (dt.Rows.Count == 0) return true;
+            return checkHasNullValue(dt);
+        }
+
+        public static bool validData_INVTB(DataTable dt)
+        {
+            if (dt.Columns.Count != ErpDbTableColumsCount.INVTB) return false;
+            if (dt.Rows.Count == 0) return true;
+            return checkHasNullValue(dt);
+        }
+
+
+
+        private static bool checkHasNullValue(DataTable dt)
+        {
+            foreach (DataRow dr in dt.Rows)
+            {
+                foreach (DataColumn dc in dt.Columns)
+                {
+                    if (dr.IsNull(dc) == true)
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        public static DataRow simulateData_INVTA(DataTable dt)
+        {
+            if (validData_INVTA(dt) == false)
+            {
+                return null;
+            }
+            DataRow dr = dt.NewRow();
+            string defaultDate = DateTime.Now.ToString("yyyyMMdd");
+            dr["COMPANY"] = MvCompany.MVTEST.ToString();
+            dr["CREATOR"] = "MIS_TEST";
+            dr["USR_GROUP"] = "220";
+            dr["CREATE_DATE"] = defaultDate;
+            dr["MODIFIER"] = "MIS_TEST";
+            dr["MODI_DATE"] = defaultDate;
+            dr["FLAG"] = 1;
+            dr["TA001"] = "A121";
+            dr["TA002"] = DateTime.Now.ToString("yyyyMM") + "99999";
+            dr["TA003"] = defaultDate;
+            dr["TA004"] = "220";
+            dr["TA005"] = "MIS_TEST";
+            dr["TA006"] = "N";
+            dr["TA007"] = 0;
+            dr["TA008"] = "001";
+            dr["TA009"] = "11";
+            dr["TA010"] = 0;
+            dr["TA011"] = 0;
+            dr["TA012"] = 0;
+            dr["TA013"] = "N";
+            dr["TA014"] = defaultDate;
+            dr["TA015"] = "";
+            dr["TA016"] = 0;
+            dr["TA017"] = "0";
+            dr["TA018"] = "0";
+            dr["TA019"] = 0;
+            dr["TA020"] = "6";
+            dr["TA021"] = "";
+            dr["TA022"] = "";
+            dr["TA023"] = 0;
+            dr["TA024"] = 0;
+            dr["TA025"] = "";
+            dr["TA026"] = "";
+            dr["TA027"] = "";
+            dr["TA028"] = "";
+            dr["UDF01"] = "";
+            dr["UDF02"] = "";
+            dr["UDF03"] = "";
+            dr["UDF04"] = "";
+            dr["UDF05"] = "";
+            dr["UDF06"] = 0;
+            dr["UDF07"] = 0;
+            dr["UDF08"] = 0;
+            dr["UDF09"] = 0;
+            dr["UDF10"] = 0;
+            dr["TA200"] = "";
+            dr["TA201"] = "";
+
+            defaultDate = null;
+            return dr;
+        }
+
+
+
+        public static DataRow simulateData_INVTB(SqlConnection connection, DataTable dt, string item)
+        {
+            if (validData_INVTB(dt) == false)
+            {
+                return null;
+            }
+
+            DataTable tempDt = collectData_Invmb(connection, item);
+            if (tempDt.Rows.Count != 1)
+            {
+                return null;
+            }
+
+            DataRow drINVMB = tempDt.Rows[0];
+
+            DataRow dr = dt.NewRow();
+            string defaultDate = DateTime.Now.ToString("yyyyMMdd");
+            dr["COMPANY"] = MvCompany.MVTEST.ToString();
+            dr["CREATOR"] = "MIS_TEST";
+            dr["USR_GROUP"] = "220";
+            dr["CREATE_DATE"] = defaultDate;
+            dr["MODIFIER"] = "MIS_TEST";
+            dr["MODI_DATE"] = defaultDate;
+            dr["FLAG"] = 1;
+
+            dr["TB001"] = "A121";
+            dr["TB002"] = DateTime.Now.ToString("yyyyMM") + "99999";
+            dr["TB003"] = "001";
+            dr["TB004"] = drINVMB["MB001"];
+            dr["TB005"] = drINVMB["MB002"];
+            dr["TB006"] = drINVMB["MB003"];
+            dr["TB007"] = 0;
+            dr["TB008"] = drINVMB["MB004"];
+            dr["TB009"] = 0;
+            dr["TB010"] = 0;
+            dr["TB011"] = 0;
+            dr["TB012"] = "";////
+            dr["TB013"] = "T02";
+            dr["TB014"] = "";
+            dr["TB015"] = "";
+            dr["TB016"] = "";
+            dr["TB017"] = "MIS_TEST";
+            dr["TB018"] = "N";
+            dr["TB019"] = "";
+            dr["TB020"] = "";
+            dr["TB021"] = "";
+            dr["TB022"] = 0;
+            dr["TB023"] = "";
+            dr["TB024"] = "N";
+            dr["TB025"] = 0;
+            dr["TB026"] = "";////
+            dr["TB027"] = "P03";////
+            dr["TB028"] = 0;
+            dr["TB029"] = 0;
+            dr["TB030"] = "";
+            dr["TB031"] = "";
+            dr["TB032"] = "";
+            dr["TB500"] = "";
+            dr["TB501"] = "";
+            dr["TB502"] = "";
+            dr["UDF01"] = "";
+            dr["UDF02"] = "";
+            dr["UDF03"] = "";
+            dr["UDF04"] = "";
+            dr["UDF05"] = "";
+            dr["UDF06"] = 0;
+            dr["UDF07"] = 0;
+            dr["UDF08"] = 0;
+            dr["UDF09"] = 0;
+            dr["UDF10"] = 0;
+
+
+            drINVMB = null;
+            tempDt.Dispose();
+            tempDt = null;
+
+            return dr;
+        }
+
+
+        public static DataTable collectData_Invmb(string pattern)
+        {
+            using (SqlConnection connection = MvDbConnector.Connection_ERPDB2_Dot_MVTEST)
+            {
+                connection.Open();
+                return collectData_Invmb(connection, pattern);
+            }
+        }
+
+        public static DataTable collectData_Invmb(SqlConnection connection, string pattern)
+        {
+
+            StringBuilder sb = new StringBuilder();
+            DataTable majorData = null;
+
+            sb.Append(string.Format("SELECT * FROM MACHVISION.dbo.INVMB WHERE RTRIM(MB001)='{0}'", pattern));
+
+            try
+            {
+                majorData = MvDbConnector.queryDataBySql(connection, sb.ToString());
+            }
+            catch (SqlException se)
+            {
+                throw se;
+            }
+
+            return majorData;
+        }
     }
 }

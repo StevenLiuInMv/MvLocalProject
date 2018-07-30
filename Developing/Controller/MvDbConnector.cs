@@ -35,7 +35,7 @@ namespace MvLocalProject.Controller
         {
             get { return ConfigurationManager.ConnectionStrings["ERPDB2.MACHVISION"].ConnectionString; }
         }
-        private static string ConnectionString_ERPDB2_Dot_MVTEST
+        public static string ConnectionString_ERPDB2_Dot_MVTEST
         {
             get { return ConfigurationManager.ConnectionStrings["ERPDB2.MVTEST"].ConnectionString; }
         }

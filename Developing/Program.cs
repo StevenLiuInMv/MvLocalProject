@@ -27,9 +27,9 @@ namespace MvLocalProject
             //var start = new Viewer.frmItCisco();
             //var start = new Viewer.frmItMxMail();
             //var start = new Viewer.frmTestMvDao();
-            //var start = new MvLocalProject.Viewer.frmTestParser();
+            var start = new MvLocalProject.Viewer.frmTestParser();
             //var start = new MvLocalProject.Viewer.frmTestMisGetBom();
-            var start = new MvLocalProject.Viewer.frmBomToMocCompare();
+            //var start = new MvLocalProject.Viewer.frmBomToMocCompare();
 
             start.FormClosed += WindowClosed;
             start.Show();

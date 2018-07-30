@@ -9,11 +9,22 @@ using MvLocalProject.Controller;
 using System.Collections;
 using System.Reflection;
 using NCalc;
+using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace MvLocalProject.Bo
 {
+
     class MvBomCompareBo
     {
+
+        public enum CompareState
+        {
+            FullMatch = 0,
+            MatchNoVer = 1,
+            Different = 2
+        }
+
         internal DataSet CollectSourceDsProcess_BomP09_VB6(string[] selectedList)
         {
             DataSet sourceDs = new DataSet();
@@ -1721,6 +1732,7 @@ namespace MvLocalProject.Bo
             }
         }
 
+
         public DataSet compareProcessByVirtualMoc(DataTable vMocA, DataTable mocB)
         {
             // 比對條件
@@ -1740,31 +1752,30 @@ namespace MvLocalProject.Bo
 
             diffDt = sameDt.Clone();
 
-            string mNameA = string.Empty;
+            string mNameLv1A = string.Empty;
             string itemA = string.Empty;
             string countA = string.Empty;
-            string mNameB = string.Empty;
+            string mNameLv1B = string.Empty;
             string itemB = string.Empty;
             string countB = string.Empty;
             bool hasFindRow = false;
 
-            foreach(DataRow vDrA in vMocA.Rows)
+            foreach (DataRow vDrA in vMocA.Rows)
             {
                 hasFindRow = false;
-                mNameA = vDrA["ModuleLv1"].ToString();
+                mNameLv1A = vDrA["ModuleLv1"].ToString();
                 itemA = vDrA["A8"].ToString();
                 // 已使用Ncalc算過, 不需要再重算
                 countA = vDrA["RealAmount"].ToString();
 
                 foreach (DataRow drB in mocB.Rows)
                 {
-                    mNameB = drB["TA006"].ToString();
+                    mNameLv1B = drB["TA006"].ToString();
                     itemB = drB["TB003"].ToString();
                     //countB = getOptionalCountByNcalc(drB["TB004"].ToString());
                     countB = drB["TB004"].ToString();
 
-                    // 1. 只要ModuleName 不合法, 不用再往下尋找
-                    if (mNameA.Equals(mNameB) == false)
+                    if (mNameLv1A.Equals(mNameLv1B) == false)
                     {
                         continue;
                     }
@@ -1781,17 +1792,287 @@ namespace MvLocalProject.Bo
                     hasFindRow = true;
                     if (countA.Equals(countB) == false)
                     {
-                        Console.WriteLine(string.Format("Diff Moudle : {0}, Item : {1}, Cnt : {2} <> {3}", mNameA, itemA, countA, countB));
+                        Console.WriteLine(string.Format("Diff Moudle : {0}, Item : {1}, Cnt : {2} <> {3}", mNameLv1A, itemA, countA, countB));
                     }
                     else
                     {
-                        Console.WriteLine(string.Format("Same Moudle : {0}, Item : {1}, Cnt : {2}", mNameA, itemA, countA));
+                        Console.WriteLine(string.Format("Same Moudle : {0}, Item : {1}, Cnt : {2}", mNameLv1A, itemA, countA));
                     }
+                    break;
+                    }
+                    if (hasFindRow == false)
+                    {
+                        Console.WriteLine(string.Format("Not Found Moudle : {0}, Item : {1}, Cnt : {2}", mNameLv1A, itemA, countA));
+                    }
+                }
+
+                return null;
+            }
+
+        public DataSet compareProcessByVirtualMoc_V2(DataTable vMocA, DataTable mocB)
+        {
+            // 比對條件
+            // 1. 判斷模組是不是在同一層
+            //    如果不是同一層, 列為不合法的資料
+            // 2. 哪些是可以忽略的資料 --> 或許可以放在跟不合法是同一層資料
+            // 3. 開始判斷在同一層的資料裡, 數量是不是相同
+            //    列出差異, 只存在Source , 只存在pattern, 兩者皆存在, 數量上不同
+
+            DataTable sameDt = new DataTable("Same");
+            DataTable diffDt = new DataTable("Different");
+            sameDt.Columns.Add("ModuleLv1");
+            sameDt.Columns.Add("Item");
+            sameDt.Columns.Add("Count");
+            sameDt.Columns.Add("Status");
+            sameDt.Columns.Add("MocNo");
+
+            diffDt = sameDt.Clone();
+
+            string mNameLv1A = string.Empty;
+            string itemA = string.Empty;
+            string countA = string.Empty;
+            string mNameLv1B = string.Empty;
+            string itemB = string.Empty;
+            string countB = string.Empty;
+
+            string tempA = string.Empty;
+            string tempB = string.Empty;
+            int tempALen = int.MinValue;
+            int tempBLen = int.MinValue;
+            bool tempAHasVer = false;
+            bool tempBHasVer = false;
+            string tempResult = string.Empty;
+            string tempString = string.Empty;
+
+            bool hasFindRow = false;
+            bool isFullMatchModuleLv1 = false;
+            bool isFullMatchItem = false;
+
+            StringBuilder sb = new StringBuilder();
+
+            Regex r = new Regex(@"^[A-Za-z]+$");
+
+            foreach (DataRow vDrA in vMocA.Rows)
+            {
+                hasFindRow = false;
+                isFullMatchModuleLv1 = false;
+                isFullMatchItem = false;
+                sb.Clear();
+
+                mNameLv1A = vDrA["ModuleLv1"].ToString();
+                //tempALen = mNameLv1A.Length;
+                // 當ModuleName > 11碼時, 判斷最末碼是否為英文字母, 決定是否有含版別
+                tempAHasVer = r.IsMatch(mNameLv1A.Substring(mNameLv1A.Length - 1));
+                //if (tempALen > 11)
+                //{
+                //    tempAHasVer = r.IsMatch(mNameLv1A.Substring(mNameLv1A.Length - 1));
+                //}
+                //else
+                //{
+                //    tempAHasVer = false;
+                //}
+
+                itemA = vDrA["A8"].ToString();
+
+                if(mNameLv1A.Equals("201ILAMP311B"))
+                {
+                    //Console.WriteLine(mNameLv1A);
+                }
+
+                if(itemA.Equals("115141001"))
+                {
+                    //Console.WriteLine(itemA);
+                }
+                // 已使用Ncalc算過, 不需要再重算
+                countA = vDrA["RealAmount"].ToString();
+
+                foreach (DataRow drB in mocB.Rows)
+                {
+                    tempA = string.Empty;
+                    tempB = string.Empty;
+                    tempALen = int.MinValue;
+                    tempBLen = int.MinValue;
+                    tempAHasVer = false;
+                    tempBHasVer = false;
+
+
+                    mNameLv1B = drB["TA006"].ToString();
+                    tempALen = mNameLv1A.Length;
+                    tempBLen = mNameLv1B.Length;
+
+
+                    if (mNameLv1B.Equals("201ILAMP311B"))
+                    {
+                        //Console.WriteLine(mNameLv1B);
+                    }
+
+                    // 當ModuleName 長度不一樣時, 直接continue
+                    if (tempALen != tempBLen)
+                    {
+                        continue;
+                    }
+
+                    // 當ModuleName > 11碼時, 判斷最末碼是否為英文字母, 決定是否有含版別
+                    tempBHasVer = r.IsMatch(mNameLv1B.Substring(mNameLv1B.Length - 1));
+                    //if (tempBLen > 11)
+                    //{
+                    //    tempBHasVer = r.IsMatch(mNameLv1B.Substring(mNameLv1B.Length - 1));
+                    //}
+                    //else
+                    //{
+                    //    tempBHasVer = false;
+                    //}
+
+                    // 只要ModuleName 有含版別
+                    // 應該用前幾碼去找, 沒有Match的, 就不用再往下尋找
+                    // 先判是不是>11碼
+                    // > 11碼 , 判斷尾碼是否為英文, 不是, 不用理
+
+                    // 如果模組A不含版本, 直接比對是否完全相同
+                    if (tempAHasVer == false)
+                    {
+                        if (mNameLv1A.Equals(mNameLv1B) == false)
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            // 代表模組完全相同
+                            isFullMatchModuleLv1 = true;
+                        }
+                    }
+                    // 如果模組A含版本(長度必>11碼), 但模組B長度<11 , 即不含版本, 直接跳離
+                    else if (tempAHasVer == true && tempALen < 11)
+                    {
+                        continue;
+                    }
+                    // 如果模組A含版本, 但模組B長度>11, 直接比對去除末碼的內容是否相同
+                    else if (tempAHasVer == true && tempBLen >= 11)
+                    {
+                        // 長度不相同, 不用再往下比
+                        if (tempALen != tempBLen)
+                        {
+                            continue;
+                        }
+                        tempA = mNameLv1A.Substring(0, tempALen - 1);
+                        tempB = mNameLv1B.Substring(0, tempBLen - 1);
+
+                        // 去末碼比對不相同, 不用再往下比
+                        if(tempA.Equals(tempB) == false)
+                        {
+                            continue;
+                        }
+
+                        // 記錄是否Full Match
+                        isFullMatchModuleLv1 = mNameLv1A.Equals(mNameLv1B);
+
+                    }
+
+                    // 2. 往下找代表module相同或模組去除版本末碼後相同
+                    //    只要品號相同, 再繼續比對數字, 如果沒有找到相同的品號
+                    // 如果模組A不含版本, 直接比對是否完全相同
+                    tempA = string.Empty;
+                    tempB = string.Empty;
+                    tempALen = int.MinValue;
+                    tempBLen = int.MinValue;
+                    tempAHasVer = false;
+                    tempBHasVer = false;
+
+                    itemB = drB["TB003"].ToString();
+                    if (itemB.Equals("115141001"))
+                    {
+                        //Console.WriteLine(itemB);
+                    }
+
+                    tempALen = itemA.Length;
+                    tempBLen = itemB.Length;
+                    
+
+                    // 當品號長度不一樣時, 直接continue
+                    if (tempALen != tempBLen)
+                    {
+                        continue;
+                    }
+
+                    tempAHasVer = r.IsMatch(itemA.Substring(itemA.Length - 1));
+                    tempBHasVer = r.IsMatch(itemB.Substring(itemB.Length - 1));
+
+                    // 如果料號A不含版本, 直接比對是否完全相同
+                    if (tempAHasVer == false)
+                    {
+                        if (itemA.Equals(itemB) == false)
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            // 代表料號完全相同
+                            isFullMatchItem = true;
+                        }
+                    }
+                    // 如果料號A含版本(長度必>=11碼), 但料號B長度<11 , 即不含版本, 直接跳離
+                    else if (tempAHasVer == true && tempALen < 11)
+                    {
+                        continue;
+                    }
+                    // 如果料號A含版本, 但料號B長度>11, 直接比對去除末碼的內容是否相同
+                    else if (tempAHasVer == true && tempBLen >= 11)
+                    {
+                        // 長度不相同, 不用再往下比
+                        if (tempALen != tempBLen)
+                        {
+                            continue;
+                        }
+                        tempA = itemA.Substring(0, tempALen - 1);
+                        tempB = itemB.Substring(0, tempBLen - 1);
+
+                        // 去末碼比對不相同, 不用再往下比
+                        if (tempA.Equals(tempB) == false)
+                        {
+                            continue;
+                        }
+                        // 記錄是否Full Match
+                        isFullMatchItem = itemA.Equals(itemB);
+                    }
+
+                    // 3. 當品號相同時, 比對數字是否相同
+                    // 相同, 記錄到相同
+                    // 不同, 記錄到相異的DataSet
+                    hasFindRow = true;
+                    countB = drB["TB004"].ToString();
+
+                    if (isFullMatchModuleLv1 == true)
+                    {
+                        sb.Append("Module : " + mNameLv1A);
+                    }
+                    else
+                    {
+                        sb.Append(string.Format( "Moudle : {0} -> {1}" , mNameLv1A, mNameLv1B));
+                    }
+
+                    if (isFullMatchItem == true)
+                    {
+                        sb.Append(", Item : " + itemA);
+                    }
+                    else
+                    {
+                        sb.Append(string.Format(", Item : {0} -> {1}", itemA, itemB));
+                    }
+
+                    if (countA.Equals(countB) == true)
+                    {
+                        sb.Append(", Cnt : " + countA);
+                    }
+                    else
+                    {
+                        sb.Append(string.Format(", Cnt : {0} -> {1}", countA,countB));
+                    }
+                    Console.WriteLine(sb.ToString());
                     break;
                 }
                 if (hasFindRow == false)
                 {
-                    Console.WriteLine(string.Format("Not Found Moudle : {0}, Item : {1}, Cnt : {2}", mNameA, itemA, countA));
+                    Console.WriteLine(string.Format("Not Found Moudle : {0}, Item : {1}, Cnt : {2}", mNameLv1A, itemA, countA));
                 }
             }
 
@@ -1839,6 +2120,335 @@ namespace MvLocalProject.Bo
             return resultDt;
         }
 
+        public bool checkOptionalItemValid(DataTable optionalDt)
+        {
+            DataRow[] tempDrList = null;
+            int orgLV = 2;
+            string childCondition = string.Empty;
+
+            childCondition = string.Format("OrgLV={0} AND MB025X='再製'", orgLV);
+            tempDrList = optionalDt.Select(childCondition);
+            if(tempDrList.Length > 0)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        private CompareState compareUnit(string patternA, string patternB)
+        {
+            int patternALen = patternA.Length;
+            int patternBLen = patternB.Length;
+            // 1. 先判斷長度是否相同
+            if (patternALen != patternBLen)
+            {
+                return CompareState.Different;
+            }
+
+            // 2. 再判斷Full字串是否相同
+            if (patternA.Equals(patternB) == true)
+            {
+                return CompareState.FullMatch;
+            }
+
+            // 3. 再判斷patternA是否含版別
+            Regex r = new Regex(@"^[A-Za-z]+$");
+            bool patternAHasVer = r.IsMatch(patternA.Substring(patternALen - 1));
+
+            // 4. 依末碼是否有含版別判斷
+            if (patternAHasVer == false)
+            {
+                return CompareState.Different;
+            }
+            else
+            {
+                string tempA = patternA.Substring(0, patternALen - 1);
+                string tempB = patternB.Substring(0, patternBLen - 1);
+
+                if (tempA.Equals(tempB) == false)
+                {
+                    return CompareState.Different;
+                } else
+                {
+                    return CompareState.MatchNoVer;
+                }
+            }
+        }
+
+
+
+        public DataSet compareProcessByVirtualMoc_V3(DataTable vMocA, DataTable mocB)
+        {
+            // 比對條件
+            // 1. 判斷模組是不是在同一層
+            //    如果不是同一層, 列為不合法的資料
+            // 2. 哪些是可以忽略的資料 --> 或許可以放在跟不合法是同一層資料
+            // 3. 開始判斷在同一層的資料裡, 數量是不是相同
+            //    列出差異, 只存在Source , 只存在pattern, 兩者皆存在, 數量上不同
+
+            MvLogger.write("##### run {0}.{1}", new object[] { System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name, MethodBase.GetCurrentMethod().Name });
+            MvLogger.write("##### start process");
+
+
+
+            DataTable sameDt = new DataTable("Same");
+            DataTable diffDt = new DataTable();
+
+            sameDt.Columns.Add("Add");
+            sameDt.Columns.Add("Change");
+            sameDt.Columns.Add("Delete");
+            sameDt.Columns.Add("OrgModule");
+            sameDt.Columns.Add("NewModule");
+            sameDt.Columns.Add("OrgItem");
+            sameDt.Columns.Add("NewItem");
+            sameDt.Columns.Add("OrgCount");
+            sameDt.Columns.Add("NewCount");
+            sameDt.Columns.Add("MocNo");
+
+            diffDt = sameDt.Clone();
+            diffDt.TableName = "Different";
+
+            string mNameLv1A = string.Empty;
+            string itemA = string.Empty;
+            string countA = string.Empty;
+            string mNameLv1B = string.Empty;
+            string itemB = string.Empty;
+            string countB = string.Empty;
+
+            DataRow tempDr = null;
+
+            bool hasFindRow = false;
+            string childMocNo = string.Empty;
+            CompareState compareStateModuleLv1 = CompareState.Different;
+            CompareState compareStateItem = CompareState.Different;
+
+            StringBuilder sb = new StringBuilder();
+
+            // 由虛擬製令找實際製令
+            foreach (DataRow drA in vMocA.Rows)
+            {
+                hasFindRow = false;
+                compareStateModuleLv1 = CompareState.Different;
+                compareStateItem = CompareState.Different;
+                childMocNo = string.Empty;
+
+                mNameLv1A = drA["ModuleLv1"].ToString();
+                itemA = drA["A8"].ToString();
+                // 已使用Ncalc算過, 不需要再重算
+                countA = drA["RealAmount"].ToString();
+
+                // ======== debug used ========
+                if (mNameLv1A.Equals("201ILAMP311B"))
+                {
+                    //Console.WriteLine(mNameLv1A);
+                }
+
+                if (itemA.Equals("115141001"))
+                {
+                    //Console.WriteLine(itemA);
+                }
+                // ======== debug used ========
+
+                foreach (DataRow drB in mocB.Rows)
+                {
+                    compareStateModuleLv1 = CompareState.Different;
+                    compareStateItem = CompareState.Different;
+
+                    // 先判斷ModuleLv1是否相同
+                    mNameLv1B = drB["TA006"].ToString();
+                    compareStateModuleLv1 = compareUnit(mNameLv1A, mNameLv1B);
+                    // 只要ModuleLv1不相同, 直接continue;
+                    if (compareStateModuleLv1 == CompareState.Different)
+                    {
+                        continue;
+                    }
+
+                    // 再判斷Item是否相同
+                    itemB = drB["TB003"].ToString();
+                    compareStateItem = compareUnit(itemA, itemB);
+                    // 只要Item不相同, 直接continue;
+                    if (compareStateItem == CompareState.Different)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        // 已有找到row
+                        countB = drB["TB004"].ToString();
+                        childMocNo = drB["ChildMoc"].ToString();
+                        hasFindRow = true;
+                        break;
+                    }
+                }
+
+                if (hasFindRow == false)
+                {
+                    // 不存在製令內, 算新增
+                    sb.AppendLine(string.Format("Not Found Moudle : {0}, Item : {1}, Cnt : {2}", mNameLv1A, itemA, countA));
+                    tempDr = diffDt.NewRow();
+                    tempDr["Add"] = "V";
+                    tempDr["OrgModule"] = "N/A";
+                    tempDr["NewModule"] = mNameLv1A;
+                    tempDr["OrgItem"] = "N/A";
+                    tempDr["NewItem"] = itemA;
+                    tempDr["OrgCount"] = 0;
+                    tempDr["NewCount"] = countA;
+                    diffDt.Rows.Add(tempDr);
+                }
+                else
+                {
+                    // 存在製令內的, 依CompareState來判斷結果
+                    // FullMatch 算相同
+                    if(compareStateModuleLv1 == CompareState.FullMatch && compareStateItem == CompareState.FullMatch && countA.Equals(countB) == true)
+                    {
+                        tempDr = sameDt.NewRow();
+                        tempDr["OrgModule"] = mNameLv1A;
+                        tempDr["NewModule"] = "N/A";
+                        tempDr["OrgItem"] = itemA;
+                        tempDr["NewItem"] = "N/A"; 
+                        tempDr["OrgCount"] = countA; 
+                        tempDr["NewCount"] = 0;
+                        tempDr["MocNo"] = childMocNo;
+                        sameDt.Rows.Add(tempDr);
+                        sb.Append("Module: ").Append(mNameLv1A).Append(", Item: ").Append(itemA).AppendLine(", Cnt: " + countA);
+                    }
+                    else
+                    {
+                        tempDr = diffDt.NewRow();
+                        tempDr["OrgModule"] = mNameLv1A;
+                        tempDr["NewModule"] = (compareStateModuleLv1 == CompareState.FullMatch ? "N/A" : mNameLv1B);
+                        sb.Append("Module: ").Append((compareStateModuleLv1 == CompareState.FullMatch ? mNameLv1A : string.Format("{0} -> {1}", mNameLv1A, mNameLv1B)));
+                        tempDr["OrgItem"] = itemA;
+                        tempDr["NewItem"] = (compareStateItem == CompareState.FullMatch ? "N/A" : itemB);
+                        sb.Append(", Item: ").Append((compareStateItem == CompareState.FullMatch ? itemA : string.Format("{0} -> {1}", itemA, itemB)));
+                        tempDr["OrgCount"] = countA;
+                        tempDr["NewCount"] = (countA.Equals(countB) == true ? "0" : countB);
+                        sb.Append(", Cnt: ").AppendLine(countA.Equals(countB) == true ? countA : string.Format("{0} -> {1}", countA, countB));
+                        tempDr["Change"] = "V";
+                        tempDr["MocNo"] = childMocNo;
+                        diffDt.Rows.Add(tempDr);
+                    }
+                }
+            }
+
+            // initial parameter
+            mNameLv1A = string.Empty;
+            itemA = string.Empty;
+            countA = string.Empty;
+            mNameLv1B = string.Empty;
+            itemB = string.Empty;
+            countB = string.Empty;
+            tempDr = null;
+
+            hasFindRow = false;
+            childMocNo = string.Empty;
+            compareStateModuleLv1 = CompareState.Different;
+            compareStateItem = CompareState.Different;
+
+            // 由實際製令找虛擬製令
+            foreach (DataRow drB in mocB.Rows)
+            {
+                hasFindRow = false;
+                compareStateModuleLv1 = CompareState.Different;
+                compareStateItem = CompareState.Different;
+
+                mNameLv1B = drB["TA006"].ToString();
+                itemB = drB["TB003"].ToString();
+                countB = drB["TB004"].ToString();
+                childMocNo = drB["ChildMoc"].ToString();
+
+                foreach (DataRow drA in vMocA.Rows)
+                {
+                    compareStateModuleLv1 = CompareState.Different;
+                    compareStateItem = CompareState.Different;
+
+                    // 先判斷ModuleLv1是否相同
+                    mNameLv1A = drA["ModuleLv1"].ToString();
+                    compareStateModuleLv1 = compareUnit(mNameLv1B, mNameLv1A);
+                    // 只要ModuleLv1不相同, 直接continue;
+                    if (compareStateModuleLv1 == CompareState.Different)
+                    {
+                        continue;
+                    }
+
+                    // 再判斷Item是否相同
+                    itemA = drA["A8"].ToString();
+                    compareStateItem = compareUnit(itemB, itemA);
+                    // 只要Item不相同, 直接continue;
+                    if (compareStateItem == CompareState.Different)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        // 已有找到row
+                        countA = drA["RealAmount"].ToString();
+                        hasFindRow = true;
+                        break;
+                    }
+                }
+
+                if (hasFindRow == false)
+                {
+                    // 不存在實際製令內, 算刪除
+                    sb.AppendLine(string.Format("Not Found Moudle : {0}, Item : {1}, Cnt : {2}", mNameLv1B, itemB, countB));
+                    tempDr = diffDt.NewRow();
+                    tempDr["Delete"] = "V";
+                    tempDr["OrgModule"] = mNameLv1B;
+                    tempDr["NewModule"] = "N/A";
+                    tempDr["OrgItem"] = itemB;
+                    tempDr["NewItem"] = "N/A"; 
+                    tempDr["OrgCount"] = countB;
+                    tempDr["NewCount"] = 0;
+                    tempDr["MocNo"] = childMocNo;
+                    diffDt.Rows.Add(tempDr);
+                }
+                else
+                {
+                    //// 存在製令內的, 依CompareState來判斷結果
+                    //// FullMatch 算相同
+                    //if (compareStateModuleLv1 == CompareState.FullMatch && compareStateItem == CompareState.FullMatch && countA.Equals(countB) == true)
+                    //{
+                    //    tempDr = sameDt.NewRow();
+                    //    tempDr["OrgModule"] = mNameLv1A;
+                    //    tempDr["NewModule"] = "N/A";
+                    //    tempDr["OrgItem"] = itemA;
+                    //    tempDr["NewItem"] = "N/A";
+                    //    tempDr["OrgCount"] = countA;
+                    //    tempDr["NewCount"] = 0;
+                    //    tempDr["MocNo"] = childMocNo;
+                    //    sameDt.Rows.Add(tempDr);
+                    //    sb.Append("Module: ").Append(mNameLv1A).Append(", Item: ").Append(itemA).AppendLine(", Cnt: " + countA);
+                    //}
+                    //else
+                    //{
+                    //    tempDr = diffDt.NewRow();
+                    //    tempDr["OrgModule"] = mNameLv1A;
+                    //    tempDr["NewModule"] = (compareStateModuleLv1 == CompareState.FullMatch ? "N/A" : mNameLv1B);
+                    //    sb.Append("Module: ").Append((compareStateModuleLv1 == CompareState.FullMatch ? mNameLv1A : string.Format("{0} -> {1}", mNameLv1A, mNameLv1B)));
+                    //    tempDr["OrgItem"] = itemA;
+                    //    tempDr["NewItem"] = (compareStateItem == CompareState.FullMatch ? "N/A" : itemB);
+                    //    sb.Append(", Item: ").Append((compareStateItem == CompareState.FullMatch ? itemA : string.Format("{0} -> {1}", itemA, itemB)));
+                    //    tempDr["OrgCount"] = countA;
+                    //    tempDr["NewCount"] = (countA.Equals(countB) == true ? "0" : countB);
+                    //    sb.Append(", Cnt: ").AppendLine(countA.Equals(countB) == true ? countA : string.Format("{0} -> {1}", countA, countB));
+                    //    tempDr["Change"] = "V";
+                    //    tempDr["MocNo"] = childMocNo;
+                    //    diffDt.Rows.Add(tempDr);
+                    //}
+                }
+            }
+
+            Console.WriteLine(sb.ToString());
+            MvLogger.write(sb.ToString());
+            MvLogger.write("##### end process");
+
+            DataSet resultDs = new DataSet();
+            resultDs.Tables.Add(sameDt);
+            resultDs.Tables.Add(diffDt);
+
+            return resultDs;
+        }
     }
 }
 

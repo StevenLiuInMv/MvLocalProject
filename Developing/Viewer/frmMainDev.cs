@@ -75,6 +75,9 @@ namespace MvLocalProject.Viewer
                 case "toolItMxMail":
                     form = new frmItMxMail();
                     break;
+                case "formBomToMocCompare":
+                    form = new frmBomToMocCompare();
+                    break;
                 default:
                     break;
             }

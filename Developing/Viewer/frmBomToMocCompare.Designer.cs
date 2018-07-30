@@ -69,6 +69,7 @@
             this.barMappingNodes = new DevExpress.XtraBars.BarButtonItem();
             this.barShowRowId = new DevExpress.XtraBars.BarButtonItem();
             this.barHideRowId = new DevExpress.XtraBars.BarButtonItem();
+            this.barExportExcel = new DevExpress.XtraBars.BarButtonItem();
             this.popupMenu1 = new DevExpress.XtraBars.PopupMenu(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.groupControl3)).BeginInit();
             this.groupControl3.SuspendLayout();
@@ -319,16 +320,18 @@
             this.treeList5.DataSource = null;
             this.treeList5.Location = new System.Drawing.Point(5, 3);
             this.treeList5.Name = "treeList5";
-            this.treeList5.Size = new System.Drawing.Size(639, 476);
+            this.treeList5.Size = new System.Drawing.Size(448, 476);
             this.treeList5.TabIndex = 6;
+            this.treeList5.MouseUp += new System.Windows.Forms.MouseEventHandler(this.treeList5_MouseUp);
             // 
             // treeList6
             // 
             this.treeList6.DataSource = null;
-            this.treeList6.Location = new System.Drawing.Point(650, 3);
+            this.treeList6.Location = new System.Drawing.Point(459, 3);
             this.treeList6.Name = "treeList6";
-            this.treeList6.Size = new System.Drawing.Size(639, 476);
+            this.treeList6.Size = new System.Drawing.Size(830, 476);
             this.treeList6.TabIndex = 7;
+            this.treeList6.MouseUp += new System.Windows.Forms.MouseEventHandler(this.treeList6_MouseUp);
             // 
             // btnExportExcel
             // 
@@ -356,8 +359,9 @@
             this.barCollapseAll,
             this.barMappingNodes,
             this.barShowRowId,
-            this.barHideRowId});
-            this.barManager1.MaxItemId = 6;
+            this.barHideRowId,
+            this.barExportExcel});
+            this.barManager1.MaxItemId = 7;
             this.barManager1.StatusBar = this.bar3;
             // 
             // bar3
@@ -446,6 +450,13 @@
             this.barHideRowId.Name = "barHideRowId";
             this.barHideRowId.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.barHideRowId_ItemClick);
             // 
+            // barExportExcel
+            // 
+            this.barExportExcel.Caption = "ExportExcel";
+            this.barExportExcel.Id = 6;
+            this.barExportExcel.Name = "barExportExcel";
+            this.barExportExcel.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.barExportExcel_ItemClick);
+            // 
             // popupMenu1
             // 
             this.popupMenu1.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
@@ -454,7 +465,8 @@
             new DevExpress.XtraBars.LinkPersistInfo(this.barCollapseAll),
             new DevExpress.XtraBars.LinkPersistInfo(this.barMappingNodes),
             new DevExpress.XtraBars.LinkPersistInfo(this.barShowRowId),
-            new DevExpress.XtraBars.LinkPersistInfo(this.barHideRowId)});
+            new DevExpress.XtraBars.LinkPersistInfo(this.barHideRowId),
+            new DevExpress.XtraBars.LinkPersistInfo(this.barExportExcel)});
             this.popupMenu1.Manager = this.barManager1;
             this.popupMenu1.Name = "popupMenu1";
             // 
@@ -554,5 +566,6 @@
         private DevExpress.XtraTreeList.TreeList treeList7;
         private DevExpress.XtraBars.BarButtonItem barShowRowId;
         private DevExpress.XtraBars.BarButtonItem barHideRowId;
+        private DevExpress.XtraBars.BarButtonItem barExportExcel;
     }
 }

@@ -13,6 +13,7 @@ using DevExpress.XtraBars;
 using DevExpress.XtraTreeList.Columns;
 using System.Collections.Generic;
 using System.Linq;
+using System.Diagnostics;
 
 namespace MvLocalProject.Viewer
 {
@@ -57,6 +58,11 @@ namespace MvLocalProject.Viewer
             SplashScreenManager.ShowDefaultWaitForm();
 
             clearAllBomCacheDtAndTreeList();
+            // initial hash tables
+            for (int i = 0; i < hashTreeListBackColor.Length; i++)
+            {
+                hashTreeListBackColor[i] = new Hashtable();
+            }
 
             MvBomCompareBo bo = new MvBomCompareBo();
             DataSet sourceDs = null;
@@ -66,25 +72,39 @@ namespace MvLocalProject.Viewer
             DataTable sourceDt = sourceDs.Tables[result + "_Filter"].Copy();
             DataTable filterDt = sourceDs.Tables[result + "_Filter"].Copy();
 
+            sourceDt.TableName = sourceDt.TableName.Replace("_Filter", "");
+            filterDt.TableName = filterDt.TableName.Replace("_Filter", "");
+
             DataTable tempDt = null;
 
             // 找出選配
             tempDt = bo.getOptionalItem(filterDt);
 
+            // 檢查選配是否合理
+            // LV=1, 選配, LV=2, 不可以有再製
+            bool checkValid = false;
+            checkValid = bo.checkOptionalItemValid(tempDt);
+            if(checkValid == false)
+            {
+                // 只顯示optional 的部份
+                tempDt.Columns.Remove("AmountSpace");
+                tempDt.Columns.Remove("NameSpaceNoVer");
+                tempDt.Columns.Remove("Column9");
+                tempDt.Columns["ModuleLv1"].SetOrdinal(6);
+                treeList2.DataSource = tempDt.Clone();
+                showTreeListByLevel(treeList2, tempDt, ref hashTreeListBackColor[1], false, true);
+                setColumnsCaption(ref treeList2);
+                MessageBox.Show("LV=1的選配展開後含再製件, 請確認Bom表選配內容是否正確");
+                return;
+            }
+
+            // 確認資料正確性均合理後, 再copy至cacheBomDt
             // set cache datatable
             if (cacheBomDt != null) { cacheBomDt.Clear(); }
             cacheBomDt = filterDt.Copy();
 
-            // initial hash tables
-            for (int i = 0; i < hashTreeListBackColor.Length; i++)
-            {
-                hashTreeListBackColor[i] = new Hashtable();
-            }
 
             // 第1個Table的特別處理
-            sourceDt.Columns.Remove("Column9");
-            sourceDt.Columns.Remove("NameSpaceNoVer");
-            sourceDt.Columns.Remove("AmountSpace");
             sourceDt.Columns["ModuleLv1"].SetOrdinal(6);
 
             treeList1.DataSource = sourceDt.Clone();
@@ -93,9 +113,6 @@ namespace MvLocalProject.Viewer
             setColumnsCaption(ref treeList1);
 
             // 第2個Table的特別處理
-            tempDt.Columns.Remove("AmountSpace");
-            tempDt.Columns.Remove("NameSpaceNoVer");
-            tempDt.Columns.Remove("Column9");
             tempDt.Columns["ModuleLv1"].SetOrdinal(6);
             treeList2.DataSource = tempDt.Clone();
             showTreeListByLevel(treeList2, tempDt, ref hashTreeListBackColor[1], false, true);
@@ -106,9 +123,15 @@ namespace MvLocalProject.Viewer
             // 不開放編輯功能, 或隱藏欄位等
             treeList1.Columns["RowId"].Visible = false;
             treeList1.Columns["NameSpace"].Visible = false;
+            treeList1.Columns["NameSpaceNoVer"].Visible = false;
+            treeList2.Columns["AmountSpace"].Visible = false;
+            treeList1.Columns["Column9"].Visible = false;
             treeList1.Columns["MD013"].Visible = false;
             treeList2.Columns["RowId"].Visible = false;
             treeList2.Columns["NameSpace"].Visible = false;
+            treeList2.Columns["NameSpaceNoVer"].Visible = false;
+            treeList2.Columns["AmountSpace"].Visible = false;
+            treeList2.Columns["Column9"].Visible = false;
             treeList2.Columns["MD013"].Visible = false;
             treeList2.Columns["OrgLV"].Visible = false;
 
@@ -471,6 +494,31 @@ namespace MvLocalProject.Viewer
                 }
             }
         }
+        private void treeList5_MouseUp(object sender, MouseEventArgs e)
+        {
+            // 只有在滑鼠右鍵, 及不在Column上才彈出 PopupMenu
+            if (e.Button == MouseButtons.Right)
+            {
+                TreeListHitInfo hitInfo = treeList5.CalcHitInfo(new Point(e.X, e.Y));
+                if (hitInfo.HitInfoType != HitInfoType.Column)
+                {
+                    popupMenu1.ShowPopup(Control.MousePosition);
+                }
+            }
+        }
+
+        private void treeList6_MouseUp(object sender, MouseEventArgs e)
+        {
+            // 只有在滑鼠右鍵, 及不在Column上才彈出 PopupMenu
+            if (e.Button == MouseButtons.Right)
+            {
+                TreeListHitInfo hitInfo = treeList6.CalcHitInfo(new Point(e.X, e.Y));
+                if (hitInfo.HitInfoType != HitInfoType.Column)
+                {
+                    popupMenu1.ShowPopup(Control.MousePosition);
+                }
+            }
+        }
 
         private void treeList7_MouseUp(object sender, MouseEventArgs e)
         {
@@ -505,13 +553,29 @@ namespace MvLocalProject.Viewer
             {
                 treeList = treeList4;
             }
+            else if (treeList5.Focused == true)
+            {
+                treeList = treeList5;
+            }
+            else if (treeList6.Focused == true)
+            {
+                treeList = treeList6;
+            }
             else if (treeList7.Focused == true)
             {
                 treeList = treeList7;
             }
 
             if (treeList == null) return;
-            Clipboard.SetText(treeList.FocusedNode.GetDisplayText(treeList.FocusedColumn));
+            try
+            {
+                Clipboard.SetText(treeList.FocusedNode.GetDisplayText(treeList.FocusedColumn));
+            }
+            catch (ArgumentNullException)
+            {
+                Clipboard.Clear();
+            }
+            
             textBox1.Text = Clipboard.GetText();
         }
 
@@ -525,6 +589,7 @@ namespace MvLocalProject.Viewer
             }
 
             SplashScreenManager.ShowDefaultWaitForm();
+            clearAllMocCacheDtAndTreeList();
             DataTable sourceDt = MvDbDao.collectData_Moc(mocNo);
             // copy to cacheDt
             if (cacheMocDt != null) { cacheMocDt.Clear(); }
@@ -557,9 +622,62 @@ namespace MvLocalProject.Viewer
             // 開始執行比對的程式
             // 比對的邏輯, 先判斷第一層模組是不是合理
             SplashScreenManager.ShowDefaultWaitForm();
-            DataSet resultDs = null;
+            DataSet sourceDs = null;
             MvBomCompareBo bo = new MvBomCompareBo();
-            resultDs = bo.compareProcessByVirtualMoc(cacheMergedBomToVirtualMocDt, cacheMocDt);
+            Stopwatch loadingWatch = new Stopwatch();
+
+            loadingWatch.Start();
+            //resultDs = bo.compareProcessByVirtualMoc_V2(cacheMergedBomToVirtualMocDt, cacheMocDt);
+            loadingWatch.Stop();
+            Console.WriteLine("V2 : " + loadingWatch.ElapsedMilliseconds);
+            loadingWatch.Reset();
+            loadingWatch.Start();
+            sourceDs = bo.compareProcessByVirtualMoc_V3(cacheMergedBomToVirtualMocDt, cacheMocDt);
+            loadingWatch.Stop();
+            Console.WriteLine("V3 : " + loadingWatch.ElapsedMilliseconds);
+
+            // 取得Result
+            DataTable sameDt = sourceDs.Tables["Same"].Copy();
+            DataTable diffDt = sourceDs.Tables["Different"].Copy();
+
+
+            // 第1個Table的特別處理
+            treeList5.DataSource = sameDt.Copy();
+            //hashTreeListBackColor[0].Clear();
+            //showTreeListByLevel(treeList1, sourceDt, ref hashTreeListBackColor[0], false, false);
+            //setColumnsCaption(ref treeList1);
+
+            // 第2個Table的特別處理
+            treeList6.DataSource = diffDt.Copy();
+            //hashTreeListBackColor[0].Clear();
+            //showTreeListByLevel(treeList2, tempDt, ref hashTreeListBackColor[1], false, true);
+            //setColumnsCaption(ref treeList2);
+
+
+            // 設定各Sheet的Sheet權限
+            // 不開放編輯功能, 或隱藏欄位等
+            treeList5.Columns["Add"].Visible = false;
+            treeList5.Columns["Change"].Visible = false;
+            treeList5.Columns["Delete"].Visible = false;
+            treeList5.Columns["NewModule"].Visible = false;
+            treeList5.Columns["NewItem"].Visible = false;
+            treeList5.Columns["NewCount"].Visible = false;
+
+            //treeList5.BestFitColumns();
+            //treeList6.BestFitColumns();
+
+            treeList5.OptionsView.AutoWidth = false;
+            treeList6.OptionsView.AutoWidth = false;
+
+            treeList5.OptionsBehavior.ReadOnly = true;
+            treeList6.OptionsBehavior.ReadOnly = true;
+
+            treeList5.OptionsBehavior.Editable = false;
+            treeList6.OptionsBehavior.Editable = false;
+
+            // 命名每個Pages
+            xtraTabControl1.TabPages[4].Text = "CompareMoc_Result";
+            xtraTabControl1.SelectedTabPage = xtraTabControl1.TabPages[4];
             SplashScreenManager.CloseForm(false);
 
         }
@@ -667,10 +785,12 @@ namespace MvLocalProject.Viewer
             SplashScreenManager.ShowDefaultWaitForm();
 
             DataTable removeNodesDt = new DataTable();
+            DataTable selectedNodesDt = new DataTable();
 
             foreach (TreeListColumn tlc in treeList2.Columns)
             {
                 removeNodesDt.Columns.Add(tlc.FieldName);
+                selectedNodesDt.Columns.Add(tlc.FieldName);
             }
 
             DataRow treeListDr = null;
@@ -694,67 +814,12 @@ namespace MvLocalProject.Viewer
             }
 
             // 取完後, 再來的部份就是要從原來的bom移除row
-            // 下午可能要調整前面的程式, 之後要用hide的, 不可以用remove datacolumn
-            // 可能會導致後續的資料無法回填
-
             // 要由後往前Remove
             // LV > 1, 先移除name space.*, 再移除name space
             // LV = 1, 只移除name space, 因為子階在之前就被移除了
             string tempNameSpace = string.Empty;
             string condition = string.Empty;
             int tempLv = 0;
-            //DataRow[] removeDataRowList = null;
-
-            //// 先將child移除後, 再移除parent
-            //for (int index = removeNodesDt.Rows.Count; index > 0; index--)
-            //{
-            //    tempDr = removeNodesDt.Rows[index - 1];
-            //    tempNameSpace = tempDr["NameSpace"].ToString();
-            //    tempLv = int.Parse(tempDr["LV"].ToString());
-            //    DataRow dr1 = null;
-
-            //    if (tempLv > 1)
-            //    {
-            //        condition = string.Format("NameSpace like '{0}.%'", tempNameSpace);
-            //        removeDataRowList = mergeDt.Select(condition);
-
-            //        try
-            //        {
-            //            for(int index1 = 0;index1< removeDataRowList.Length; index1++)
-            //            {
-            //                dr1 = removeDataRowList[index1];
-            //                mergeDt.Rows.Remove(dr1);
-            //            }
-            //        }
-            //        catch (IndexOutOfRangeException)
-            //        {
-            //            // 發生此exception 不跳離, 有可能該row在之前已被移除
-            //            Console.WriteLine("Remove Child Exception, RowId=" + dr1["RowId"] + ", " + dr1["LV"].ToString() + " " + dr1["A8"].ToString() + " " + dr1["ModuleLv1"].ToString());
-            //        }
-            //    }
-            //    // 先將child移除後, 再移除parent
-            //    // 不能改用List 接Array, 有可能會把parent給移除
-            //    condition = string.Format("NameSpace = '{0}'", tempNameSpace);
-            //    removeDataRowList = mergeDt.Select(condition);
-            //    try
-            //    {
-            //        for (int index1 = 0; index1 < removeDataRowList.Length; index1++)
-            //        {
-            //            dr1 = removeDataRowList[index1];
-            //            mergeDt.Rows.Remove(dr1);
-            //        }
-            //        //mergeDt.Rows.Remove(removeDataRowList);
-            //    }
-            //    catch (IndexOutOfRangeException)
-            //    {
-            //        // 發生此exception 不跳離, 有可能該row在之前已被移除
-            //        Console.WriteLine("Remove Parent Exception, RowId=" + tempDr["RowId"] + ", " + tempDr["LV"].ToString() + " " + tempDr["A8"].ToString() + " " + tempDr["ModuleLv1"].ToString());
-            //    }
-            //}
-
-
-
-
 
             // 先將child移除後, 再移除parent
             List<DataRow> removeDataRowList = new List<DataRow>();
@@ -789,6 +854,60 @@ namespace MvLocalProject.Viewer
                     Console.WriteLine("Remove Exception, RowId=" + dr1["RowId"] + ", " + dr1["LV"].ToString() + " " + dr1["A8"].ToString() + " " + dr1["ModuleLv1"].ToString());
                 }
             }
+
+            // 移除完成後, DataTable依據選配的規則做調整
+            // LV=1選配 -> LV=2模組, 要將下階模組往上調移, 並調整ModuleLv1的值, 移除該階LV1選配
+            // LV=1選配 -> LV=2市構, 要將下階市購往上調移, 並調整ModuleLv1的值, 移除該階LV1選配
+            // LV>1選配 -> 下階往上調, ModuleLv1的值不變, 移除該階選配
+            removeDataRowList.Clear();
+            condition = string.Format("MB025X = '選配'");
+            removeDataRowList.AddRange(mergeDt.Select(condition));
+            DataRow[] adjustDataRowList = null;
+            string adjustModuleLv1 = string.Empty;
+            string adjustAmountSpace = string.Empty;
+            int adjustLv = int.MinValue;
+            try
+            {
+                for (int index = removeDataRowList.Count-1; index >= 0; index--)
+                {
+                    tempDr = removeDataRowList[index];
+                    tempLv = int.Parse(tempDr["LV"].ToString());
+                    // 找各child nodes
+                    condition = string.Format("LV > {0} AND NameSpace like '{1}.%'", tempLv, tempDr["NameSpace"]);
+                    adjustDataRowList = mergeDt.Select(condition);
+                    // 變更LV及ModuleLv1及NameSpace, NameSpaceNoVer, AmountSpace
+                    foreach (DataRow adjustDr in adjustDataRowList)
+                    {
+                        tempNameSpace = adjustDr["NameSpace"].ToString();
+                        adjustAmountSpace = adjustDr["AmountSpace"].ToString();
+                        adjustLv = int.Parse(adjustDr["LV"].ToString()) - 1;
+                        adjustDr["LV"] = adjustLv;
+                        adjustDr["NameSpace"] = tempNameSpace.Remove(0, tempNameSpace.IndexOf('.') + 1);
+                        adjustDr["NameSpaceNoVer"] = tempNameSpace.Remove(0, tempNameSpace.IndexOf('.') + 1);
+                        adjustDr["AmountSpace"] = adjustAmountSpace.Remove(0, adjustAmountSpace.IndexOf('*') + 1);
+
+                        // 當選配在LV=1時, 要變更ModuleLv1
+                        if(adjustLv == 1)
+                        {
+                            adjustDr["ModuleLv1"] = mergeDt.TableName;
+                        }
+                        else if (tempLv == 1)
+                        {
+                            adjustModuleLv1 = tempNameSpace.Split('.')[1];
+                            adjustDr["ModuleLv1"] = adjustModuleLv1;
+                        }
+                    }
+                    // 上述處理完成, 再將選配該欄移除
+                    mergeDt.Rows.Remove(tempDr);
+                    
+                }
+            }
+            catch (IndexOutOfRangeException)
+            {
+                // 發生此exception 不跳離, 有可能該row在之前已被移除
+                Console.WriteLine("Remove Exception, RowId=" + dr1["RowId"] + ", " + dr1["LV"].ToString() + " " + dr1["A8"].ToString() + " " + dr1["ModuleLv1"].ToString());
+            }
+
 
 
             // copy to cacheDt
@@ -838,11 +957,6 @@ namespace MvLocalProject.Viewer
             cacheMergedBomToVirtualMocDt = mocDt.Copy();
 
             // 第3個Table的特別處理
-            //mocDt.Columns.Remove("MD006");
-            //mocDt.Columns.Remove("NameSpace");
-            //mocDt.Columns.Remove("NameSpaceNoVer");
-            //mocDt.Columns.Remove("Column9");
-
             mocDt.Columns["RealAmount"].SetOrdinal(5);
             mocDt.Columns["ModuleLv1"].SetOrdinal(7);
             treeList3.DataSource = mocDt.Copy();
@@ -858,6 +972,7 @@ namespace MvLocalProject.Viewer
             treeList3.Columns["NameSpaceNoVer"].Visible = false;
             treeList3.Columns["Column9"].Visible = false;
             treeList3.Columns["RowId"].Visible = false;
+            treeList3.Columns["MD013"].Visible = false;
 
             treeList3.OptionsView.AutoWidth = false;
             treeList3.OptionsBehavior.ReadOnly = true;
@@ -876,7 +991,6 @@ namespace MvLocalProject.Viewer
             cacheBomDt = null;
             cacheMergedBomDt = null;
             cacheMergedBomToVirtualMocDt = null;
-            cacheMocDt = null;
 
             treeList1.DataSource = null;
             treeList1.DataBindings.Clear();
@@ -893,6 +1007,24 @@ namespace MvLocalProject.Viewer
             treeList7.DataSource = null;
             treeList7.DataBindings.Clear();
             treeList7.Columns.Clear();
+
+        }
+
+        private void clearAllMocCacheDtAndTreeList()
+        {
+            cacheMocDt = null;
+
+            treeList4.DataSource = null;
+            treeList4.DataBindings.Clear();
+            treeList4.Columns.Clear();
+
+            treeList5.DataSource = null;
+            treeList5.DataBindings.Clear();
+            treeList5.Columns.Clear();
+
+            treeList6.DataSource = null;
+            treeList6.DataBindings.Clear();
+            treeList6.Columns.Clear();
         }
 
         private void barShowRowId_ItemClick(object sender, ItemClickEventArgs e)
@@ -1000,5 +1132,62 @@ namespace MvLocalProject.Viewer
                 col.Visible =false;
             }
         }
+
+        private void barExportExcel_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            TreeList treeList = null;
+
+            if (treeList1.Focused == true)
+            {
+                treeList = treeList1;
+            }
+            else if (treeList2.Focused == true)
+            {
+                treeList = treeList2;
+            }
+            else if (treeList3.Focused == true)
+            {
+                treeList = treeList3;
+            }
+            else if (treeList4.Focused == true)
+            {
+                treeList = treeList4;
+            }
+            else if (treeList5.Focused == true)
+            {
+                treeList = treeList5;
+            }
+            else if (treeList6.Focused == true)
+            {
+                treeList = treeList6;
+            }
+            else if (treeList7.Focused == true)
+            {
+                treeList = treeList7;
+            }
+
+            // 如果focusd 不是treelist, 就直接跳離
+            if (treeList == null) return;
+
+            SaveFileDialog saveFileDialog1 = new SaveFileDialog();
+            saveFileDialog1.Filter = "Excel 活頁簿 |*.xlsx";
+            saveFileDialog1.Title = "Save an Excel File";
+            saveFileDialog1.ShowDialog();
+            // If the file name is not an empty string open it for saving.  
+            if (saveFileDialog1.FileName == "") { return; }
+            string filePathAndName = saveFileDialog1.FileName;
+
+            try
+            {
+                treeList.ExportToXlsx(filePathAndName);
+            }
+            catch (System.IO.IOException)
+            {
+                MessageBox.Show(string.Format("please close the file first, then do save excel again.{0}{1}", Environment.NewLine, filePathAndName));
+                return;
+            }
+            MessageBox.Show(string.Format("Save as path {0}{1}", Environment.NewLine, filePathAndName));
+        }
+
     }
 }

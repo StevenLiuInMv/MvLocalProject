@@ -339,36 +339,116 @@ namespace MvLocalProject.Viewer
             DataTable majorData = null;
             StringBuilder sb = new StringBuilder();
 
+
+            //using (TransactionScope scope = new TransactionScope())
+            //{
+            //    SqlConnection connection = MvDbConnector.Connection_ERPDB2_Dot_MVTEST;
+            //    SqlCommand command = connection.CreateCommand();
+            //    try
+            //    {
+            //        command.CommandTimeout = 3;
+            //        connection.Open();
+
+            //        // 新增INVTA
+            //        sb.AppendLine(string.Format(@"SELECT TOP 0 * from MVTEST.dbo.INVTA"));
+            //        command.CommandText = sb.ToString();
+            //        majorData = MvDbConnector.queryDataBySql(command);
+
+            //        //做完以後
+            //        scope.Complete();
+            //    }
+            //    catch (SqlException se)
+            //    {
+            //        //發生例外時，會自動rollback
+            //        throw se;
+            //    }
+            //    finally
+            //    {
+            //        command.Dispose();
+            //        connection.Close();
+            //        connection.Dispose();
+            //    }
+            //}
+
+            // using sql bulkcopy
+            DataRow dr = null;
+
             using (TransactionScope scope = new TransactionScope())
             {
                 SqlConnection connection = MvDbConnector.Connection_ERPDB2_Dot_MVTEST;
-                SqlCommand command = connection.CreateCommand();
+                //SqlCommand command = connection.CreateCommand();
+
                 try
                 {
                     connection.Open();
 
-                    sb.AppendLine(string.Format(@"SELECT LV, MD003 as A8, MB025 as MB025X, MB002 as Column4, MB004, MD006, RTRIM(MD200) as Column9, MD013 FROM MACHVISION.dbo.GetBomPartList('{0}')", "21506066V01"));
-                    command.CommandText = sb.ToString();
-                    majorData = MvDbConnector.queryDataBySql(command);
-                    majorData.TableName = "Test";
+                    // Get Data schema INVTA
+                    sb.AppendLine(string.Format(@"SELECT TOP 0 * from MVTEST.dbo.INVTA"));
+                    majorData = MvDbConnector.queryDataBySql(connection, sb.ToString());
 
-                    //做完以後
+                    // add simulate data
+                    dr = MvDbDao.simulateData_INVTA(majorData);
+                    majorData.Rows.Add(dr);
+
+                    // use BulkCopy insert to DB
+                    using (SqlBulkCopy sbc = new SqlBulkCopy(connection))
+                    {
+                        // set number of records to be processed
+                        sbc.BatchSize = 300;
+                        sbc.DestinationTableName = ErpTableName.INVTA.ToString();
+
+                        // Add column mappings
+                        foreach (DataColumn column in majorData.Columns)
+                        {
+                            sbc.ColumnMappings.Add(new SqlBulkCopyColumnMapping(column.ColumnName, column.ColumnName));
+                        }
+
+                        // write to server
+                        sbc.WriteToServer(majorData);
+                    }
+
+                    // Get Data schema INVTB
+                    sb.Clear();
+                    sb.AppendLine(string.Format(@"SELECT TOP 0 * from MVTEST.dbo.INVTB"));
+                    majorData.Clear();
+                    majorData.Columns.Clear();
+                    majorData = MvDbConnector.queryDataBySql(connection, sb.ToString());
+
+                    // add simulate data
+                    dr = MvDbDao.simulateData_INVTB(connection, majorData, "10101001");
+                    majorData.Rows.Add(dr);
+
+                    // use BulkCopy insert to DB
+                    using (SqlBulkCopy sbc = new SqlBulkCopy(connection))
+                    {
+                        // set number of records to be processed
+                        sbc.BatchSize = 300;
+                        sbc.DestinationTableName = ErpTableName.INVTB.ToString();
+
+                        // Add column mappings
+                        foreach (DataColumn column in majorData.Columns)
+                        {
+                            sbc.ColumnMappings.Add(new SqlBulkCopyColumnMapping(column.ColumnName, column.ColumnName));
+                        }
+
+                        // write to server
+                        sbc.WriteToServer(majorData);
+                    }
+
                     scope.Complete();
                 }
                 catch (SqlException se)
                 {
-                    //發生例外時，會自動rollback
+                    // 發生例外時，會自動rollback
                     throw se;
                 }
                 finally
                 {
-                    command.Dispose();
                     connection.Close();
                     connection.Dispose();
                 }
             }
 
-            // release parameter
             sb = null;
         }
     }

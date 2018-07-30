@@ -30,7 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMainDev));
-            DevExpress.XtraBars.Docking2010.Views.Tabbed.DockingContainer dockingContainer4 = new DevExpress.XtraBars.Docking2010.Views.Tabbed.DockingContainer();
+            DevExpress.XtraBars.Docking2010.Views.Tabbed.DockingContainer dockingContainer1 = new DevExpress.XtraBars.Docking2010.Views.Tabbed.DockingContainer();
             this.documentGroup1 = new DevExpress.XtraBars.Docking2010.Views.Tabbed.DocumentGroup(this.components);
             this.document1 = new DevExpress.XtraBars.Docking2010.Views.Tabbed.Document(this.components);
             this.dockManager1 = new DevExpress.XtraBars.Docking.DockManager(this.components);
@@ -60,6 +60,7 @@
             this.dockPanel2_Container = new DevExpress.XtraBars.Docking.ControlContainer();
             this.documentManager1 = new DevExpress.XtraBars.Docking2010.DocumentManager(this.components);
             this.tabbedView1 = new DevExpress.XtraBars.Docking2010.Views.Tabbed.TabbedView(this.components);
+            this.formBomToMocCompare = new DevExpress.XtraNavBar.NavBarItem();
             ((System.ComponentModel.ISupportInitialize)(this.documentGroup1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.document1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dockManager1)).BeginInit();
@@ -146,7 +147,8 @@
             this.reportPurP17,
             this.formMoc,
             this.toolItCisco,
-            this.toolItMxMail});
+            this.toolItMxMail,
+            this.formBomToMocCompare});
             this.navBarControl1.Location = new System.Drawing.Point(3, 3);
             this.navBarControl1.Name = "navBarControl1";
             this.navBarControl1.OptionsNavPane.ExpandedWidth = 185;
@@ -158,7 +160,6 @@
             // nbgTesting
             // 
             this.nbgTesting.Caption = "Testing";
-            this.nbgTesting.Expanded = true;
             this.nbgTesting.ImageOptions.LargeImage = ((System.Drawing.Image)(resources.GetObject("nbgTesting.ImageOptions.LargeImage")));
             this.nbgTesting.ItemLinks.AddRange(new DevExpress.XtraNavBar.NavBarItemLink[] {
             new DevExpress.XtraNavBar.NavBarItemLink(this.toolTestProcessBar),
@@ -245,7 +246,8 @@
             new DevExpress.XtraNavBar.NavBarItemLink(this.formBom),
             new DevExpress.XtraNavBar.NavBarItemLink(this.formMoc),
             new DevExpress.XtraNavBar.NavBarItemLink(this.formBomCompare),
-            new DevExpress.XtraNavBar.NavBarItemLink(this.formBomCompareDev)});
+            new DevExpress.XtraNavBar.NavBarItemLink(this.formBomCompareDev),
+            new DevExpress.XtraNavBar.NavBarItemLink(this.formBomToMocCompare)});
             this.nbgErpFoms.Name = "nbgErpFoms";
             // 
             // formBom
@@ -298,13 +300,10 @@
             // dockPanel2
             // 
             this.dockPanel2.Controls.Add(this.dockPanel2_Container);
-            this.dockPanel2.Dock = DevExpress.XtraBars.Docking.DockingStyle.Float;
             this.dockPanel2.DockedAsTabbedDocument = true;
             this.dockPanel2.ID = new System.Guid("3d71af3a-70d5-4251-a1be-4f72f561039a");
-            this.dockPanel2.Location = new System.Drawing.Point(0, 0);
             this.dockPanel2.Name = "dockPanel2";
             this.dockPanel2.OriginalSize = new System.Drawing.Size(200, 200);
-            this.dockPanel2.Size = new System.Drawing.Size(513, 571);
             this.dockPanel2.Text = "Dialog";
             // 
             // dockPanel2_Container
@@ -327,9 +326,15 @@
             this.documentGroup1});
             this.tabbedView1.Documents.AddRange(new DevExpress.XtraBars.Docking2010.Views.BaseDocument[] {
             this.document1});
-            dockingContainer4.Element = this.documentGroup1;
+            dockingContainer1.Element = this.documentGroup1;
             this.tabbedView1.RootContainer.Nodes.AddRange(new DevExpress.XtraBars.Docking2010.Views.Tabbed.DockingContainer[] {
-            dockingContainer4});
+            dockingContainer1});
+            // 
+            // formBomToMocCompare
+            // 
+            this.formBomToMocCompare.Caption = "BomToMocCompare";
+            this.formBomToMocCompare.ImageOptions.SmallImage = ((System.Drawing.Image)(resources.GetObject("formBomToMocCompare.ImageOptions.SmallImage")));
+            this.formBomToMocCompare.Name = "formBomToMocCompare";
             // 
             // frmMainDev
             // 
@@ -389,5 +394,6 @@
         private DevExpress.XtraNavBar.NavBarGroup nbgTesting;
         private DevExpress.XtraNavBar.NavBarItem toolItCisco;
         private DevExpress.XtraNavBar.NavBarItem toolItMxMail;
+        private DevExpress.XtraNavBar.NavBarItem formBomToMocCompare;
     }
 }

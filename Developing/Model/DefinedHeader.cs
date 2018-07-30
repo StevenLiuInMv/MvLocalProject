@@ -42,6 +42,32 @@ namespace MvLocalProject.Model
         }
     }
 
+
+    public enum MvCompany
+    {
+        MACHVISION,
+        MV_CE,
+        MV_CS,
+        SIGOLD,
+        MVTEST
+    }
+
+    public enum ErpTableName
+    {
+        INVTA,
+        INVTB
+    }
+
+    
+
+    public sealed class ErpDbTableColumsCount
+    {
+        public static readonly int INVTA = 47;
+        public static readonly int INVTB = 52;
+    }
+
+
+
     public sealed class DefinedHeader
     {
         public static readonly string[] Bom09HeaderAliasName = new string[] { "階次", "取替代料", "元件品號", "品號屬性", "二階", "三階", "四階", "品名", "材料", "尺寸", "後製程", "型號", "規格", "單位", "數量", "SOP圖號", "備料順序", "備註", "單價", "金額", "最近廠商", "前一版", "CNC", "3年前舊價", "國外廠商", "獨家廠商", "核價單" };
