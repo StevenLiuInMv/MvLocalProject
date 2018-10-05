@@ -31,6 +31,7 @@
             this.sbBomP07 = new DevExpress.XtraEditors.SimpleButton();
             this.gridControl1 = new DevExpress.XtraGrid.GridControl();
             this.gridView1 = new DevExpress.XtraGrid.Views.Grid.GridView();
+            this.sbTestMvSop = new DevExpress.XtraEditors.SimpleButton();
             ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView1)).BeginInit();
             this.SuspendLayout();
@@ -59,11 +60,21 @@
             this.gridView1.GridControl = this.gridControl1;
             this.gridView1.Name = "gridView1";
             // 
+            // sbTestMvSop
+            // 
+            this.sbTestMvSop.Location = new System.Drawing.Point(95, 12);
+            this.sbTestMvSop.Name = "sbTestMvSop";
+            this.sbTestMvSop.Size = new System.Drawing.Size(77, 28);
+            this.sbTestMvSop.TabIndex = 2;
+            this.sbTestMvSop.Text = "TestMvSop";
+            this.sbTestMvSop.Click += new System.EventHandler(this.sbTestMvSop_Click);
+            // 
             // frmTestMvDao
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1065, 586);
+            this.Controls.Add(this.sbTestMvSop);
             this.Controls.Add(this.gridControl1);
             this.Controls.Add(this.sbBomP07);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
@@ -84,5 +95,6 @@
         private DevExpress.XtraEditors.SimpleButton sbBomP07;
         private DevExpress.XtraGrid.GridControl gridControl1;
         private DevExpress.XtraGrid.Views.Grid.GridView gridView1;
+        private DevExpress.XtraEditors.SimpleButton sbTestMvSop;
     }
 }

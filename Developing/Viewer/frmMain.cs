@@ -78,7 +78,7 @@ namespace MvLocalProject.Viewer
                     form = new frmReport();
                     break;
                 case "MocP07":
-                    form = new frmMocP07();
+                    form = new frmReportMocP07();
                     break;
                 case "TestMvSecurityScanBo":
                     form = new frmTestMvSecurityScanBo();

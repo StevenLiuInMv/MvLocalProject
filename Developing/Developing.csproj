@@ -116,6 +116,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bo\MvBomCompareBo.cs" />
+    <Compile Include="Bo\MvErpNoteBo.cs" />
     <Compile Include="Bo\MvItCiscoBo.cs" />
     <Compile Include="Bo\MvItToolBo.cs" />
     <Compile Include="Bo\MvSecurityScanBo.cs" />
@@ -163,6 +164,12 @@
     <Compile Include="Viewer\frmBomCompareDev.Designer.cs">
       <DependentUpon>frmBomCompareDev.cs</DependentUpon>
     </Compile>
+    <Compile Include="Viewer\frmErpCreatePR.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Viewer\frmErpCreatePR.Designer.cs">
+      <DependentUpon>frmErpCreatePR.cs</DependentUpon>
+    </Compile>
     <Compile Include="Viewer\frmItCisco.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -193,6 +200,12 @@
     <Compile Include="Viewer\frmMainDev.Designer.cs">
       <DependentUpon>frmMainDev.cs</DependentUpon>
     </Compile>
+    <Compile Include="Viewer\frmMcBatchJob.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Viewer\frmMcBatchJob.Designer.cs">
+      <DependentUpon>frmMcBatchJob.cs</DependentUpon>
+    </Compile>
     <Compile Include="Viewer\frmMoc.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -205,11 +218,17 @@
     <Compile Include="Viewer\frmProgress.Designer.cs">
       <DependentUpon>frmProgress.cs</DependentUpon>
     </Compile>
-    <Compile Include="Viewer\frmPurP17.cs">
+    <Compile Include="Viewer\frmReportFinance.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Viewer\frmPurP17.Designer.cs">
-      <DependentUpon>frmPurP17.cs</DependentUpon>
+    <Compile Include="Viewer\frmReportFinance.Designer.cs">
+      <DependentUpon>frmReportFinance.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Viewer\frmReportPurP17.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Viewer\frmReportPurP17.Designer.cs">
+      <DependentUpon>frmReportPurP17.cs</DependentUpon>
     </Compile>
     <Compile Include="Viewer\frmReport.cs">
       <SubType>Form</SubType>
@@ -219,11 +238,11 @@
     </Compile>
     <Compile Include="Controller\Mailer.cs" />
     <Compile Include="Controller\MvExcelReport.cs" />
-    <Compile Include="Viewer\frmMocP07.cs">
+    <Compile Include="Viewer\frmReportMocP07.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Viewer\frmMocP07.Designer.cs">
-      <DependentUpon>frmMocP07.cs</DependentUpon>
+    <Compile Include="Viewer\frmReportMocP07.Designer.cs">
+      <DependentUpon>frmReportMocP07.cs</DependentUpon>
     </Compile>
     <Compile Include="Viewer\frmMain.cs">
       <SubType>Form</SubType>
@@ -302,6 +321,9 @@
     <EmbeddedResource Include="Viewer\frmBomCompareDev.resx">
       <DependentUpon>frmBomCompareDev.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Viewer\frmErpCreatePR.resx">
+      <DependentUpon>frmErpCreatePR.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Viewer\frmItCisco.resx">
       <DependentUpon>frmItCisco.cs</DependentUpon>
     </EmbeddedResource>
@@ -317,20 +339,26 @@
     <EmbeddedResource Include="Viewer\frmMainDev.resx">
       <DependentUpon>frmMainDev.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Viewer\frmMcBatchJob.resx">
+      <DependentUpon>frmMcBatchJob.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Viewer\frmMoc.resx">
       <DependentUpon>frmMoc.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Viewer\frmProgress.resx">
       <DependentUpon>frmProgress.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Viewer\frmPurP17.resx">
-      <DependentUpon>frmPurP17.cs</DependentUpon>
+    <EmbeddedResource Include="Viewer\frmReportFinance.resx">
+      <DependentUpon>frmReportFinance.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Viewer\frmReportPurP17.resx">
+      <DependentUpon>frmReportPurP17.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Viewer\frmReport.resx">
       <DependentUpon>frmReport.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Viewer\frmMocP07.resx">
-      <DependentUpon>frmMocP07.cs</DependentUpon>
+    <EmbeddedResource Include="Viewer\frmReportMocP07.resx">
+      <DependentUpon>frmReportMocP07.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Viewer\frmMain.resx">
       <DependentUpon>frmMain.cs</DependentUpon>
@@ -414,7 +442,7 @@
     <COMReference Include="Microsoft.Office.Interop.Excel">
       <Guid>{00020813-0000-0000-C000-000000000046}</Guid>
       <VersionMajor>1</VersionMajor>
-      <VersionMinor>6</VersionMinor>
+      <VersionMinor>9</VersionMinor>
       <Lcid>0</Lcid>
       <WrapperTool>primary</WrapperTool>
       <Isolated>False</Isolated>

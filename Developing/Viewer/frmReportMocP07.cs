@@ -8,11 +8,11 @@ using MvLocalProject.Controller;
 
 namespace MvLocalProject.Viewer
 {
-    public partial class frmMocP07 : Form
+    public partial class frmReportMocP07 : Form
     {
         DataTable machineTypeMappingTable = new DataTable();
 
-        public frmMocP07()
+        public frmReportMocP07()
         {
             InitializeComponent();
         }

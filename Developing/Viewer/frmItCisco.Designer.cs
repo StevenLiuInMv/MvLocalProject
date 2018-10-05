@@ -303,7 +303,7 @@
             // 
             this.toolStripStatusLabel1.ForeColor = System.Drawing.Color.Red;
             this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
-            this.toolStripStatusLabel1.Size = new System.Drawing.Size(399, 17);
+            this.toolStripStatusLabel1.Size = new System.Drawing.Size(398, 17);
             this.toolStripStatusLabel1.Text = "因使用非同步寫法, 在操作Enable及Disable的動作, 請等後2秒後再執行 !!!";
             // 
             // groupMacNumberEdit

@@ -53,6 +53,8 @@
             this.formMoc = new DevExpress.XtraNavBar.NavBarItem();
             this.formBomCompare = new DevExpress.XtraNavBar.NavBarItem();
             this.formBomCompareDev = new DevExpress.XtraNavBar.NavBarItem();
+            this.formBomToMocCompare = new DevExpress.XtraNavBar.NavBarItem();
+            this.formErpCreatePR = new DevExpress.XtraNavBar.NavBarItem();
             this.nbgItTools = new DevExpress.XtraNavBar.NavBarGroup();
             this.toolItCisco = new DevExpress.XtraNavBar.NavBarItem();
             this.toolItMxMail = new DevExpress.XtraNavBar.NavBarItem();
@@ -60,7 +62,7 @@
             this.dockPanel2_Container = new DevExpress.XtraBars.Docking.ControlContainer();
             this.documentManager1 = new DevExpress.XtraBars.Docking2010.DocumentManager(this.components);
             this.tabbedView1 = new DevExpress.XtraBars.Docking2010.Views.Tabbed.TabbedView(this.components);
-            this.formBomToMocCompare = new DevExpress.XtraNavBar.NavBarItem();
+            this.formMcBatchJob = new DevExpress.XtraNavBar.NavBarItem();
             ((System.ComponentModel.ISupportInitialize)(this.documentGroup1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.document1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dockManager1)).BeginInit();
@@ -148,7 +150,9 @@
             this.formMoc,
             this.toolItCisco,
             this.toolItMxMail,
-            this.formBomToMocCompare});
+            this.formBomToMocCompare,
+            this.formErpCreatePR,
+            this.formMcBatchJob});
             this.navBarControl1.Location = new System.Drawing.Point(3, 3);
             this.navBarControl1.Name = "navBarControl1";
             this.navBarControl1.OptionsNavPane.ExpandedWidth = 185;
@@ -247,7 +251,9 @@
             new DevExpress.XtraNavBar.NavBarItemLink(this.formMoc),
             new DevExpress.XtraNavBar.NavBarItemLink(this.formBomCompare),
             new DevExpress.XtraNavBar.NavBarItemLink(this.formBomCompareDev),
-            new DevExpress.XtraNavBar.NavBarItemLink(this.formBomToMocCompare)});
+            new DevExpress.XtraNavBar.NavBarItemLink(this.formBomToMocCompare),
+            new DevExpress.XtraNavBar.NavBarItemLink(this.formErpCreatePR),
+            new DevExpress.XtraNavBar.NavBarItemLink(this.formMcBatchJob)});
             this.nbgErpFoms.Name = "nbgErpFoms";
             // 
             // formBom
@@ -274,6 +280,18 @@
             this.formBomCompareDev.Caption = "BomCompareDev";
             this.formBomCompareDev.ImageOptions.SmallImage = ((System.Drawing.Image)(resources.GetObject("formBomCompareDev.ImageOptions.SmallImage")));
             this.formBomCompareDev.Name = "formBomCompareDev";
+            // 
+            // formBomToMocCompare
+            // 
+            this.formBomToMocCompare.Caption = "BomToMocCompare";
+            this.formBomToMocCompare.ImageOptions.SmallImage = ((System.Drawing.Image)(resources.GetObject("formBomToMocCompare.ImageOptions.SmallImage")));
+            this.formBomToMocCompare.Name = "formBomToMocCompare";
+            // 
+            // formErpCreatePR
+            // 
+            this.formErpCreatePR.Caption = "ErpCreatePR";
+            this.formErpCreatePR.ImageOptions.SmallImage = ((System.Drawing.Image)(resources.GetObject("formErpCreatePR.ImageOptions.SmallImage")));
+            this.formErpCreatePR.Name = "formErpCreatePR";
             // 
             // nbgItTools
             // 
@@ -330,11 +348,11 @@
             this.tabbedView1.RootContainer.Nodes.AddRange(new DevExpress.XtraBars.Docking2010.Views.Tabbed.DockingContainer[] {
             dockingContainer1});
             // 
-            // formBomToMocCompare
+            // formMcBatchJob
             // 
-            this.formBomToMocCompare.Caption = "BomToMocCompare";
-            this.formBomToMocCompare.ImageOptions.SmallImage = ((System.Drawing.Image)(resources.GetObject("formBomToMocCompare.ImageOptions.SmallImage")));
-            this.formBomToMocCompare.Name = "formBomToMocCompare";
+            this.formMcBatchJob.Caption = "McBatchJob";
+            this.formMcBatchJob.ImageOptions.SmallImage = ((System.Drawing.Image)(resources.GetObject("formMcBatchJob.ImageOptions.SmallImage")));
+            this.formMcBatchJob.Name = "formMcBatchJob";
             // 
             // frmMainDev
             // 
@@ -395,5 +413,7 @@
         private DevExpress.XtraNavBar.NavBarItem toolItCisco;
         private DevExpress.XtraNavBar.NavBarItem toolItMxMail;
         private DevExpress.XtraNavBar.NavBarItem formBomToMocCompare;
+        private DevExpress.XtraNavBar.NavBarItem formErpCreatePR;
+        private DevExpress.XtraNavBar.NavBarItem formMcBatchJob;
     }
 }

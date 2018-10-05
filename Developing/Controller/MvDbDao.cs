@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Data;
 using System.Transactions;
 using MvLocalProject.Model;
@@ -809,7 +806,8 @@ namespace MvLocalProject.Controller
 
         }
 
-        public static DataTable collectData_Moc(string parentMocNo)
+
+        public static DataTable collectData_Moc(SqlConnection connection, string parentMocNo)
         {
             DataTable majorData = null;
             StringBuilder sb = new StringBuilder();
@@ -819,43 +817,49 @@ namespace MvLocalProject.Controller
             string mocType = tmpStr[0];
             string mocNumber = tmpStr[1];
 
-            using (TransactionScope scope = new TransactionScope())
+            try
             {
-                SqlConnection connection = MvDbConnector.Connection_ERPDB2_Dot_MACHVISION;
-                SqlCommand command = connection.CreateCommand();
-                try
-                {
-                    connection.Open();
+                connection.Open();
 
-                    //sb.AppendLine("SELECT TA024+'-'+TA025 '母製令', TB001+'-'+TB002 '子製令',TA006 '模組', TB003 '品號', TB012 '品名', TB013'規格', Convert(int,TB004) '需領用量', Convert(int,TB005) '已領用量', MB077 '類別' ")
-                    sb.AppendLine("SELECT TA024+'-'+TA025 'ParentMoc', TB001+'-'+TB002 'ChildMoc', RTRIM(TA006) TA006, RTRIM(TB003) TB003, TB012, TB013, Convert(int,TB004) 'TB004', Convert(int,TB005) 'TB005', MB077 ")
+                //sb.AppendLine("SELECT TA024+'-'+TA025 '母製令', TB001+'-'+TB002 '子製令',TA006 '模組', TB003 '品號', TB012 '品名', TB013'規格', Convert(int,TB004) '需領用量', Convert(int,TB005) '已領用量', MB077 '類別' ")
+                // 先用來源單號串出所有母及子製令內容
+                sb.AppendLine("SELECT TA024+'-'+TA025 'ParentMoc', TB001+'-'+TB002 'ChildMoc', TA201, RTRIM(TA006) TA006, RTRIM(TB003) TB003, TB012, TB013, Convert(int,TB004) 'TB004', Convert(int,TB005) 'TB005', MB077, TA200, TB201, TB017 ")
+                    .AppendLine("FROM ERPDB2.MACHVISION.dbo.MOCTA A, ERPDB2.MACHVISION.dbo.MOCTB B, ERPDB2.MACHVISION.dbo.INVMB MB ")
+                    .AppendLine(string.Format("WHERE TA024 = '{0}' AND TA025 = '{1}' AND A.TA001 = B.TB001 AND A.TA002 = B.TB002 AND TB003 = MB001 AND TB018 <> 'V' ORDER BY B.TB001, B.TB002", mocType.ToUpper(), mocNumber));
+
+                majorData = MvDbConnector.queryDataBySql(connection, sb.ToString());
+
+                // 如果輸入為子製令, 串出子製令內容
+                sb.Clear();
+                if (majorData.Rows.Count == 0)
+                {
+                    sb.AppendLine("SELECT TA024+'-'+TA025 'ParentMoc', TB001+'-'+TB002 'ChildMoc', TA201, RTRIM(TA006) TA006, RTRIM(TB003) TB003, TB012, TB013, Convert(int,TB004) 'TB004', Convert(int,TB005) 'TB005', MB077, TA200, TB201, TB017 ")
                         .AppendLine("FROM ERPDB2.MACHVISION.dbo.MOCTA A, ERPDB2.MACHVISION.dbo.MOCTB B, ERPDB2.MACHVISION.dbo.INVMB MB ")
-                        .AppendLine(string.Format("WHERE TA024 = '{0}' AND TA025 = '{1}' AND A.TA001 = B.TB001 AND A.TA002 = B.TB002 AND TB003 = MB001 AND TB018 <> 'V' ORDER BY B.TB001, B.TB002", mocType.ToUpper(), mocNumber));
+                        .AppendLine(string.Format("WHERE TA001 = '{0}' AND TA002 = '{1}' AND A.TA001 = B.TB001 AND A.TA002 = B.TB002 AND TB003 = MB001 AND TB018 <> 'V' ORDER BY B.TB001, B.TB002", mocType.ToUpper(), mocNumber));
+                    majorData = MvDbConnector.queryDataBySql(connection, sb.ToString());
+                }
 
-                    command.CommandText = sb.ToString();
-                    majorData = MvDbConnector.queryDataBySql(command);
-                    majorData.TableName = parentMocNo;
+                majorData.TableName = parentMocNo;
 
-                    //做完以後
-                    scope.Complete();
-                }
-                catch (SqlException se)
-                {
-                    //發生例外時，會自動rollback
-                    throw se;
-                }
-                finally
-                {
-                    command.Dispose();
-                    connection.Close();
-                    connection.Dispose();
-                }
+            }
+            catch (SqlException se)
+            {
+                //發生例外時，會自動rollback
+                throw se;
             }
 
             // release parameter
             sb = null;
 
             return majorData;
+        }
+
+        public static DataTable collectData_Moc(string parentMocNo)
+        {
+            using (SqlConnection connection = MvDbConnector.Connection_ERPDB2_Dot_MACHVISION)
+            {
+                return collectData_Moc(connection, parentMocNo);
+            }
         }
 
         public static DataTable collectData_ItMxMail(string startDate, string endDate)
@@ -1270,6 +1274,32 @@ namespace MvLocalProject.Controller
             }
         }
 
+
+        public static DataTable checkData_hasIllegalItemListInInvmb(string[] itemList)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append("DECLARE @dtTempTable TABLE (MB001 NVARCHAR(50));");
+            foreach (string item in itemList)
+            {
+                sb.Append(string.Format("INSERT INTO @dtTempTable (MB001) VALUES ('{0}');", item));
+            }
+            sb.Append("SELECT DISTINCT(MB001) FROM @dtTempTable temp WHERE NOT EXISTS (SELECT MB001 FROM MACHVISION.dbo.INVMB source WHERE source.MB001 = temp.MB001);");
+
+            using (SqlConnection connection = MvDbConnector.Connection_ERPDB2_Dot_MACHVISION)
+            {
+                try
+                {
+                    connection.Open();
+                    return MvDbConnector.queryDataBySql(connection, sb.ToString());
+                }
+                catch (SqlException se)
+                {
+                    // do nothing
+                    throw se;
+                }
+            }
+        }
+
         /// <summary>
         /// 取得IT.dbo.NetworkDevice內的所有資料
         /// </summary>
@@ -1391,10 +1421,7 @@ namespace MvLocalProject.Controller
         }
 
 
-        public void createErpNote_A121(DateTime noteDate)
-        {
-
-        }
+     
 
 
         public static bool validData_INVTA(DataTable dt)
@@ -1488,8 +1515,6 @@ namespace MvLocalProject.Controller
             return dr;
         }
 
-
-
         public static DataRow simulateData_INVTB(SqlConnection connection, DataTable dt, string item)
         {
             if (validData_INVTB(dt) == false)
@@ -1526,7 +1551,7 @@ namespace MvLocalProject.Controller
             dr["TB009"] = 0;
             dr["TB010"] = 0;
             dr["TB011"] = 0;
-            dr["TB012"] = "";////
+            dr["TB012"] = "";
             dr["TB013"] = "T02";
             dr["TB014"] = "";
             dr["TB015"] = "";
@@ -1540,8 +1565,8 @@ namespace MvLocalProject.Controller
             dr["TB023"] = "";
             dr["TB024"] = "N";
             dr["TB025"] = 0;
-            dr["TB026"] = "";////
-            dr["TB027"] = "P03";////
+            dr["TB026"] = "";
+            dr["TB027"] = "P03";
             dr["TB028"] = 0;
             dr["TB029"] = 0;
             dr["TB030"] = "";
@@ -1570,15 +1595,6 @@ namespace MvLocalProject.Controller
         }
 
 
-        public static DataTable collectData_Invmb(string pattern)
-        {
-            using (SqlConnection connection = MvDbConnector.Connection_ERPDB2_Dot_MVTEST)
-            {
-                connection.Open();
-                return collectData_Invmb(connection, pattern);
-            }
-        }
-
         public static DataTable collectData_Invmb(SqlConnection connection, string pattern)
         {
 
@@ -1597,6 +1613,182 @@ namespace MvLocalProject.Controller
             }
 
             return majorData;
+        }
+
+        public static DataTable collectData_InvmbItems(string[] itemList, string columnPattern = "*")
+        {
+            using (SqlConnection connection = MvDbConnector.Connection_ERPDB2_Dot_MACHVISION)
+            {
+                try
+                {
+                    connection.Open();
+                    return collectData_InvmbItems(connection, itemList, columnPattern);
+                }
+                catch (SqlException se)
+                {
+                    // do nothing
+                    throw se;
+                }
+            }
+        }
+        public static DataTable collectData_InvmbItems(SqlConnection connection, string[] itemList, string columnPattern = "*")
+        {
+            StringBuilder sb = new StringBuilder();
+            DataTable majorData = null;
+
+            if (columnPattern.Length == 0) { return null; }
+
+            sb.Append("DECLARE @dtTempTable TABLE (MB001 NVARCHAR(50));");
+            foreach (string item in itemList)
+            {
+                sb.Append(string.Format("INSERT INTO @dtTempTable (MB001) VALUES ('{0}');", item));
+            }
+            sb.Append(string.Format("SELECT {0} FROM MACHVISION.dbo.INVMB source WHERE EXISTS (select MB001 FROM @dtTempTable temp WHERE source.MB001 = temp.MB001);", columnPattern));
+
+            try
+            {
+                majorData = MvDbConnector.queryDataBySql(connection, sb.ToString());
+            }
+            catch (SqlException se)
+            {
+                throw se;
+            }
+
+            return majorData;
+        }
+
+
+        public static DataTable collectData_MachineFromMVPlan(string machineNo, bool isIncludeShipped = false)
+        {
+            using (SqlConnection connection = MvDbConnector.Connection_ERPBK_Dot_MVPlanSystem2018)
+            {
+                try
+                {
+                    connection.Open();
+                    return collectData_MachineFromMVPlan(connection, machineNo, isIncludeShipped);
+                }
+                catch (SqlException se)
+                {
+                    // do nothing
+                    throw se;
+                }
+            }
+        }
+
+        public static DataTable collectData_MachineFromMVPlan(SqlConnection connection, string machineNo, bool isIncludeShipped = false)
+        {
+            StringBuilder sb = new StringBuilder();
+            DataTable majorData = null;
+
+            sb.Append(string.Format(@"SELECT * FROM tblMachManages  WHERE MachSN = '{0}' ", machineNo));
+            if (isIncludeShipped == false)
+            {
+                sb.Append(" AND MachShip IS Null ");
+            }
+            sb.Append(" AND (OrderType <> '製令作廢' OR OrderType IS NULL) AND (OrderType <> '指定結案' OR OrderType IS NULL)");
+
+            try
+            {
+                majorData = MvDbConnector.queryDataBySql(connection, sb.ToString());
+            }
+            catch (SqlException se)
+            {
+                throw se;
+            }
+
+            return majorData;
+        }
+
+        public static DataTable collectData_InventoryWithStorageLocation(SqlConnection connection, string[] items, string[] warehosues)
+        {
+            if (items == null || items.Length == 0) { return null; }
+
+            StringBuilder sb = new StringBuilder();
+            DataTable majorData = null;
+
+            sb.Append(" SELECT * ")
+                   .Append(" FROM INVMM MM ")
+                   .Append("WHERE MM.MM001 IN (");
+            foreach (string data in items)
+            {
+                sb.Append("'").Append(data).Append("',");
+            }
+            sb.Remove(sb.Length - 1, 1).Append(")").Append("  AND MM.MM005 > 0 ");
+
+            if (warehosues != null && warehosues.Length > 0)
+            {
+                sb.Append("  AND MM.MM002 IN (");
+                foreach (string data in warehosues)
+                {
+                    sb.Append("'").Append(data).Append("',");
+                }
+                sb.Remove(sb.Length - 1, 1).Append(") ");
+            }
+
+            try
+            {
+                majorData = MvDbConnector.queryDataBySql(connection, sb.ToString());
+            }
+            catch (SqlException se)
+            {
+                throw se;
+            }
+            return majorData;
+        }
+
+
+        public static DataTable collectData_Inventory(SqlConnection connection, string[] items, string[] warehosues)
+        {
+
+            if (items == null || items.Length == 0) { return null; }
+            StringBuilder sb = new StringBuilder();
+            DataTable majorData = null;
+
+            sb.Append(" SELECT * ")
+                .Append(" FROM INVMC MC ")
+                .Append("WHERE MC.MC001 IN (");
+            foreach(string data in items)
+            {
+                sb.Append("'").Append(data).Append("',");
+            }
+            sb.Remove(sb.Length - 1, 1).Append(")")
+                .Append("  AND MC.MC007 > 0 ");
+
+            if (warehosues != null && warehosues.Length>0)
+            {
+                sb.Append("  AND MC.MC002 IN (");
+                foreach (string data in warehosues)
+                {
+                    sb.Append("'").Append(data).Append("',");
+                }
+                sb.Remove(sb.Length - 1, 1).Append(") ");
+            }
+
+            try
+            {
+                majorData = MvDbConnector.queryDataBySql(connection, sb.ToString());
+            }
+            catch (SqlException se)
+            {
+                throw se;
+            }
+            return majorData;
+        }
+
+
+        public static DataTable collectData_HasStorageLocation(SqlConnection conn, string[] warehosues)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append("SELECT MC001, MC009 from CMSMC WHERE MC001 IN (");
+            foreach (string item in warehosues)
+            {
+                sb.Append(string.Format("'{0}',", item));
+            }
+            sb.Remove(sb.Length - 1, 1);
+            sb.Append(")");
+
+            DataTable tempDt = MvDbConnector.queryDataBySql(conn, sb.ToString());
+            return tempDt;
         }
     }
 }

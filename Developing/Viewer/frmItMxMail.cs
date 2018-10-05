@@ -7,6 +7,7 @@ using DevExpress.XtraGrid.Views.Grid;
 using DevExpress.XtraEditors;
 using System.Text;
 using System.IO;
+using MvLocalProject.Model;
 
 namespace MvLocalProject.Viewer
 {
@@ -65,6 +66,11 @@ namespace MvLocalProject.Viewer
             this.sbExportUser.Click += new EventHandler(buttonClickAction);
             this.sbExportLdap.Click += new EventHandler(buttonClickAction);
             this.sbExportAD.Click += new EventHandler(buttonClickAction);
+
+            foreach(string item in MachvisionInfo.DepartmentNameList)
+            {
+                this.cboMvDept.Items.Add(item);
+            }
         }
 
         private void buttonClickAction(object sender, EventArgs e)
@@ -439,14 +445,45 @@ namespace MvLocalProject.Viewer
             System.Diagnostics.Process.Start(MvAdConnector.MxMailUrlSiGold);
         }
 
-        private void sbExportAD_Click(object sender, EventArgs e)
-        {
-
-        }
-
         private void frmItMxMail_FormClosed(object sender, FormClosedEventArgs e)
         {
             Application.Exit();
+        }
+
+
+        private void sbClearScript_Click(object sender, EventArgs e)
+        {
+            richTextBox1.Clear();
+        }
+
+        private void sbDisableUser_Click(object sender, EventArgs e)
+        {
+            if (cboMvDept.Text.Length == 0)
+            {
+                MessageBox.Show("請選取部門");
+                return;
+            }
+            if (txtUserName.Text.Length == 0)
+            {
+                MessageBox.Show("請輸入姓名");
+                return;
+            }
+            richTextBox1.Text += string.Format("dsmod user cn={0},ou={1},dc=office,dc=machvision,dc=com,dc=tw -disabled yes{2}", txtUserName.Text, cboMvDept.Text, Environment.NewLine);
+        }
+
+        private void sbEnableUser_Click(object sender, EventArgs e)
+        {
+            if (cboMvDept.Text.Length == 0)
+            {
+                MessageBox.Show("請選取部門");
+                return;
+            }
+            if (txtUserName.Text.Length == 0)
+            {
+                MessageBox.Show("請輸入姓名");
+                return;
+            }
+            richTextBox1.Text += string.Format("dsmod user cn={0},ou={1},dc=office,dc=machvision,dc=com,dc=tw -disabled no{2}", txtUserName.Text, cboMvDept.Text, Environment.NewLine);
         }
     }
 }

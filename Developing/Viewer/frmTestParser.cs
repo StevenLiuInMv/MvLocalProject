@@ -47,7 +47,7 @@ namespace MvLocalProject.Viewer
 
 
             DataTable dt = new DataTable();
-            using (FileStream stream = new FileStream(@"D:\99_TempArea\\RD差異料清單表_嘉聯益LV_D57-18176~277_20180524.xlsx", FileMode.Open))
+            using (FileStream stream = new FileStream(@"D:\99_TempForProgram\\差異料清單表_OK_AOI4.0 R167.xlsx", FileMode.Open))
             {
                 isLoad = workbook.LoadDocument(stream, DocumentFormat.Xlsx);
                 if (isLoad == false)
@@ -376,7 +376,6 @@ namespace MvLocalProject.Viewer
             using (TransactionScope scope = new TransactionScope())
             {
                 SqlConnection connection = MvDbConnector.Connection_ERPDB2_Dot_MVTEST;
-                //SqlCommand command = connection.CreateCommand();
 
                 try
                 {

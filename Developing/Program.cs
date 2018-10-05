@@ -19,18 +19,25 @@ namespace MvLocalProject
             //Application.Run(new MvLocalProject.Viewer.frmLogin());
 
             //var start = new MvLocalProject.Viewer.frmLogin();
-            //var start = new MvLocalProject.Viewer.frmBomCompareDev();
-            //var start = new MvLocalProject.Viewer.frmBom();
-            //var start = new MvLocalProject.Viewer.frmMoc();
-
             //var start = new MvLocalProject.Viewer.frmMainDev();
-            //var start = new Viewer.frmItCisco();
             //var start = new Viewer.frmItMxMail();
-            //var start = new Viewer.frmTestMvDao();
-            var start = new MvLocalProject.Viewer.frmTestParser();
+
+            //var start = new Viewer.frmItCisco();
+            //var start = new MvLocalProject.Viewer.frmTestParser();
             //var start = new MvLocalProject.Viewer.frmTestMisGetBom();
             //var start = new MvLocalProject.Viewer.frmBomToMocCompare();
 
+            //var start = new Viewer.frmBomCompareDev();
+            //var start = new Viewer.frmMoc();
+            //var start = new Viewer.frmBom();
+
+            //var start = new Viewer.frmErpCreatePR();
+            //var start = new Viewer.frmReportFinance();
+            //var start = new Viewer.frmTestMvDao();
+
+            //2018/10/05 using
+            //var start = new Viewer.frmMcBatchJob();
+            var start = new Viewer.frmTestParser();
             start.FormClosed += WindowClosed;
             start.Show();
             Application.Run();

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using MvLocalProject.Controller;
 using DevExpress.XtraSplashScreen;
+using System.Data.SqlClient;
 
 namespace MvLocalProject.Viewer
 {
@@ -41,6 +42,31 @@ namespace MvLocalProject.Viewer
         private void frmTestMvDao_FormClosed(object sender, FormClosedEventArgs e)
         {
             Application.Exit();
+        }
+
+        private void sbTestMvSop_Click(object sender, EventArgs e)
+        {
+            SqlConnection connection = MvDbConnector.Connection_MV_SOP;
+            StringBuilder sb = new StringBuilder();
+            DataTable majorData = new DataTable();
+            try
+            {
+                connection.Open();
+
+                sb.AppendLine("select * from dbo.spt_values ");
+
+                majorData = MvDbConnector.queryDataBySql(connection, sb.ToString());
+            }
+            catch (SqlException se)
+            {
+                //發生例外時，會自動rollback
+                throw se;
+            }
+            finally
+            {
+                connection.Close();
+                connection.Dispose();
+            }
         }
     }
 }

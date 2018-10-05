@@ -11,9 +11,9 @@ using System.Windows.Forms;
 
 namespace MvLocalProject.Viewer
 {
-    public partial class frmPurP17 : Form
+    public partial class frmReportPurP17 : Form
     {
-        public frmPurP17()
+        public frmReportPurP17()
         {
             InitializeComponent();
         }

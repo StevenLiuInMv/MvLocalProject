@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 using MvLocalProject.Controller;
+using MvLocalProject.Model;
 
 namespace MvLocalProject.Viewer
 {
@@ -32,7 +33,10 @@ namespace MvLocalProject.Viewer
                 txtPassWord.Focus();
                 return;
             }
-            
+
+            // 先parse出company, 以利下面連線判斷
+            GlobalMvVariable.MvAdCompany = (MvCompany)Enum.Parse(typeof(MvCompany), cboCompany.Text, false);
+
             // 連線至LDAP 確認使用者帳密是否合法
             result = MvAdConnector.validateUser(userName, passWord, domainName);
             if (result == false)
@@ -56,7 +60,7 @@ namespace MvLocalProject.Viewer
             }
 
             // 連線至ERP GP 確認使用者是否在職
-            result = MvDbConnector.validateUserFromErpGP(userName, passWord);
+            result = MvDbConnector.validateUserFromErpGP(GlobalMvVariable.MvAdCompany, userName, passWord);
             if (result == false)
             {
                 MessageBox.Show("該帳號人員無ERP權限, 請重新輸入");
@@ -66,6 +70,9 @@ namespace MvLocalProject.Viewer
                 return;
             }
 
+            // 存入全域變數
+            GlobalMvVariable.MvAdUserName = userName;
+            GlobalMvVariable.MvAdPassword = passWord;
             // 進入Main頁面
             new frmMainDev().Show();
             this.Hide();
@@ -77,6 +84,9 @@ namespace MvLocalProject.Viewer
         private void frmLogin_Load(object sender, EventArgs e)
         {
             pictureBox1.Image = ResourcePicture.MvPortal;
+            txtAccount.Text = Environment.UserName;
+            cboCompany.DataSource = Enum.GetValues(typeof(MvCompany));
+            cboCompany.SelectedIndex = 0;
         }
 
         private void txtPassWord_KeyDown(object sender, KeyEventArgs e)

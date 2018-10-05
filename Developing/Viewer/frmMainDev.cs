@@ -26,7 +26,6 @@ namespace MvLocalProject.Viewer
             getMappingFormAndShowDialog(s);
         }
 
-
         private void getMappingFormAndShowDialog(string name)
         {
             Form form = null;
@@ -37,10 +36,10 @@ namespace MvLocalProject.Viewer
                     form = new frmReport();
                     break;
                 case "reportMocP07":
-                    form = new frmMocP07();
+                    form = new frmReportMocP07();
                     break;
                 case "reportPurP17":
-                    form = new frmPurP17();
+                    form = new frmReportPurP17();
                     break;
                 case "toolTestMvSecurityScanBo":
                     form = new frmTestMvSecurityScanBo();
@@ -78,6 +77,12 @@ namespace MvLocalProject.Viewer
                 case "formBomToMocCompare":
                     form = new frmBomToMocCompare();
                     break;
+                case "formErpCreatePR":
+                    form = new frmErpCreatePR();
+                    break;
+                case "formMcBatchJob":
+                    form = new frmMcBatchJob();
+                    break;
                 default:
                     break;
             }
@@ -89,23 +94,13 @@ namespace MvLocalProject.Viewer
             this.Show();
         }
 
-        private void tileBarItem1_ItemClick(object sender, DevExpress.XtraEditors.TileItemEventArgs e)
-        {
-
-        }
-
-        private void tileBar1_Click(object sender, EventArgs e)
-        {
-
-        }
-
         private void frmMainDev_Load(object sender, EventArgs e)
         {
             string localHost = Dns.GetHostName().Split('.')[0];
             bool isFindRole = false;
 
             // 如果是Admin 全開
-            foreach (string host in DefinedParameter.MvAdminPcHostName)
+            foreach (string host in GlobalConstant.MvAdminPcHostName)
             {
                 if (host.Equals(localHost))
                 {
@@ -116,7 +111,7 @@ namespace MvLocalProject.Viewer
 
             // MvMis權限
             if (isFindRole == true) { return; }
-            foreach (string host in DefinedParameter.MvMisPcHostName)
+            foreach (string host in GlobalConstant.MvMisPcHostName)
             {
                 if (host.Equals(localHost))
                 {
@@ -127,7 +122,7 @@ namespace MvLocalProject.Viewer
 
             // RD權限
             if (isFindRole == true) { return; }
-            foreach (string host in DefinedParameter.MvRdPcHostName)
+            foreach (string host in GlobalConstant.MvRdPcHostName)
             {
                 if (host.Equals(localHost))
                 {
@@ -138,11 +133,23 @@ namespace MvLocalProject.Viewer
 
             // 料控權限
             if (isFindRole == true) { return; }
-            foreach (string host in DefinedParameter.MvMcPcHostName)
+            foreach (string host in GlobalConstant.MvMcPcHostName)
             {
                 if (host.Equals(localHost))
                 {
                     enableMenuForMc();
+                    enableMenuForMcSpecial(GlobalMvVariable.MvAdUserName);
+                    isFindRole = true;
+                }
+            }
+
+            // 客服權限
+            if (isFindRole == true) { return; }
+            foreach (string host in GlobalConstant.MvCsrPcHostName)
+            {
+                if (host.Equals(localHost))
+                {
+                    enableMenuForCsr();
                     isFindRole = true;
                 }
             }
@@ -177,8 +184,14 @@ namespace MvLocalProject.Viewer
             nbgErpFoms.Visible = true;
             nbgItTools.Visible = false;
             nbgTesting.Visible = false;
+            // 各別group disable
             formBom.Visible = false;
             formBomCompareDev.Visible = false;
+            formMoc.Visible = false;
+            formBomCompare.Visible = false;
+            formBomToMocCompare.Visible = false;
+            formErpCreatePR.Visible = false;
+            formMcBatchJob.Visible = false;
         }
 
         private void enableMenuForRd()
@@ -187,6 +200,7 @@ namespace MvLocalProject.Viewer
             nbgErpFoms.Visible = true;
             nbgItTools.Visible = false;
             nbgTesting.Visible = false;
+            formMcBatchJob.Visible = false;
         }
 
         private void enableMenuForMc()
@@ -195,7 +209,53 @@ namespace MvLocalProject.Viewer
             nbgErpFoms.Visible = true;
             nbgItTools.Visible = false;
             nbgTesting.Visible = false;
+            // 各別group disable
+            formBom.Visible = false;
+            formBomCompareDev.Visible = false;
+            formMoc.Visible = false;
+            formBomCompare.Visible = false;
+            formBomToMocCompare.Visible = false;
+            formErpCreatePR.Visible = true;
+            formMcBatchJob.Visible = true;
         }
+
+        private void enableMenuForMcSpecial(string adUserName)
+        {
+            if (adUserName.Equals("rainyluo", StringComparison.OrdinalIgnoreCase) == false)
+            {
+                return;
+            }
+            nbpErpReport.Visible = false;
+            nbgErpFoms.Visible = true;
+            nbgItTools.Visible = false;
+            nbgTesting.Visible = false;
+            // 各別group disable
+            formBom.Visible = true;
+            formBomCompareDev.Visible = false; 
+            formMoc.Visible = true;
+            formBomCompare.Visible = false;
+            formBomToMocCompare.Visible = false;
+            formErpCreatePR.Visible = true;
+            formMcBatchJob.Visible = true;
+        }
+
+
+        private void enableMenuForCsr()
+        {
+            nbpErpReport.Visible = false;
+            nbgErpFoms.Visible = true;
+            nbgItTools.Visible = false;
+            nbgTesting.Visible = false;
+            // 各別group disable
+            formBom.Visible = false;
+            formBomCompareDev.Visible = false;
+            formMoc.Visible = false;
+            formBomCompare.Visible = false;
+            formBomToMocCompare.Visible = false;
+            formErpCreatePR.Visible = true;
+            formMcBatchJob.Visible = false;
+        }
+
 
         private void frmMainDev_FormClosed(object sender, FormClosedEventArgs e)
         {

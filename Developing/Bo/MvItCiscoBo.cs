@@ -177,6 +177,10 @@ namespace MvLocalProject.Bo
                 await client.WriteLine(strCommand);
                 strResult = await client.ReadAsync(new TimeSpan(0, 0, 1));
 
+                strCommand = "     ";
+                await client.WriteLine(strCommand);
+                strResult += await client.ReadAsync(new TimeSpan(0, 0, 1));
+
                 strCommand = "exit";
                 await client.WriteLine(strCommand);
             }

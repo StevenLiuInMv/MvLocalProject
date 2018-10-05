@@ -1,6 +1,7 @@
 ﻿using System.Configuration;
 using System.Data.SqlClient;
 using System.Data;
+using MvLocalProject.Model;
 
 namespace MvLocalProject.Controller
 {
@@ -40,6 +41,23 @@ namespace MvLocalProject.Controller
             get { return ConfigurationManager.ConnectionStrings["ERPDB2.MVTEST"].ConnectionString; }
         }
 
+        public static string ConnectionString_ERPDB2_Dot_MV_CE
+        {
+            get { return ConfigurationManager.ConnectionStrings["ERPDB2.MV_CE"].ConnectionString; }
+        }
+        public static string ConnectionString_ERPDB2_Dot_MV_CS
+        {
+            get { return ConfigurationManager.ConnectionStrings["ERPDB2.MV_CS"].ConnectionString; }
+        }
+        public static string ConnectionString_ERPDB2_Dot_SIGOLD
+        {
+            get { return ConfigurationManager.ConnectionStrings["ERPDB2.SIGOLD"].ConnectionString; }
+        }
+        public static string ConnectionString_MV_SOP
+        {
+            get { return ConfigurationManager.ConnectionStrings["MV_SOP"].ConnectionString; }
+        }
+
         public static SqlConnection Connection_ERPBK_DEMO
         {
             get { return new SqlConnection(ConnectionString_ERPBK_DEMO); }
@@ -73,6 +91,41 @@ namespace MvLocalProject.Controller
         public static SqlConnection Connection_ERPDB2_Dot_MVTEST
         {
             get { return new SqlConnection(ConnectionString_ERPDB2_Dot_MVTEST); }
+        }
+        public static SqlConnection Connection_ERPDB2_Dot_MV_CE
+        {
+            get { return new SqlConnection(ConnectionString_ERPDB2_Dot_MV_CE); }
+        }
+        public static SqlConnection Connection_ERPDB2_Dot_MV_CS
+        {
+            get { return new SqlConnection(ConnectionString_ERPDB2_Dot_MV_CS); }
+        }
+        public static SqlConnection Connection_ERPDB2_Dot_SIGOLD
+        {
+            get { return new SqlConnection(ConnectionString_ERPDB2_Dot_SIGOLD); }
+        }
+        public static SqlConnection Connection_MV_SOP
+        {
+            get { return new SqlConnection(ConnectionString_MV_SOP); }
+        }
+
+        public static SqlConnection getErpDbConnection(MvCompany company)
+        {
+            switch (company)
+            {
+                case MvCompany.MACHVISION:
+                    return Connection_ERPDB2_Dot_MACHVISION;
+                case MvCompany.MVTEST:
+                    return Connection_ERPDB2_Dot_MVTEST;
+                case MvCompany.MV_CE:
+                    return Connection_ERPDB2_Dot_MV_CE;
+                case MvCompany.MV_CS:
+                    return Connection_ERPDB2_Dot_MV_CS;
+                case MvCompany.SIGOLD:
+                    return Connection_ERPDB2_Dot_SIGOLD;
+                default:
+                    throw new System.Exception("illegal company");
+            }
         }
 
         public static DataTable queryDataBySql(SqlCommand sqlCommand)
@@ -109,7 +162,6 @@ namespace MvLocalProject.Controller
             }
 
             return dataTable;
-
         }
 
         public static DataTable queryDataBySql(SqlConnection connection, string command)
@@ -156,12 +208,12 @@ namespace MvLocalProject.Controller
             }
         }
 
-        public static bool validateUserFromErpGP(string account, string password)
+        public static bool validateUserFromErpGP(MvCompany company, string account, string password)
         {
             // 確認此帳號是否存在ERP GP
             try
             {
-                using (SqlConnection conn = MvDbConnector.Connection_ERPDB2_Dot_MACHVISION)
+                using (SqlConnection conn = MvDbConnector.getErpDbConnection(company))
                 {
                     string command = string.Format("select * from DSCSYS.dbo.DSCMA WHERE MA001 = '{0}'", account);
                     conn.Open();
@@ -171,6 +223,21 @@ namespace MvLocalProject.Controller
             catch (SqlException)
             {
                 return false;
+            }
+        }
+
+        public static void closeSqlConnection(ref SqlConnection connection)
+        {
+            if (connection == null) { return; }
+            try
+            {
+                connection.Close();
+                connection.Dispose();
+                connection = null;
+            }
+            catch (SqlException se)
+            {
+                throw se;
             }
         }
     }

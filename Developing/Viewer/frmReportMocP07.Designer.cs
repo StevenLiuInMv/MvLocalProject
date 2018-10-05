@@ -1,6 +1,6 @@
 ﻿namespace MvLocalProject.Viewer
 {
-    partial class frmMocP07
+    partial class frmReportMocP07
     {
         /// <summary>
         /// 設計工具所需的變數。
@@ -113,7 +113,7 @@
             this.dataGridView1.Size = new System.Drawing.Size(634, 306);
             this.dataGridView1.TabIndex = 12;
             // 
-            // frmMocP07
+            // frmReportMocP07
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -129,9 +129,9 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "frmMocP07";
+            this.Name = "frmReportMocP07";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "frmMocP07";
+            this.Text = "frmReportMocP07";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.frmMocP07_FormClosed);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.ResumeLayout(false);

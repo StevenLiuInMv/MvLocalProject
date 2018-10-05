@@ -34,7 +34,9 @@ namespace MvLocalProject.Viewer
             // 不開放編輯功能
             treeList1.OptionsBehavior.ReadOnly = true;
             treeList1.OptionsBehavior.Editable = false;
-
+            treeList1.OptionsView.AutoWidth = false;
+            // 只要最後一列設定BestFit即可
+            treeList1.Columns[treeList1.Columns.Count - 1].BestFit();
             SplashScreenManager.CloseForm(false);
         }
 

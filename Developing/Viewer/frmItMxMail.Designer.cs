@@ -42,6 +42,16 @@
             this.sbExportAD = new DevExpress.XtraEditors.SimpleButton();
             this.sbLinkMvMxMail = new DevExpress.XtraEditors.SimpleButton();
             this.sbLinkSiGoldMxMail = new DevExpress.XtraEditors.SimpleButton();
+            this.groupControl2 = new DevExpress.XtraEditors.GroupControl();
+            this.sbEnableUser = new DevExpress.XtraEditors.SimpleButton();
+            this.sbClearScript = new DevExpress.XtraEditors.SimpleButton();
+            this.sbDisableUser = new DevExpress.XtraEditors.SimpleButton();
+            this.cboMvDept = new System.Windows.Forms.ComboBox();
+            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
+            this.txtUserName = new System.Windows.Forms.TextBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.sbFindEnabledAllUser = new DevExpress.XtraEditors.SimpleButton();
             ((System.ComponentModel.ISupportInitialize)(this.deEnd.Properties.CalendarTimeProperties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.deEnd.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.deStart.Properties.CalendarTimeProperties)).BeginInit();
@@ -50,6 +60,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.gridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.groupControl1)).BeginInit();
             this.groupControl1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.groupControl2)).BeginInit();
+            this.groupControl2.SuspendLayout();
             this.SuspendLayout();
             // 
             // label3
@@ -105,10 +117,10 @@
             // 
             // gridControl1
             // 
-            this.gridControl1.Location = new System.Drawing.Point(12, 87);
+            this.gridControl1.Location = new System.Drawing.Point(12, 185);
             this.gridControl1.MainView = this.gridView1;
             this.gridControl1.Name = "gridControl1";
-            this.gridControl1.Size = new System.Drawing.Size(1302, 380);
+            this.gridControl1.Size = new System.Drawing.Size(1302, 375);
             this.gridControl1.TabIndex = 6;
             this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView1});
@@ -121,16 +133,16 @@
             // 
             // sbQueryUser
             // 
-            this.sbQueryUser.Location = new System.Drawing.Point(288, 12);
+            this.sbQueryUser.Location = new System.Drawing.Point(12, 87);
             this.sbQueryUser.Name = "sbQueryUser";
-            this.sbQueryUser.Size = new System.Drawing.Size(66, 69);
+            this.sbQueryUser.Size = new System.Drawing.Size(66, 92);
             this.sbQueryUser.TabIndex = 7;
             this.sbQueryUser.Text = "查詢使用者";
             this.sbQueryUser.Click += new System.EventHandler(this.sbQueryUser_Click);
             // 
             // sbExportUser
             // 
-            this.sbExportUser.Location = new System.Drawing.Point(360, 16);
+            this.sbExportUser.Location = new System.Drawing.Point(88, 87);
             this.sbExportUser.Name = "sbExportUser";
             this.sbExportUser.Size = new System.Drawing.Size(66, 26);
             this.sbExportUser.TabIndex = 8;
@@ -138,7 +150,7 @@
             // 
             // sbExportLdap
             // 
-            this.sbExportLdap.Location = new System.Drawing.Point(360, 48);
+            this.sbExportLdap.Location = new System.Drawing.Point(88, 119);
             this.sbExportLdap.Name = "sbExportLdap";
             this.sbExportLdap.Size = new System.Drawing.Size(66, 28);
             this.sbExportLdap.TabIndex = 9;
@@ -153,42 +165,140 @@
             this.groupControl1.Controls.Add(this.deStart);
             this.groupControl1.Location = new System.Drawing.Point(12, 12);
             this.groupControl1.Name = "groupControl1";
-            this.groupControl1.Size = new System.Drawing.Size(270, 69);
+            this.groupControl1.Size = new System.Drawing.Size(273, 69);
             this.groupControl1.TabIndex = 10;
             this.groupControl1.Text = "日期區間";
             // 
             // sbExportAD
             // 
-            this.sbExportAD.Location = new System.Drawing.Point(520, 16);
+            this.sbExportAD.Location = new System.Drawing.Point(88, 153);
             this.sbExportAD.Name = "sbExportAD";
             this.sbExportAD.Size = new System.Drawing.Size(66, 26);
             this.sbExportAD.TabIndex = 11;
             this.sbExportAD.Text = "匯出AD";
-            this.sbExportAD.Click += new System.EventHandler(this.sbExportAD_Click);
             // 
             // sbLinkMvMxMail
             // 
-            this.sbLinkMvMxMail.Location = new System.Drawing.Point(432, 16);
+            this.sbLinkMvMxMail.Location = new System.Drawing.Point(160, 87);
             this.sbLinkMvMxMail.Name = "sbLinkMvMxMail";
-            this.sbLinkMvMxMail.Size = new System.Drawing.Size(82, 26);
+            this.sbLinkMvMxMail.Size = new System.Drawing.Size(89, 26);
             this.sbLinkMvMxMail.TabIndex = 12;
             this.sbLinkMvMxMail.Text = "Go_MvMail";
             this.sbLinkMvMxMail.Click += new System.EventHandler(this.sbLinkMvMxMail_Click);
             // 
             // sbLinkSiGoldMxMail
             // 
-            this.sbLinkSiGoldMxMail.Location = new System.Drawing.Point(432, 48);
+            this.sbLinkSiGoldMxMail.Location = new System.Drawing.Point(160, 119);
             this.sbLinkSiGoldMxMail.Name = "sbLinkSiGoldMxMail";
-            this.sbLinkSiGoldMxMail.Size = new System.Drawing.Size(82, 26);
+            this.sbLinkSiGoldMxMail.Size = new System.Drawing.Size(89, 26);
             this.sbLinkSiGoldMxMail.TabIndex = 13;
             this.sbLinkSiGoldMxMail.Text = "Go_SiGoldMail";
             this.sbLinkSiGoldMxMail.Click += new System.EventHandler(this.sbLinkSiGoldMxMail_Click);
+            // 
+            // groupControl2
+            // 
+            this.groupControl2.Controls.Add(this.sbEnableUser);
+            this.groupControl2.Controls.Add(this.sbClearScript);
+            this.groupControl2.Controls.Add(this.sbDisableUser);
+            this.groupControl2.Controls.Add(this.cboMvDept);
+            this.groupControl2.Controls.Add(this.richTextBox1);
+            this.groupControl2.Controls.Add(this.txtUserName);
+            this.groupControl2.Controls.Add(this.label5);
+            this.groupControl2.Controls.Add(this.label4);
+            this.groupControl2.Location = new System.Drawing.Point(291, 12);
+            this.groupControl2.Name = "groupControl2";
+            this.groupControl2.Size = new System.Drawing.Size(745, 167);
+            this.groupControl2.TabIndex = 11;
+            this.groupControl2.Text = "AD指令產生器";
+            // 
+            // sbEnableUser
+            // 
+            this.sbEnableUser.Location = new System.Drawing.Point(522, 24);
+            this.sbEnableUser.Name = "sbEnableUser";
+            this.sbEnableUser.Size = new System.Drawing.Size(66, 22);
+            this.sbEnableUser.TabIndex = 16;
+            this.sbEnableUser.Text = "啟用使用者";
+            this.sbEnableUser.Click += new System.EventHandler(this.sbEnableUser_Click);
+            // 
+            // sbClearScript
+            // 
+            this.sbClearScript.Appearance.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(0)))));
+            this.sbClearScript.Appearance.Options.UseForeColor = true;
+            this.sbClearScript.Location = new System.Drawing.Point(674, 24);
+            this.sbClearScript.Name = "sbClearScript";
+            this.sbClearScript.Size = new System.Drawing.Size(66, 22);
+            this.sbClearScript.TabIndex = 15;
+            this.sbClearScript.Text = "ClearText";
+            this.sbClearScript.Click += new System.EventHandler(this.sbClearScript_Click);
+            // 
+            // sbDisableUser
+            // 
+            this.sbDisableUser.Location = new System.Drawing.Point(450, 24);
+            this.sbDisableUser.Name = "sbDisableUser";
+            this.sbDisableUser.Size = new System.Drawing.Size(66, 22);
+            this.sbDisableUser.TabIndex = 14;
+            this.sbDisableUser.Text = "停用使用者";
+            this.sbDisableUser.Click += new System.EventHandler(this.sbDisableUser_Click);
+            // 
+            // cboMvDept
+            // 
+            this.cboMvDept.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cboMvDept.FormattingEnabled = true;
+            this.cboMvDept.Location = new System.Drawing.Point(42, 24);
+            this.cboMvDept.Name = "cboMvDept";
+            this.cboMvDept.Size = new System.Drawing.Size(177, 22);
+            this.cboMvDept.TabIndex = 9;
+            // 
+            // richTextBox1
+            // 
+            this.richTextBox1.Font = new System.Drawing.Font("微軟正黑體", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.richTextBox1.Location = new System.Drawing.Point(8, 52);
+            this.richTextBox1.Name = "richTextBox1";
+            this.richTextBox1.Size = new System.Drawing.Size(732, 110);
+            this.richTextBox1.TabIndex = 8;
+            this.richTextBox1.Text = "";
+            // 
+            // txtUserName
+            // 
+            this.txtUserName.Location = new System.Drawing.Point(267, 24);
+            this.txtUserName.Name = "txtUserName";
+            this.txtUserName.Size = new System.Drawing.Size(177, 22);
+            this.txtUserName.TabIndex = 7;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(230, 27);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(31, 14);
+            this.label5.TabIndex = 6;
+            this.label5.Text = "姓名";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(5, 27);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(31, 14);
+            this.label4.TabIndex = 5;
+            this.label4.Text = "部門";
+            // 
+            // sbFindEnabledAllUser
+            // 
+            this.sbFindEnabledAllUser.AutoSize = true;
+            this.sbFindEnabledAllUser.Location = new System.Drawing.Point(1042, 12);
+            this.sbFindEnabledAllUser.Name = "sbFindEnabledAllUser";
+            this.sbFindEnabledAllUser.Size = new System.Drawing.Size(114, 22);
+            this.sbFindEnabledAllUser.TabIndex = 14;
+            this.sbFindEnabledAllUser.Text = "找All_Enabled_User";
             // 
             // frmItMxMail
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1326, 477);
+            this.ClientSize = new System.Drawing.Size(1326, 572);
+            this.Controls.Add(this.sbFindEnabledAllUser);
+            this.Controls.Add(this.groupControl2);
             this.Controls.Add(this.sbLinkSiGoldMxMail);
             this.Controls.Add(this.sbLinkMvMxMail);
             this.Controls.Add(this.sbExportAD);
@@ -214,7 +324,11 @@
             ((System.ComponentModel.ISupportInitialize)(this.groupControl1)).EndInit();
             this.groupControl1.ResumeLayout(false);
             this.groupControl1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.groupControl2)).EndInit();
+            this.groupControl2.ResumeLayout(false);
+            this.groupControl2.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -233,5 +347,15 @@
         private DevExpress.XtraEditors.SimpleButton sbExportAD;
         private DevExpress.XtraEditors.SimpleButton sbLinkMvMxMail;
         private DevExpress.XtraEditors.SimpleButton sbLinkSiGoldMxMail;
+        private DevExpress.XtraEditors.GroupControl groupControl2;
+        private System.Windows.Forms.TextBox txtUserName;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.RichTextBox richTextBox1;
+        private System.Windows.Forms.ComboBox cboMvDept;
+        private DevExpress.XtraEditors.SimpleButton sbDisableUser;
+        private DevExpress.XtraEditors.SimpleButton sbClearScript;
+        private DevExpress.XtraEditors.SimpleButton sbEnableUser;
+        private DevExpress.XtraEditors.SimpleButton sbFindEnabledAllUser;
     }
 }

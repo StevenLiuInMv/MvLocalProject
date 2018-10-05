@@ -34,7 +34,7 @@ namespace MvLocalProject.Viewer
             gridView1.Columns.Clear();
             gridView1.RefreshData();
 
-            dt = await bo.getPortStatusTable(DefinedParameter.MvMisCiscoIpList);
+            dt = await bo.getPortStatusTable(GlobalConstant.MvMisCiscoIpList);
 
             gridControl1.DataSource = dt;
             gridView1.OptionsBehavior.Editable = false;
@@ -48,7 +48,7 @@ namespace MvLocalProject.Viewer
             clearAllText();
             SplashScreenManager.ShowDefaultWaitForm();
             MvItCiscoBo bo = new MvItCiscoBo();
-            string result = await bo.getPortStatus(DefinedParameter.MvMisCiscoIpList);
+            string result = await bo.getPortStatus(GlobalConstant.MvMisCiscoIpList);
             richTextBox1.Text = result.ToString();
             richTextBox1.Refresh();
             SplashScreenManager.CloseForm(false);
@@ -457,7 +457,7 @@ namespace MvLocalProject.Viewer
             gridView1.RefreshData();
 
             //dt = await bo.getStatusTableIncludeMacAddress(new string[] { "192.168.151.11" });
-            dt = await bo.getStatusTableIncludeMacAddress(DefinedParameter.MvMisCiscoIpList);
+            dt = await bo.getStatusTableIncludeMacAddress(GlobalConstant.MvMisCiscoIpList);
             dt.Columns.Add("IsInDB");
             dtFromDb = MvDbDao.collectData_ItNetworkDevice();
 
@@ -507,7 +507,7 @@ namespace MvLocalProject.Viewer
             dt.Columns.Add("IsInCisco");
 
             //dtFromCisco = await bo.getStatusTableIncludeMacAddress(new string[] { "192.168.151.11" });
-            dtFromCisco = await bo.getStatusTableIncludeMacAddress(DefinedParameter.MvMisCiscoIpList);
+            dtFromCisco = await bo.getStatusTableIncludeMacAddress(GlobalConstant.MvMisCiscoIpList);
 
             Hashtable cacheResult = new Hashtable();
             string matchKey = string.Empty;

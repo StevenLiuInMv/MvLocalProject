@@ -1124,22 +1124,26 @@ namespace MvLocalProject.Bo
         private DataRow convertNewItemToResultTalbeByRd(DataTable targetTable, DataRow source, DataRow target, bool needConsideVer, bool isSameLv, bool isSameItemName, bool isSameAmount, bool isDefineAdd)
         {
             DataRow dr = targetTable.NewRow();
-
+            int lv = int.Parse(source["LV"].ToString().Trim().Replace(".", "")); 
             // 先填入輔助資訊
             dr["CompareLV"] = "--";
             dr["CompareA8"] = "--";
             dr["CompareMD006"] = "--";
-            dr["LV"] = "L" + source["LV"].ToString().Trim().Replace(".", "");
+            dr["LV"] = "L" + lv.ToString();
             dr["A8"] = source["A8"];
             dr["MB025X"] = source["MB025X"];
             dr["Column4"] = source["Column4"];
             dr["MB004"] = source["MB004"];
             dr["MD006"] = source["MD006"];
             dr["Column9"] = source["Column9"];
-
+            
             string tmpNameSpace = (isDefineAdd == true ? target["NameSpace"].ToString() : source["NameSpace"].ToString());
             int findDotIndex = tmpNameSpace.IndexOf(".");
-            if (findDotIndex < 0)
+            if (lv == 1)
+            {
+                dr["ModuleLv1"] = (isDefineAdd == true ? target["ModuleLv1"] : source["ModuleLv1"]);
+            }
+            else if (findDotIndex < 0)
             {
                 dr["ModuleLv1"] = tmpNameSpace;
             }
@@ -1239,6 +1243,7 @@ namespace MvLocalProject.Bo
                 newDr["No"] = rowId;
                 newDr["ModuleLv1"] = dr["ModuleLv1"];
                 newDr["Column4"] = dr["Column4"];
+                newDr["Remark"] = dr["Column9"];
 
                 if(compareA8.Equals("料件刪除"))
                 {

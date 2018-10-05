@@ -1,6 +1,6 @@
 ﻿namespace MvLocalProject.Viewer
 {
-    partial class frmPurP17
+    partial class frmReportPurP17
     {
         /// <summary>
         /// Required designer variable.
@@ -167,7 +167,7 @@
             this.sbtnGet.Text = "取得";
             this.sbtnGet.Click += new System.EventHandler(this.sbtnGet_Click);
             // 
-            // frmPurP17
+            // frmReportPurP17
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -178,7 +178,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "frmPurP17";
+            this.Name = "frmReportPurP17";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "frmPurP17";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.frmPurP17_FormClosed);

@@ -378,8 +378,8 @@ namespace MvLocalProject.Viewer
             DataTable dtIncludeNameSpace1;
             DataTable dtIncludeNameSpace2;
             DataTable summaryDt;
-            dtIncludeNameSpace1 = bo.extendBomNameSpace(filterDt1);
-            dtIncludeNameSpace2 = bo.extendBomNameSpace(filterDt2);
+            dtIncludeNameSpace1 = bo.extendBomNameSpace(filterDt1, true);
+            dtIncludeNameSpace2 = bo.extendBomNameSpace(filterDt2, true);
 
             summaryDs = bo.compareBomByRuleRd_v2(dtIncludeNameSpace1, dtIncludeNameSpace2, false);
             tmpDs = bo.compareBomByRuleRd_v2(dtIncludeNameSpace2, dtIncludeNameSpace1, true);
@@ -407,12 +407,6 @@ namespace MvLocalProject.Viewer
             tmpDt = bo.generateSummaryTableByPur(summaryDt);
             treeList6.DataSource = tmpDt.Copy();
             setSummaryColumnsCaption(ref treeList6);
-
-            // 整理完後再把name space資訊移除
-            dtIncludeNameSpace1.Columns.Remove("NameSpace");
-            dtIncludeNameSpace1.Columns.Remove("NameSpaceNoVer");
-            dtIncludeNameSpace2.Columns.Remove("NameSpace");
-            dtIncludeNameSpace2.Columns.Remove("NameSpaceNoVer");
 
             // initial hash tables
             for (int i = 0; i < hashTreeListBackColor.Length; i++)
@@ -456,6 +450,18 @@ namespace MvLocalProject.Viewer
             treeList4.OptionsBehavior.Editable = false;
             treeList5.OptionsBehavior.Editable = false;
             treeList6.OptionsBehavior.Editable = false;
+
+            treeList1.Columns["NameSpace"].Visible = false;
+            treeList1.Columns["NameSpaceNoVer"].Visible = false;
+            treeList1.Columns["MD013"].Visible = false;
+            treeList1.Columns["AmountSpace"].Visible = false;
+            treeList1.Columns["RowId"].Visible = false;
+
+            treeList2.Columns["NameSpace"].Visible = false;
+            treeList2.Columns["NameSpaceNoVer"].Visible = false;
+            treeList2.Columns["MD013"].Visible = false;
+            treeList2.Columns["AmountSpace"].Visible = false;
+            treeList2.Columns["RowId"].Visible = false;
 
             //Close Wait Form
             SplashScreenManager.CloseForm(false);
