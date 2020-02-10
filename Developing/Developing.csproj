@@ -124,12 +124,14 @@
     <Compile Include="Controller\MvDbDao.cs" />
     <Compile Include="Controller\MvLogger.cs" />
     <Compile Include="Controller\MvNetworker.cs" />
+    <Compile Include="Controller\UtilityDevExpress.cs" />
     <Compile Include="Model\DefinedHeader.cs" />
     <Compile Include="Controller\FileScanner.cs" />
     <Compile Include="Controller\Utility.cs" />
     <Compile Include="Model\DefinedParameter.cs" />
     <Compile Include="Model\DefinedReport.cs" />
     <Compile Include="Model\IPEnumerator.cs" />
+    <Compile Include="Model\UserData.cs" />
     <Compile Include="ResourceNewStaff.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

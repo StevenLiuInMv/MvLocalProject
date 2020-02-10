@@ -50,9 +50,9 @@ namespace MvLocalProject.Viewer
             labelControl2.Text = "2. 建立使用者帳號" + Environment.NewLine + "      >使用者管理" + Environment.NewLine + "      >帳號管理" + Environment.NewLine + "      >新增帳號，建立使用者帳號/密碼";
             labelControl3.Text = "1. 帳號 (英名 + 英姓皆小寫)" + Environment.NewLine + "    範例：mingwang" + Environment.NewLine
                 + "2.姓名 (英名 + 英姓皆開頭大寫 + 中文全名 + _ + 部門代號)" + Environment.NewLine + "    範例：MingWang王小明_220" + Environment.NewLine
-                + "    部門代號 - 華東部門CE、華南部門CS" + Environment.NewLine
+                + "    部門代號 - 華東部門CE、華南部門CS、華中部門CC" + Environment.NewLine
                 + "3.密碼 (同AD密碼，英文代號 + 隨機產生五碼)" + Environment.NewLine + "    範例：產品研發部 r12345" + Environment.NewLine
-                + "    密碼-華東華南 - 生日八碼" + Environment.NewLine
+                + "    密碼-華東華南華中 - 生日八碼" + Environment.NewLine
                 + "4.勾選 功能> WM";
             pictureEdit1.Image = ResourceNewStaff.MailServerExample;
         }

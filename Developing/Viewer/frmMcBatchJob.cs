@@ -34,7 +34,7 @@ namespace MvLocalProject.Viewer
         DataTable cacheNoteDt = null;
         string cacheMocNo = string.Empty;
         DataSet cacheSortDs = null;                 // 依add, delete, change 分類的DataTable
-        DataTable cacheMocDt = null;
+        DataSet cacheErpNoteDs = null;
 
         private void frmMcBatchJob_Load(object sender, EventArgs e)
         {
@@ -166,11 +166,10 @@ namespace MvLocalProject.Viewer
             excelToDt.Columns.Add("MB003");
             excelToDt.Columns.Add("MB004");
             // 以下欄位是為了從製令取資料, 以利開PR時帶入
-            excelToDt.Columns.Add("MOCTA_TA201");
-            excelToDt.Columns.Add("MOCTA_TA200");
-            excelToDt.Columns.Add("MOCTB_TB201");
-            excelToDt.Columns.Add("MOCTB_TB017");
-
+            excelToDt.Columns.Add("MOCTA_TA201");   // 機號
+            excelToDt.Columns.Add("MOCTA_TA200");   // 預計儲位
+            excelToDt.Columns.Add("MOCTB_TB201");   // 備料順序
+            excelToDt.Columns.Add("MOCTB_TB017");   // 備註
             // 取得欄位修改內容
             j = 2;
             for (int i = 9; i <= range.RowCount; i++)
@@ -279,35 +278,34 @@ namespace MvLocalProject.Viewer
             if (isIllegal == false)
             {
                 sbParsing_Click(sender, e);
+                sbCommit_Click(sender, e);
             }
 
             SplashScreenManager.CloseForm(false);
         }
         private void clearAllCacheData()
         {
+            if (cacheSortDs != null) { cacheSortDs.Tables.Clear(); }
+            if (cacheErpNoteDs != null) { cacheErpNoteDs.Tables.Clear(); }
             cacheMocNo = string.Empty;
-            treeList1.DataSource = null;
-            treeList1.DataBindings.Clear();
-            treeList1.Columns.Clear();
+            UtilityDevExpress.clearTreeListData(ref treeList1);
+            UtilityDevExpress.clearTreeListData(ref treeList2);
+            UtilityDevExpress.clearTreeListData(ref treeList3);
+            UtilityDevExpress.clearTreeListData(ref treeList4);
+            UtilityDevExpress.clearTreeListData(ref treeList5);
+            UtilityDevExpress.clearTreeListData(ref treeList6);
 
-            treeList2.DataSource = null;
-            treeList2.DataBindings.Clear();
-            treeList2.Columns.Clear();
+            TextBox[] boxList = new TextBox[] { textBox1, textBox2, textBox3, textBox4, textBox5, textBox6 };
+            Utility.clearTextBox(ref boxList);
 
-            treeList3.DataSource = null;
-            treeList3.DataBindings.Clear();
-            treeList3.Columns.Clear();
-
-            textBox1.Clear();
-            textBox2.Clear();
-            textBox3.Clear();
-            textBox4.Clear();
-            textBox5.Clear();
-            textBox6.Clear();
+            //textBox1.Clear();
+            //textBox2.Clear();
+            //textBox3.Clear();
+            //textBox4.Clear();
+            //textBox5.Clear();
+            //textBox6.Clear();
             txtItem.Clear();
-
         }
-
 
         private void setColumnsCaption(ref TreeList tl)
         {
@@ -326,7 +324,7 @@ namespace MvLocalProject.Viewer
             tl.Columns[12].Caption = "模組";
             tl.Columns[13].Caption = "備註";
             tl.Columns[14].Caption = "料控倉";
-            tl.Columns[15].Caption = "其他倉";
+            tl.Columns[15].Caption = "各倉存貨數量";
         }
 
         private void setColumnsCaptionForInvetory(ref TreeList tl)
@@ -592,7 +590,6 @@ namespace MvLocalProject.Viewer
                 }
             }
 
-
             // 開始執行庫存檢查作業
             int orgAmount = 0;
             int newAmount = 0;
@@ -664,7 +661,7 @@ namespace MvLocalProject.Viewer
             {
                 connection.Open();
                 tempDt = MvDbDao.collectData_HasStorageLocation(connection, GlobalMvVariableForMc.OwnWarehouses);
-                if (tempDt == null || tempDt.Rows.Count == 0)
+                if (tempDt == null || tempDt?.Rows.Count == 0)
                 {
                     MessageBox.Show("Can't find the storage location information");
                     return;
@@ -703,6 +700,7 @@ namespace MvLocalProject.Viewer
 
                     string amountForOthers = string.Empty;
                     string warehouse = string.Empty;
+                    // 依各料號取得各倉別的數量
                     for (int i = 0; i < addDt.Rows.Count; i++)
                     {
                         amountForMc = 0;
@@ -721,12 +719,16 @@ namespace MvLocalProject.Viewer
                                 warehouse = tempDrList[j]["MC002"].ToString().TrimEnd();
                                 if (Array.IndexOf(GlobalMvVariableForMc.OwnWarehouses, warehouse) >= 0)
                                 {
+                                    // 在放在料控倉的, 301, 472, 701, 310倉別
                                     amountForMc += float.Parse(tempDrList[j]["MC007"].ToString());
                                 }
-                                else
-                                {
-                                    amountForOthers += string.Format("{0} {1:0}; ", warehouse, tempDrList[j]["MC007"]);
-                                }
+                                //else
+                                //{
+                                //    amountForOthers += string.Format("{0} {1:0}; ", warehouse, tempDrList[j]["MC007"]);
+                                //}
+
+                                // 不管料控或非料控倉, 還有該料號的存貨數量, 都列出來
+                                amountForOthers += string.Format("{0} {1:0}; ", warehouse, tempDrList[j]["MC007"]);
                             }
                             addDt.Rows[i]["AmountForMC"] = amountForMc;
                             addDt.Rows[i]["InventoryAll"] = amountForOthers.TrimEnd();
@@ -741,23 +743,25 @@ namespace MvLocalProject.Viewer
                         Console.WriteLine("Only PR");
                         //MvErpNoteBo.createErpNote_PR(GlobalMvVariable.MvAdCompany, connection, ErpNoteHead.H_3109, null, DateTime.Now, GlobalMvVariable.MvAdUserName, "");
 
-                        GlobalMvVariable.MvEmpNo = "M657";
+                        //GlobalMvVariable.MvEmpNo = "M657";
                         for (int i = 0; i < addDt.Rows.Count; i++)
                         {
 
                             Console.WriteLine("create PR");
                             // 先轉成匯入的excel格式的DataTable
                             tempDr = noteDtPr.NewRow();
-                            tempDr["TA012"] = GlobalMvVariable.MvEmpNo;
+                            tempDr["TA012"] = GlobalMvVariable.UserData.EmployeeID;
                             tempDr["TB004"] = addDt.Rows[i]["MB001"];
                             tempDr["TB005"] = addDt.Rows[i]["MB002"];
                             tempDr["TB006"] = addDt.Rows[i]["MB003"];
+                            tempDr["MB004"] = addDt.Rows[i]["MB004"];
                             tempDr["TB009"] = addDt.Rows[i]["NewAmount"];
                             tempDr["TB008"] = "303";
                             tempDr["TB011"] = DateTime.Today.ToString("yyyy/MM/dd");
                             tempDr["TB012"] = "差異料清單" + addDt.Rows[i]["MOCTA_TA201"].ToString();
                             tempDr["TB201"] = addDt.Rows[i]["MOCTA_TA200"].ToString();
                             tempDr["TA202"] = "Y";
+                            tempDr["TA201"] = addDt.Rows[i]["MOCTA_TA201"];
                             noteDtPr.Rows.Add(tempDr);
                         }
                     }
@@ -768,9 +772,9 @@ namespace MvLocalProject.Viewer
                         Console.WriteLine("Has A121, A12E, PR");
 
                         // 暫時使用
-                        GlobalMvVariable.MvEmpNo = "M657";
                         float needAmount = 0;
                         float existAmount = 0;
+                        string tempLocation = string.Empty;
 
                         DataRow[] tempDrList310 = null;
                         DataRow[] tempDrList472 = null;
@@ -782,12 +786,13 @@ namespace MvLocalProject.Viewer
                             needAmount = int.Parse(addDt.Rows[i]["NewAmount"].ToString());
                             condition = string.Format("MM001 = '{0}'", addDt.Rows[i]["NewA8"]);
                             tempDrList = tempDt.Select(condition);
+                            tempLocation = string.Empty;
 
                             if (tempDrList.Length == 0)
                             {
                                 Console.WriteLine("create PR");
-                                // 先轉成匯入的excel格式的DataTable
-                                addDataRowToNoteDt(ref noteDtPr, addDt.Rows[i], GlobalMvVariable.MvEmpNo, "303", float.MinValue, DateTime.Today.ToString("yyyy/MM/dd"));
+                                // 先轉成匯入的excel格式的DataTable, 不含原庫別及儲位資訊
+                                addDataRowToNoteDt(ref noteDtPr, addDt.Rows[i], GlobalMvVariable.UserData.EmployeeID, "303", float.MinValue, DateTime.Today.ToString("yyyy/MM/dd"));
                             }
                             else
                             {
@@ -812,15 +817,16 @@ namespace MvLocalProject.Viewer
                                 {
                                     foreach (DataRow dr in tempDrList310)
                                     {
+                                        tempLocation = dr["MM003"].ToString();
                                         existAmount = float.Parse(dr["MM005"].ToString());
                                         if (needAmount >= existAmount)
                                         {
-                                            addDataRowToNoteDt(ref noteDtA12E, addDt.Rows[i], GlobalMvVariable.MvEmpNo, "303", existAmount, DateTime.Today.ToString("yyyy/MM/dd"));
+                                            addDataRowToNoteDt(ref noteDtA12E, addDt.Rows[i], GlobalMvVariable.UserData.EmployeeID, "303", existAmount, DateTime.Today.ToString("yyyy/MM/dd"), "310", tempLocation);
                                             needAmount -= existAmount;
                                         }
                                         else
                                         {
-                                            addDataRowToNoteDt(ref noteDtA12E, addDt.Rows[i], GlobalMvVariable.MvEmpNo, "303", needAmount, DateTime.Today.ToString("yyyy/MM/dd"));
+                                            addDataRowToNoteDt(ref noteDtA12E, addDt.Rows[i], GlobalMvVariable.UserData.EmployeeID, "303", needAmount, DateTime.Today.ToString("yyyy/MM/dd"), "310", tempLocation);
                                             needAmount = 0;
                                         }
                                     }
@@ -831,15 +837,16 @@ namespace MvLocalProject.Viewer
                                 {
                                     foreach (DataRow dr in tempDrList472)
                                     {
+                                        tempLocation = dr["MM003"].ToString();
                                         existAmount = float.Parse(dr["MM005"].ToString());
                                         if (needAmount >= existAmount)
                                         {
-                                            addDataRowToNoteDt(ref noteDtA121, addDt.Rows[i], GlobalMvVariable.MvEmpNo, "303", existAmount, DateTime.Today.ToString("yyyy/MM/dd"));
+                                            addDataRowToNoteDt(ref noteDtA121, addDt.Rows[i], GlobalMvVariable.UserData.EmployeeID, "303", existAmount, DateTime.Today.ToString("yyyy/MM/dd"), "472", tempLocation);
                                             needAmount -= existAmount;
                                         }
                                         else
                                         {
-                                            addDataRowToNoteDt(ref noteDtA121, addDt.Rows[i], GlobalMvVariable.MvEmpNo, "303", needAmount, DateTime.Today.ToString("yyyy/MM/dd"));
+                                            addDataRowToNoteDt(ref noteDtA121, addDt.Rows[i], GlobalMvVariable.UserData.EmployeeID, "303", needAmount, DateTime.Today.ToString("yyyy/MM/dd"), "472", tempLocation);
                                             needAmount = 0;
                                         }
                                     }
@@ -850,15 +857,16 @@ namespace MvLocalProject.Viewer
                                 {
                                     foreach(DataRow dr in tempDrList701)
                                     {
+                                        tempLocation = dr["MM003"].ToString();
                                         existAmount = float.Parse(dr["MM005"].ToString());
                                         if (needAmount >= existAmount)
                                         {
-                                            addDataRowToNoteDt(ref noteDtA121, addDt.Rows[i], GlobalMvVariable.MvEmpNo, "303", existAmount, DateTime.Today.ToString("yyyy/MM/dd"));
+                                            addDataRowToNoteDt(ref noteDtA121, addDt.Rows[i], GlobalMvVariable.UserData.EmployeeID, "303", existAmount, DateTime.Today.ToString("yyyy/MM/dd"), "701", tempLocation);
                                             needAmount -= existAmount;
                                         }
                                         else
                                         {
-                                            addDataRowToNoteDt(ref noteDtA121, addDt.Rows[i], GlobalMvVariable.MvEmpNo, "303", needAmount, DateTime.Today.ToString("yyyy/MM/dd"));
+                                            addDataRowToNoteDt(ref noteDtA121, addDt.Rows[i], GlobalMvVariable.UserData.EmployeeID, "303", needAmount, DateTime.Today.ToString("yyyy/MM/dd"), "701", tempLocation);
                                             needAmount = 0;
                                         }
                                     }
@@ -869,15 +877,16 @@ namespace MvLocalProject.Viewer
                                 {
                                     foreach (DataRow dr in tempDrList301)
                                     {
+                                        tempLocation = dr["MM003"].ToString();
                                         existAmount = float.Parse(dr["MM005"].ToString());
                                         if (needAmount >= existAmount)
                                         {
-                                            addDataRowToNoteDt(ref noteDtA12E, addDt.Rows[i], GlobalMvVariable.MvEmpNo, "303", existAmount, DateTime.Today.ToString("yyyy/MM/dd"));
+                                            addDataRowToNoteDt(ref noteDtA12E, addDt.Rows[i], GlobalMvVariable.UserData.EmployeeID, "303", existAmount, DateTime.Today.ToString("yyyy/MM/dd"), "301", tempLocation);
                                             needAmount -= existAmount;
                                         }
                                         else
                                         {
-                                            addDataRowToNoteDt(ref noteDtA12E, addDt.Rows[i], GlobalMvVariable.MvEmpNo, "303", needAmount, DateTime.Today.ToString("yyyy/MM/dd"));
+                                            addDataRowToNoteDt(ref noteDtA12E, addDt.Rows[i], GlobalMvVariable.UserData.EmployeeID, "303", needAmount, DateTime.Today.ToString("yyyy/MM/dd"), "301", tempLocation);
                                             needAmount = 0;
                                         }
                                     }
@@ -885,18 +894,30 @@ namespace MvLocalProject.Viewer
                                 if (needAmount > 0)
                                 {
                                     // 以上倉別都調撥完了, 還是不夠, 需再加入PR
-                                    addDataRowToNoteDt(ref noteDtPr, addDt.Rows[i], GlobalMvVariable.MvEmpNo, "303", needAmount, DateTime.Today.ToString("yyyy/MM/dd"));
+                                    addDataRowToNoteDt(ref noteDtPr, addDt.Rows[i], GlobalMvVariable.UserData.EmployeeID, "303", needAmount, DateTime.Today.ToString("yyyy/MM/dd"));
                                 }
                             }
                         }
                     }
                 }
 
+                noteDtPr.TableName = "3102";
+                noteDtA121.TableName = "A121";
+                noteDtA12E.TableName = "A12E";
+
                 // 存入cacheSortDs
                 cacheSortDs = new DataSet();
                 cacheSortDs.Tables.Add(addDt);
                 cacheSortDs.Tables.Add(deleteDt);
                 cacheSortDs.Tables.Add(changeDt);
+
+
+                // 存入cacheErpNoteDs
+                cacheErpNoteDs = new DataSet();
+                cacheErpNoteDs.Tables.Add(noteDtPr);
+                cacheErpNoteDs.Tables.Add(noteDtA121);
+                cacheErpNoteDs.Tables.Add(noteDtA12E);
+
             }
             catch (SqlException se)
             {
@@ -926,6 +947,7 @@ namespace MvLocalProject.Viewer
             treeList2.Columns["MB002"].Visible = false;
             treeList2.Columns["MB003"].Visible = false;
             treeList2.Columns["MB004"].Visible = false;
+            treeList2.Columns["AmountForMC"].Visible = false;
             treeList2.OptionsView.AutoWidth = false;
             treeList2.OptionsBehavior.ReadOnly = true;
             treeList2.OptionsBehavior.Editable = false;
@@ -1059,27 +1081,100 @@ namespace MvLocalProject.Viewer
         }
 
 
-        private void sbResort_Click(object sender, EventArgs e)
+        private void sbCommit_Click(object sender, EventArgs e)
         {
-      
+            SqlConnection connection = null;
+            string userGroup = string.Empty;
+            DataSet ds = null;
+
+            // ======================
+            // 模擬功能, 之後要移掉
+            //GlobalMvVariable.MvAdUserName = "stevenliu";
+            userGroup = GlobalMvVariable.UserData.DepartmentID;
+            //userGroup = "220";
+            connection = MvDbConnector.getErpDbConnection(MvCompanySite.MVTEST);
+            //connection = MvDbConnector.getErpDbConnection(MvCompany.MACHVISION);
+            // ======================
+
+            DataTable excelDt = null;
+
+            //SqlTransaction transaction = null;
+            try
+            {
+                // 這裡需要使用Transaction
+                connection.Open();
+                //transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted);
+                // 開立調撥單 A121
+                excelDt = cacheErpNoteDs.Tables["A121"].Copy();
+                txtNoteA121.Clear();
+                if (excelDt.Rows.Count > 0)
+                {
+                    ds = MvErpNoteBo.createErpNote_MoveOrder(MvCompanySite.MACHVISION, connection, ErpNoteHead.H_A121, excelDt, DateTime.Today, GlobalMvVariable.MvAdUserName, userGroup);
+                    excelDt.Clear();
+                    excelDt = ds.Tables["INVTA"];
+                    txtNoteA121.Text = excelDt.Rows[0]["TA002"].ToString();
+                }
+                // 開立調證單 A12E
+                excelDt.Clear();
+                txtNoteA121.Clear();
+                excelDt = cacheErpNoteDs.Tables["A12E"].Copy();
+                if (excelDt.Rows.Count > 0)
+                {
+                    ds = MvErpNoteBo.createErpNote_MoveOrder(MvCompanySite.MACHVISION, connection, ErpNoteHead.H_A12E, excelDt, DateTime.Today, GlobalMvVariable.MvAdUserName, userGroup);
+                    excelDt.Clear();
+                    excelDt = ds.Tables["INVTA"];
+                    txtNoteA12E.Text = excelDt.Rows[0]["TA002"].ToString();
+                }
+
+                // 開立請購單 3102
+                excelDt.Clear();
+                txtNoteA121.Clear();
+                excelDt = cacheErpNoteDs.Tables["3102"].Copy();
+                
+                if (excelDt.Rows.Count > 0)
+                {
+                    ds = MvErpNoteBo.createErpNote_PR(MvCompanySite.MACHVISION, connection, ErpNoteHead.H_3102, excelDt, DateTime.Today, GlobalMvVariable.MvAdUserName, userGroup);
+                    excelDt.Clear();
+                    excelDt = ds.Tables["PURTA"];
+                    txtNote3102.Text = excelDt.Rows[0]["TA002"].ToString();
+                }
+                //transaction.Commit();
+
+            }
+            catch(SqlException se)
+            {
+                //transaction.Rollback();
+                throw se;
+            }
+            finally
+            {
+                MvDbConnector.closeSqlConnection(ref connection);
+            }
+
+            // 顯示至指定頁面
+            xtraTabControl1.TabPages[3].Text = "開立單號資訊";
+            xtraTabControl1.SelectedTabPage = xtraTabControl1.TabPages[3];
         }
 
-        private void addDataRowToNoteDt(ref DataTable noteDt, DataRow itemDr, string ta012, string tb008, float tb009, string createDate)
+        private void addDataRowToNoteDt(ref DataTable noteDt, DataRow itemDr, string ta012, string tb008, float tb009, string createDate, string mm002 = "", string mm003 = "")
         {
             DataRow tempDr = noteDt.NewRow();
             tempDr["TA012"] = ta012;
             tempDr["TB004"] = itemDr["MB001"];
             tempDr["TB005"] = itemDr["MB002"];
             tempDr["TB006"] = itemDr["MB003"];
+            tempDr["MB004"] = itemDr["MB004"];
             tempDr["TB008"] = tb008;
-            // tb009如果是最小數, 直接帶入NewAmount
+            // tb009 如果是最小數, 直接帶入NewAmount
             tempDr["TB009"] = float.MinValue == tb009 ? itemDr["NewAmount"] : tb009;
             tempDr["TB011"] = createDate;
             tempDr["TB012"] = "差異料清單" + itemDr["MOCTA_TA201"].ToString();
             tempDr["TB201"] = itemDr["MOCTA_TA200"].ToString();
             tempDr["TA202"] = "Y";
+            tempDr["MM002"] = mm002;
+            tempDr["MM003"] = mm003;
+            tempDr["TA201"] = itemDr["MOCTA_TA201"];
             noteDt.Rows.Add(tempDr);
         }
-
     }
 }

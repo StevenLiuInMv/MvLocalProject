@@ -11,6 +11,7 @@ using MvLocalProject.Controller;
 using System.Collections;
 using DevExpress.XtraGrid.Views.Grid;
 using System.Drawing;
+using System.Net.Sockets;
 
 namespace MvLocalProject.Viewer
 {
@@ -35,6 +36,12 @@ namespace MvLocalProject.Viewer
             gridView1.RefreshData();
 
             dt = await bo.getPortStatusTable(GlobalConstant.MvMisCiscoIpList);
+            SocketException se = null;
+            se = bo.getSocketException();
+            if (se != null)
+            {
+                MessageBox.Show(se.Message + Environment.NewLine + Environment.NewLine + "持續載入資訊中 ......");
+            }
 
             gridControl1.DataSource = dt;
             gridView1.OptionsBehavior.Editable = false;

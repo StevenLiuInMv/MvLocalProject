@@ -273,6 +273,7 @@ namespace MvLocalProject.Viewer
 
             // 匯入PR
             // 測試用
+            GlobalMvVariable.MvAdUserName = "rainyluo";
             string noteNumber = string.Empty;
             using (SqlConnection conn = MvDbConnector.Connection_ERPDB2_Dot_MVTEST)
             {

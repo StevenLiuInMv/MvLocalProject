@@ -862,6 +862,12 @@ namespace MvLocalProject.Controller
             }
         }
 
+        /// <summary>
+        /// 取得MxMail的產生資料
+        /// </summary>
+        /// <param name="startDate"></param>
+        /// <param name="endDate"></param>
+        /// <returns></returns>
         public static DataTable collectData_ItMxMail(string startDate, string endDate)
         {
             DataTable majorData = null;
@@ -879,6 +885,7 @@ namespace MvLocalProject.Controller
                     .Append("CASE ")
                     .Append("   WHEN dep.DepartmentName like '%華東%' THEN replace(text3,' ','')+text2+'_CE' ")
                     .Append("   WHEN dep.DepartmentName like '%華南%' THEN replace(text3,' ','')+text2+'_CS' ")
+                    .Append("   WHEN dep.DepartmentName like '%華中%' THEN replace(text3,' ','')+text2+'_CC' ")
                     .Append("   ELSE replace(text3,' ','')+text2+'_'+select2 ")
                     .Append("END'使用者姓名' ")
                     .Append(",'500' AS'QUOTA','1' AS'WM','' AS'WH','' AS'SMB','' AS'FTP','' AS'WEB','' AS'SQL','0' AS'EXP', ")
@@ -886,6 +893,7 @@ namespace MvLocalProject.Controller
                     .Append("CASE ")
                     .Append("   WHEN dep.DepartmentName like '%華東%' THEN text2+'_CE' ")
                     .Append("   WHEN dep.DepartmentName like '%華南%' THEN text2+'_CS' ")
+                    .Append("   WHEN dep.DepartmentName like '%華中%' THEN text2+'_CC' ")
                     .Append("   ELSE text2+'_'+select2 ")
                     .Append("END'LDAP名字' ")
                     .Append(",text6'電子郵件', ")
@@ -893,12 +901,14 @@ namespace MvLocalProject.Controller
                     .Append("CASE ")
                     .Append("   WHEN dep.DepartmentName like '%華東%'  THEN 'CE中國華東' ")
                     .Append("   WHEN dep.DepartmentName like '%華南%' THEN 'CS中國華南' ")
+                    .Append("   WHEN dep.DepartmentName like '%華中%' THEN 'CC中國華中' ")
                     .Append("   ELSE select2+dep.DepartmentName ")
                     .Append("END'公司' ")
                     .Append(",emp.TitleName'職稱', ")
                     .Append("CASE ")
                     .Append("   WHEN dep.DepartmentName like '%華東%'  THEN 'CE中國華東' ")
                     .Append("   WHEN dep.DepartmentName like '%華南%' THEN 'CS中國華南' ")
+                    .Append("   WHEN dep.DepartmentName like '%華中%' THEN 'CC中國華中' ")
                     .Append("   ELSE select2+dep.DepartmentName ")
                     .Append("END'部門' ")
                     .Append(",'MACHVISION牧德科技' AS'辦公室', ")
@@ -932,6 +942,87 @@ namespace MvLocalProject.Controller
             return majorData;
         }
 
+
+        /// <summary>
+        /// 取得MxMail的產生資料, 此版本有更改password規則
+        /// </summary>
+        /// <param name="startDate"></param>
+        /// <param name="endDate"></param>
+        /// <returns></returns>
+        public static DataTable collectData_ItMxMail_20190904(string startDate, string endDate)
+        {
+            DataTable majorData = null;
+            StringBuilder sb = new StringBuilder();
+
+            SqlConnection connection = MvDbConnector.Connection_ERPDB2_Dot_MACHVISION;
+            SqlCommand command = connection.CreateCommand();
+            try
+            {
+                connection.Open();
+
+                sb.Append("SELECT Convert(nvarchar,Convert(datetime,datetime2),111)'建立日期', ")
+                    .Append("Convert(nvarchar,Convert(datetime,datetime2),111)'到職日', ")
+                    .Append("text1 '工號',text2 '姓名',text4'使用者帳號', ")
+                    .Append("Left(text4,1)+Left(Right(replace(datetime2,'/',''),2),1)+Left(Right(replace(text5,'-',''),4),3)+Right(replace(datetime2,'/',''),1) AS '使用者密碼', ")
+                    .Append("CASE ")
+                    .Append("   WHEN dep.DepartmentName like '%華東%' THEN replace(text3,' ','')+text2+'_CE' ")
+                    .Append("   WHEN dep.DepartmentName like '%華南%' THEN replace(text3,' ','')+text2+'_CS' ")
+                    .Append("   WHEN dep.DepartmentName like '%華中%' THEN replace(text3,' ','')+text2+'_CC' ")
+                    .Append("   ELSE replace(text3,' ','')+text2+'_'+select2 ")
+                    .Append("END'使用者姓名', ")
+                    .Append("'500' AS'QUOTA','1' AS'WM','' AS'WH','' AS'SMB','' AS'FTP','' AS'WEB','' AS'SQL','0' AS'EXP', ")
+                    .Append("replace(text3,' ','')'LDAP姓氏', ")
+                    .Append("CASE ")
+                    .Append("   WHEN dep.DepartmentName like '%華東%' THEN text2+'_CE' ")
+                    .Append("   WHEN dep.DepartmentName like '%華南%' THEN text2+'_CS' ")
+                    .Append("   WHEN dep.DepartmentName like '%華中%' THEN text2+'_CC' ")
+                    .Append("   ELSE text2+'_'+select2 ")
+                    .Append("END'LDAP名字' ")
+                    .Append(",text6'電子郵件', ")
+                    .Append("'' AS'電話','' AS'傳真','' AS'行動電話','' AS'地址','' AS'網頁', ")
+                    .Append("CASE ")
+                    .Append("   WHEN dep.DepartmentName like '%華東%'  THEN 'CE中國華東' ")
+                    .Append("   WHEN dep.DepartmentName like '%華南%' THEN 'CS中國華南' ")
+                    .Append("   WHEN dep.DepartmentName like '%華中%' THEN 'CC中國華中' ")
+                    .Append("   ELSE select2+dep.DepartmentName ")
+                    .Append("END'公司' ")
+                    .Append(",emp.TitleName'職稱', ")
+                    .Append("CASE ")
+                    .Append("   WHEN dep.DepartmentName like '%華東%'  THEN 'CE中國華東' ")
+                    .Append("   WHEN dep.DepartmentName like '%華南%' THEN 'CS中國華南' ")
+                    .Append("   WHEN dep.DepartmentName like '%華中%' THEN 'CC中國華中' ")
+                    .Append("   ELSE select2+dep.DepartmentName ")
+                    .Append("END'部門' ")
+                    .Append(",'MACHVISION牧德科技' AS'辦公室', ")
+                    .Append("'' AS'辦公室電話','' AS'辦公室傳真','' AS'IP電話','' AS'呼叫器','' AS'國家','' AS'郵遞區號','' AS'縣/市','' AS'鄉/鎮/市/區','' AS'街名','' AS'其它' ")
+                    .Append("FROM [EFNETDB].[dbo].[mvhr08] hr , ERPBK.mvWorkFlow.dbo.Department dep , ERPBK.mvWorkFlow.dbo.EmployeeTitle emp , [EFNETDB].[dbo].[resda] da ")
+                    .Append("WHERE hr.select2 = dep.DepartmentID and hr.select3 = emp.TitleCode ")
+                    .Append(string.Format("AND (Convert(nvarchar,Convert(datetime,hr.datetime2),111) >= '{0}' and Convert(nvarchar,Convert(datetime,hr.datetime2),111) <= '{1}') ", startDate, endDate))
+                    .Append("AND emp.Disable = 0 AND (da.resda021 IN ('1', '2')) AND hr.mvhr08001 = da.resda001 AND hr.mvhr08002 = da.resda002 ")
+                    .Append("ORDER BY datetime2 DESC ");
+
+                command.CommandText = sb.ToString();
+                majorData = MvDbConnector.queryDataBySql(command);
+                majorData.TableName = "ItMxMail";
+
+            }
+            catch (SqlException se)
+            {
+                //發生例外時，會自動rollback
+                throw se;
+            }
+            finally
+            {
+                command.Dispose();
+                connection.Close();
+                connection.Dispose();
+            }
+
+            // release parameter
+            sb = null;
+
+            return majorData;
+        }
 
         /// <summary>
         /// 取得多張bom list
@@ -1463,7 +1554,7 @@ namespace MvLocalProject.Controller
             }
             DataRow dr = dt.NewRow();
             string defaultDate = DateTime.Now.ToString("yyyyMMdd");
-            dr["COMPANY"] = MvCompany.MVTEST.ToString();
+            dr["COMPANY"] = MvCompanySite.MVTEST.ToString();
             dr["CREATOR"] = "MIS_TEST";
             dr["USR_GROUP"] = "220";
             dr["CREATE_DATE"] = defaultDate;
@@ -1532,7 +1623,7 @@ namespace MvLocalProject.Controller
 
             DataRow dr = dt.NewRow();
             string defaultDate = DateTime.Now.ToString("yyyyMMdd");
-            dr["COMPANY"] = MvCompany.MVTEST.ToString();
+            dr["COMPANY"] = MvCompanySite.MVTEST.ToString();
             dr["CREATOR"] = "MIS_TEST";
             dr["USR_GROUP"] = "220";
             dr["CREATE_DATE"] = defaultDate;

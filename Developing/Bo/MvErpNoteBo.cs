@@ -59,6 +59,12 @@ namespace MvLocalProject.Bo
                         sqlCommand = string.Format("SELECT MAX(TA002) MAX_TA002 FROM PURTA WHERE TA001='{0}' AND (TA002 >= '{1}' AND TA002 < '{2}')", (int)noteHead, DateTime.Now.ToString("yyyyMM"), DateTime.Now.AddMonths(1).ToString("yyyyMM"));
                         //sqlCommand = string.Format("SELECT MAX(TA002) MAX_TA002 FROM PURTA WHERE TA001='{0}' AND (TA002 >= '{1}' AND TA002 < '{2}')", (int)noteHead, DateTime.Now.AddMonths(2).ToString("yyyyMM"), DateTime.Now.AddMonths(3).ToString("yyyyMM"));
                         break;
+                    case ErpNoteHead.H_A121:
+                        sqlCommand = string.Format("SELECT MAX(TA002) MAX_TA002 FROM INVTA WHERE TA001='{0}' AND (TA002 >= '{1}' AND TA002 < '{2}')", "A121", DateTime.Now.ToString("yyyyMM"), DateTime.Now.AddMonths(1).ToString("yyyyMM"));
+                        break;
+                    case ErpNoteHead.H_A12E:
+                        sqlCommand = string.Format("SELECT MAX(TA002) MAX_TA002 FROM INVTA WHERE TA001='{0}' AND (TA002 >= '{1}' AND TA002 < '{2}')", "A12E", DateTime.Now.ToString("yyyyMM"), DateTime.Now.AddMonths(1).ToString("yyyyMM"));
+                        break;
                     default:
                         break;
                 }
@@ -74,6 +80,8 @@ namespace MvLocalProject.Bo
                     case ErpNoteHead.H_3104:
                     case ErpNoteHead.H_3105:
                     case ErpNoteHead.H_3109:
+                    case ErpNoteHead.H_A121:
+                    case ErpNoteHead.H_A12E:
                         // 如果是null, 直接回傳00000
                         return Convert.IsDBNull(tempDt.Rows[0]["MAX_TA002"]) ? DateTime.Today.ToString("yyyyMM") + "00000" : tempDt.Rows[0]["MAX_TA002"].ToString();
                     default:
@@ -106,7 +114,7 @@ namespace MvLocalProject.Bo
         /// <param name="userGroup"></param>
         /// <param name="testingNoteNumber"></param>
         /// <returns>開單後的DataSet for PURTA/PURTB</returns>
-        public static DataSet createErpNote_PR(MvCompany company, SqlConnection conn, ErpNoteHead noteHead, DataTable excelDt, DateTime requestDate, string adUserName, string userGroup, string testingNoteNumber = "")
+        public static DataSet createErpNote_PR(MvCompanySite company, SqlConnection conn, ErpNoteHead noteHead, DataTable excelDt, DateTime requestDate, string adUserName, string userGroup, string testingNoteNumber = "")
         {
             DataSet ds = new DataSet();
             DataTable resultDt = null;
@@ -387,140 +395,144 @@ namespace MvLocalProject.Bo
         }
 
 
-        public static DataSet createErpNote_MoveOrder(SqlConnection conn, ErpNoteHead noteHead, DataTable excelDt, DateTime requestDate, string adUserName, string userGroup)
+        public static DataSet createErpNote_MoveOrder(MvCompanySite company, SqlConnection conn, ErpNoteHead noteHead, DataTable excelDt, DateTime requestDate, string adUserName, string userGroup, string testingNoteNumber = "")
         {
+            string noteHeadString = string.Empty; 
 
-            if(noteHead != ErpNoteHead.H_A121 || noteHead != ErpNoteHead.H_A12E)
+            if (noteHead == ErpNoteHead.H_A121)
             {
-                return null;
+                noteHeadString = "A" + ((int)noteHead).ToString();
+            }
+            else if (noteHead == ErpNoteHead.H_A12E)
+            {
+                noteHeadString = "A12E";
+            }
+            else
+            {
+                throw new NotSupportedException("Can't support ERP note head : " + noteHead.ToString());
             }
 
-            DataTable majorData = null;
+            DataSet ds = new DataSet();
+            DataTable resultDt = null;
             StringBuilder sb = new StringBuilder();
-            DataRow dr = null;
-
-
-            // 使用之前的流程串出開立調撥單的流程
-
+            // 使用temp table 的方式串接資料
             //INVTB
-            sb.Clear();
             sb.Append("DECLARE @INVTB_Temp TABLE (COMPANY NCHAR(20), CREATOR NCHAR(10), USR_GROUP NCHAR(10), CREATE_DATE NCHAR(8), ")
                 .Append("MODIFIER NCHAR(10), MODI_DATE NCHAR(8), FLAG NUMERIC(3,0), TB001 NCHAR(4), TB002 NCHAR(11), TB003 NCHAR(4), ")
                 .Append("TB004 NVARCHAR(40), TB005 NVARCHAR(120), TB006 NVARCHAR(120), TB007 NUMERIC(16,3), TB008 NVARCHAR(6), TB009 NUMERIC(16,3), ")
                 .Append("TB010 NUMERIC(21,6), TB011 NUMERIC(21,6), TB012 NVARCHAR(10), TB013 NVARCHAR(10), TB014 NVARCHAR(20), TB015 NVARCHAR(8), ")
-                .Append("TB016 NVARCHAR(8), TB017 NVARCHAR(255), TB018 NVARCHAR(1),6), TB019 NVARCHAR(8), TB020 NVARCHAR(6), TB021 NVARCHAR(20), ")
+                .Append("TB016 NVARCHAR(8), TB017 NVARCHAR(255), TB018 NVARCHAR(1), TB019 NVARCHAR(8), TB020 NVARCHAR(6), TB021 NVARCHAR(20), ")
                 .Append("TB022 NUMERIC(16,3), TB023 NVARCHAR(6), TB024 NVARCHAR(1), TB025 NUMERIC(16,3), TB026 NVARCHAR(10), TB027 NVARCHAR(10), ")
                 .Append("TB028 NUMERIC(21,6), TB029 NUMERIC(15,6), TB030 NVARCHAR(1), TB031 NVARCHAR(30), TB032 NVARCHAR(60), TB500 NVARCHAR(1250), ")
                 .Append("TB501 NVARCHAR(1), TB502 NVARCHAR(20), UDF01 NVARCHAR(255), UDF02 NVARCHAR(255), UDF03 NVARCHAR(255), UDF04 NVARCHAR(255), ")
                 .Append("UDF05 NVARCHAR(255), UDF06 NUMERIC(21,6), UDF07 NUMERIC(21,6), UDF08 NUMERIC(21,6), UDF09 NUMERIC(21,6), UDF10 NUMERIC(21,6) ")
                 .AppendLine(" );");
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-            //INVTA
-            sb.Clear();
-            sb.Append("DECLARE @INVTA_Temp TABLE (COMPANY NVARCHAR(20), CREATOR NVARCHAR(10), USR_GROUP NCHAR(10), CREATE_DATE NVARCHAR(8), ")
-                .Append("MODIFIER NVARCHAR(10), MODI_DATE NVARCHAR(8), FLAG NUMERIC(3,0), TA001 NCHAR(4), TA002 NCHAR(11), TA003 NVARCHAR(8), ")
-                .Append("TA004 NVARCHAR(6), TA005 NVARCHAR(255), TA006 NVARCHAR(1), TA007 NUMERIC(1,0), TA008 NVARCHAR(6), TA009 NVARCHAR(2), ")
-                .Append("TA010 NUMERIC(5,0), TA011 NUMERIC(16,3), TA012 NUMERIC(21,6), TA013 NVARCHAR(1), TA014 NVARCHAR(8), TA015 NVARCHAR(10), ")
-                .Append("TA016 NUMERIC(16,3), TA017 NVARCHAR(1), TA018 NVARCHAR(1), TA019 NUMERIC(1,0), TA020 NVARCHAR(1), TA021 NVARCHAR(4), ")
-                .Append("TA022 NVARCHAR(11), TA023 NUMERIC(21,6), TA024 NUMERIC(15,6), TA025 NVARCHAR(1), TA026 NVARCHAR(30), TA027 NVARCHAR(60), ")
-                .Append("TA028 NVARCHAR(15), UDF01 NVARCHAR(255), UDF02 NVARCHAR(255), UDF03 NVARCHAR(255), UDF04 NVARCHAR(255), UDF05 NVARCHAR(255), ")
-                .Append("UDF06 NUMERIC(21,6), UDF07 NUMERIC(21,6), UDF08 NUMERIC(21,6), UDF09 NUMERIC(21,6), UDF10 NUMERIC(21,6), TA200 NVARCHAR(20) ")
-                .Append("TA201 NVARCHAR(20) ")
-                .AppendLine(" );");
-
-
-
-
-
             using (TransactionScope scope = new TransactionScope())
             {
+                SqlCommand command = null;
+                string createDate = DateTime.Now.ToString("yyyyMMdd");
+                string isUrgent = string.Empty; // 只要excel 裡有一筆急件, 單頭帶入急件
+                string machineNo = string.Empty;
+
                 try
                 {
-                    conn.Open();
-
-                    // Get Data schema INVTA
-                    sb.AppendLine(string.Format(@"SELECT TOP 0 * from MVTEST.dbo.INVTA"));
-                    majorData = MvDbConnector.queryDataBySql(conn, sb.ToString());
-
-                    // add simulate data
-                    dr = MvDbDao.simulateData_INVTA(majorData);
-                    majorData.Rows.Add(dr);
-
-                    // use BulkCopy insert to DB
-                    using (SqlBulkCopy sbc = new SqlBulkCopy(conn))
+                    command = conn.CreateCommand();
+                    // 先取最大單號
+                    string noteNumber = getMaxErpNote(conn, noteHead);
+                    long n;
+                    if (long.TryParse(noteNumber, out n) == false)
                     {
-                        // set number of records to be processed
-                        sbc.BatchSize = 300;
-                        sbc.DestinationTableName = ErpTableName.INVTA.ToString();
-
-                        // Add column mappings
-                        foreach (DataColumn column in majorData.Columns)
-                        {
-                            sbc.ColumnMappings.Add(new SqlBulkCopyColumnMapping(column.ColumnName, column.ColumnName));
-                        }
-
-                        // write to server
-                        sbc.WriteToServer(majorData);
+                        throw new ArgumentException("Un-support format");
+                    }
+                    else
+                    {
+                        n = long.Parse(noteNumber);
+                        noteNumber = (n += 1).ToString();
                     }
 
-                    // Get Data schema INVTB
+                    float totalQty = 0;
+                    int itemNo = 1;
+                    string remark = string.Empty;       //INVTA 最後一筆
+                    string itemName = string.Empty;
+                    foreach (DataRow excelDr in excelDt.Rows)
+                    {
+                        // Insert INVTB指令
+                        string strDateTime = DateTime.Today.ToString("yyyyMMdd");
+                        itemName = excelDr["TB004"].ToString();
+                        machineNo = excelDr["TA201"].ToString();
+
+                        // TA011 的數量是INVTB的所有TB007的總計, 同excelDt的TB009
+                        totalQty += float.Parse(excelDr["TB009"].ToString());
+
+                        sb.Append("INSERT INTO @INVTB_Temp ")
+                            .Append("(TB001, TB002, TB003, TB004, TB005, TB006, TB007, TB008, TB009, TB011, ")
+                            .Append(" TB012, TB013, TB017, TB018, TB019, TB021, TB026, TB027, CREATOR) VALUES (")
+                            .AppendLine(string.Format("'{0}','{1}','{2:0000}','{3}','{4}','{5}',{6},'{7}',{8},{9}"
+                                    + ",'{10}','{11}','{12}','{13}','{14}','{15}','{16}','{17}','{18}');",
+                                noteHeadString, noteNumber, itemNo, excelDr["TB004"], excelDr["TB005"], excelDr["TB006"], excelDr["TB009"], excelDr["MB004"], 0, 0
+                                , excelDr["MM002"], excelDr["TB008"], excelDr["TB012"], "N", "", "", excelDr["MM003"], excelDr["TB201"], adUserName));
+                        itemNo++;
+                    }
+                    sb.AppendLine(string.Format("UPDATE @INVTB_Temp SET COMPANY='{5}', USR_GROUP='{3}', CREATE_DATE='{4}', MODIFIER='', MODI_DATE='', FLAG=0 WHERE CREATOR='{0}' AND TB001='{1}' AND TB002='{2}';", adUserName, noteHeadString, noteNumber, userGroup, createDate, company.ToString()))
+                        .AppendLine(string.Format("UPDATE @INVTB_Temp SET TB010 = 0, TB014 = '', TB015 = '', TB016 = '', TB020 = '', TB022 = 0, TB023 = '', TB024 = 'N', TB025 = 0, TB028 = 0, TB029 = 0, TB030 = '', TB031 = '', TB032 = '', TB500 = '', TB501 = '', TB502 = '', UDF01 = '', UDF02 = '', UDF03 = '', UDF04 = '', UDF05 = '', UDF06 = 0, UDF07 = 0, UDF08 = 0, UDF09 = 0, UDF10 = 0 WHERE CREATOR = '{0}' AND TB001 = '{1}' AND TB002 = '{2}';", adUserName, noteHeadString, noteNumber))
+                        .AppendLine(string.Format("INSERT INTO MVTEST.dbo.INVTB SELECT * FROM @INVTB_Temp WHERE CREATOR='{0}' AND TB001='{1}' AND TB002='{2}';", adUserName, noteHeadString, noteNumber))
+                        ;
+
+                    sb.AppendLine(string.Format("SELECT * FROM MVTEST.dbo.INVTB WHERE TB001='{0}' AND TB002='{1}';", noteHeadString, noteNumber));
+
+                    resultDt = MvDbConnector.queryDataBySql(conn, sb.ToString());
+                    resultDt.TableName = "INVTB";
+                    ds.Tables.Add(resultDt.Copy());
+
+                    //Insert INVTA指令
                     sb.Clear();
-                    sb.AppendLine(string.Format(@"SELECT TOP 0 * from MVTEST.dbo.INVTB"));
-                    majorData.Clear();
-                    majorData.Columns.Clear();
-                    majorData = MvDbConnector.queryDataBySql(conn, sb.ToString());
+                    sb.Append("DECLARE @INVTA_Temp TABLE (COMPANY NVARCHAR(20), CREATOR NVARCHAR(10), USR_GROUP NCHAR(10), CREATE_DATE NVARCHAR(8), ")
+                        .Append("MODIFIER NVARCHAR(10), MODI_DATE NVARCHAR(8), FLAG NUMERIC(3,0), TA001 NCHAR(4), TA002 NCHAR(11), TA003 NVARCHAR(8), ")
+                        .Append("TA004 NVARCHAR(6), TA005 NVARCHAR(255), TA006 NVARCHAR(1), TA007 NUMERIC(1,0), TA008 NVARCHAR(6), TA009 NVARCHAR(2), ")
+                        .Append("TA010 NUMERIC(5,0), TA011 NUMERIC(16,3), TA012 NUMERIC(21,6), TA013 NVARCHAR(1), TA014 NVARCHAR(8), TA015 NVARCHAR(10), ")
+                        .Append("TA016 NUMERIC(16,3), TA017 NVARCHAR(1), TA018 NVARCHAR(1), TA019 NUMERIC(1,0), TA020 NVARCHAR(1), TA021 NVARCHAR(4), ")
+                        .Append("TA022 NVARCHAR(11), TA023 NUMERIC(21,6), TA024 NUMERIC(15,6), TA025 NVARCHAR(1), TA026 NVARCHAR(30), TA027 NVARCHAR(60), ")
+                        .Append("TA028 NVARCHAR(15), UDF01 NVARCHAR(255), UDF02 NVARCHAR(255), UDF03 NVARCHAR(255), UDF04 NVARCHAR(255), UDF05 NVARCHAR(255), ")
+                        .Append("UDF06 NUMERIC(21,6), UDF07 NUMERIC(21,6), UDF08 NUMERIC(21,6), UDF09 NUMERIC(21,6), UDF10 NUMERIC(21,6), TA200 NVARCHAR(20), ")
+                        .Append("TA201 NVARCHAR(20) ")
+                        .AppendLine(" );");
 
-                    // add simulate data
-                    dr = MvDbDao.simulateData_INVTB(conn, majorData, "10101001");
-                    majorData.Rows.Add(dr);
+                    sb.Append("INSERT INTO @INVTA_Temp ")
+                        .Append("(TA001, TA002, TA003, TA004, TA005, TA006, TA007, TA008, TA009, TA010, ")
+                        .Append(" TA011, TA012, TA013, TA014, TA015, TA017, TA200, TA201, CREATOR) VALUES (")
+                        .AppendLine(string.Format("'{0}','{1}','{2}','{3}','{4}','{5}',{6},'{7}','{8}',{9}"
+                                + ",{10},{11},'{12}','{13}','{14}','{15}','{16}','{17}','{18}');",
+                            noteHeadString, noteNumber, createDate, userGroup, "", "N", 0, "001", "12", 0
+                            , totalQty, 0, "N", "", "", "N", "1101-0100", machineNo, adUserName));
 
-                    // use BulkCopy insert to DB
-                    using (SqlBulkCopy sbc = new SqlBulkCopy(conn))
-                    {
-                        // set number of records to be processed
-                        sbc.BatchSize = 300;
-                        sbc.DestinationTableName = ErpTableName.INVTB.ToString();
+                    sb.AppendLine(string.Format("UPDATE @INVTA_Temp SET COMPANY='{5}', USR_GROUP='{3}', CREATE_DATE='{4}', MODIFIER='', MODI_DATE='', FLAG=0 WHERE CREATOR='{0}' AND TA001='{1}' AND TA002='{2}';", adUserName, noteHeadString, noteNumber, userGroup, createDate, company.ToString()))
+                        .AppendLine(string.Format("UPDATE @INVTA_Temp SET TA016 = 0, TA018 = '', TA019 = 0, TA020 = '', TA021 = '', TA022 = '', TA023 = 0, TA024 = 0, TA025 = '', TA026 = '', TA027 = '', TA028 = '', UDF01 = '', UDF02 = '', UDF03 = '', UDF04 = '', UDF05 = '', UDF06 = 0, UDF07 = 0, UDF08 = 0, UDF09 = 0, UDF10 = 0 WHERE CREATOR = '{0}' AND TA001 = '{1}' AND TA002 = '{2}';", adUserName, noteHeadString, noteNumber))
+                        .AppendLine(string.Format("INSERT INTO MVTEST.dbo.INVTA SELECT * FROM @INVTA_Temp WHERE CREATOR='{0}' AND TA001='{1}' AND TA002='{2}';", adUserName, noteHeadString, noteNumber))
+                        ;
 
-                        // Add column mappings
-                        foreach (DataColumn column in majorData.Columns)
-                        {
-                            sbc.ColumnMappings.Add(new SqlBulkCopyColumnMapping(column.ColumnName, column.ColumnName));
-                        }
+                    sb.AppendLine(string.Format("SELECT * FROM MVTEST.dbo.INVTA WHERE TA001='{0}' AND TA002='{1}';", noteHeadString, noteNumber));
 
-                        // write to server
-                        sbc.WriteToServer(majorData);
-                    }
-
-                    scope.Complete();
+                    resultDt = MvDbConnector.queryDataBySql(conn, sb.ToString());
+                    resultDt.TableName = "INVTA";
+                    ds.Tables.Add(resultDt.Copy());
                 }
                 catch (SqlException se)
                 {
-                    // 發生例外時，會自動rollback
                     throw se;
                 }
                 finally
                 {
-                    conn.Close();
-                    conn.Dispose();
+                    command.Dispose();
+                    command = null;
+
+                    if (resultDt != null) { resultDt.Dispose(); }
+                    resultDt = null;
                 }
             }
 
             sb = null;
-
-            return null;
+            return ds;
         }
     }
 }

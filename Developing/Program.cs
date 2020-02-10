@@ -37,7 +37,12 @@ namespace MvLocalProject
 
             //2018/10/05 using
             //var start = new Viewer.frmMcBatchJob();
-            var start = new Viewer.frmTestParser();
+            //var start = new Viewer.frmTestParser();
+            var start = new Viewer.frmLogin();
+
+            //var start = new Viewer.frmDiskScan();
+            //var start = new Viewer.frmItCisco();
+            //var start = new Viewer.frmItMxMail();
             start.FormClosed += WindowClosed;
             start.Show();
             Application.Run();

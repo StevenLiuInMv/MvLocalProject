@@ -2,15 +2,24 @@
 using System;
 using System.Data;
 using System.Threading.Tasks;
+using System.Net.Sockets;
 
 namespace MvLocalProject.Bo
 {
     internal sealed class MvItCiscoBo : IDisposable
     {
+        SocketException exceptionSE = null;
+
+        public SocketException getSocketException()
+        {
+            return exceptionSE;
+        }
+
         private async Task<string> getPortStatusByTelnet(string routerIp)
         {
             string strCommand = string.Empty;
             string strResult = string.Empty;
+
 
             using (Client client = new Client(routerIp, 23, new System.Threading.CancellationToken()))
             {
@@ -81,7 +90,16 @@ namespace MvLocalProject.Bo
             DataRow dr = null; 
             foreach (string ip in routerIps)
             {
-                strBuffer = await getPortStatus(ip);
+                //strBuffer = await getPortStatus(ip);
+                try
+                {
+                    strBuffer = await getPortStatus(ip);
+                }
+                catch (SocketException se)
+                {
+                    exceptionSE = se;
+                    continue;
+                }
                 tmpArray = strBuffer.Split(new string[] { "\r\n" }, StringSplitOptions.None);
 
                 foreach (string tmpLine in tmpArray)
@@ -565,6 +583,7 @@ namespace MvLocalProject.Bo
 
         public void Dispose()
         {
+            exceptionSE = null;
             GC.SuppressFinalize(this);
         }
     }

@@ -34,6 +34,8 @@
             this.btnScanFilesForAllDisk = new System.Windows.Forms.Button();
             this.btnTest = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
+            this.button2 = new System.Windows.Forms.Button();
+            this.button3 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btnCheckDisk
@@ -50,7 +52,7 @@
             // 
             this.rtb_ListDriveInfo.Location = new System.Drawing.Point(31, 69);
             this.rtb_ListDriveInfo.Name = "rtb_ListDriveInfo";
-            this.rtb_ListDriveInfo.Size = new System.Drawing.Size(438, 260);
+            this.rtb_ListDriveInfo.Size = new System.Drawing.Size(588, 260);
             this.rtb_ListDriveInfo.TabIndex = 1;
             this.rtb_ListDriveInfo.Text = "";
             // 
@@ -94,11 +96,33 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(465, 30);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(74, 33);
+            this.button2.TabIndex = 6;
+            this.button2.Text = "單磁碟";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
+            // 
+            // button3
+            // 
+            this.button3.Location = new System.Drawing.Point(545, 30);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(74, 33);
+            this.button3.TabIndex = 7;
+            this.button3.Text = "單主機";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
+            // 
             // frmDiskScan
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(496, 366);
+            this.ClientSize = new System.Drawing.Size(666, 366);
+            this.Controls.Add(this.button3);
+            this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.btnTest);
             this.Controls.Add(this.btnScanFilesForAllDisk);
@@ -123,5 +147,7 @@
         private System.Windows.Forms.Button btnScanFilesForAllDisk;
         private System.Windows.Forms.Button btnTest;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button button3;
     }
 }

@@ -48,7 +48,7 @@ namespace MvLocalProject.Viewer
             }
 
             _majorDt = null;
-            _majorDt = MvDbDao.collectData_ItMxMail(deStart.Text, deEnd.Text);
+            _majorDt = MvDbDao.collectData_ItMxMail_20190904(deStart.Text, deEnd.Text);
             gridControl1.DataSource = _majorDt;
             hideGridViewForAll(ref gridView1);
             showGridViewForQuery(ref gridView1);
@@ -354,7 +354,24 @@ namespace MvLocalProject.Viewer
             string deptNo = deptName.Substring(0, 3);
 
             int n;
-            if (int.TryParse(deptNo, out n) == false)
+
+            if (deptName.ToString().EndsWith("CS中國華南") ==true)
+            {
+                return "114華南區";
+            }
+            else if (deptName.ToString().EndsWith("CE中國華東") == true)
+            {
+                return "115華東區";
+            }
+            else if (deptName.ToString().EndsWith("CC中國華中") == true)
+            {
+                return "117華中區";
+            }
+            else if (int.TryParse(deptNo, out n) == false)
+            {
+                return string.Empty;
+            }
+            else
             {
                 return string.Empty;
             }
@@ -398,6 +415,10 @@ namespace MvLocalProject.Viewer
             {
                 return "420研發部光機電";
             }
+            else if (n >= 450 && n <= 459)
+            {
+                return "450人工智慧研發中心";
+            }
             else if (n >= 470 && n <= 479)
             {
                 return "470專案研發部";
@@ -421,14 +442,6 @@ namespace MvLocalProject.Viewer
             else if (n >= 730 && n <= 739)
             {
                 return "730料控中心";
-            }
-            else if (n >= 811 && n <= 816)
-            {
-                return "114華南區";
-            }
-            else if (n >= 821 && n <= 824)
-            {
-                return "115華東區";
             }
 
             // 上面條件都沒成立, 不設定部門

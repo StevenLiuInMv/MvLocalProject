@@ -30,9 +30,8 @@
         {
             this.components = new System.ComponentModel.Container();
             this.groupControl2 = new DevExpress.XtraEditors.GroupControl();
-            this.sbCommit = new DevExpress.XtraEditors.SimpleButton();
             this.sbParsing = new DevExpress.XtraEditors.SimpleButton();
-            this.sbResort = new DevExpress.XtraEditors.SimpleButton();
+            this.sbCommit = new DevExpress.XtraEditors.SimpleButton();
             this.sbOpenFile = new DevExpress.XtraEditors.SimpleButton();
             this.xtraTabControl1 = new DevExpress.XtraTab.XtraTabControl();
             this.xtraTabPage1 = new DevExpress.XtraTab.XtraTabPage();
@@ -57,6 +56,13 @@
             this.label6 = new System.Windows.Forms.Label();
             this.treeList4 = new DevExpress.XtraTreeList.TreeList();
             this.xtraTabPage4 = new DevExpress.XtraTab.XtraTabPage();
+            this.groupControl5 = new DevExpress.XtraEditors.GroupControl();
+            this.label11 = new System.Windows.Forms.Label();
+            this.txtNoteA121 = new System.Windows.Forms.TextBox();
+            this.txtNoteA12E = new System.Windows.Forms.TextBox();
+            this.label10 = new System.Windows.Forms.Label();
+            this.label9 = new System.Windows.Forms.Label();
+            this.txtNote3102 = new System.Windows.Forms.TextBox();
             this.xtraTabPage5 = new DevExpress.XtraTab.XtraTabPage();
             this.groupControl3 = new DevExpress.XtraEditors.GroupControl();
             this.sbCheckItemValidity = new DevExpress.XtraEditors.SimpleButton();
@@ -93,6 +99,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.treeList6)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.treeList5)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.treeList4)).BeginInit();
+            this.xtraTabPage4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.groupControl5)).BeginInit();
+            this.groupControl5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.groupControl3)).BeginInit();
             this.groupControl3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.barManager1)).BeginInit();
@@ -103,23 +112,14 @@
             // 
             // groupControl2
             // 
-            this.groupControl2.Controls.Add(this.sbCommit);
             this.groupControl2.Controls.Add(this.sbParsing);
-            this.groupControl2.Controls.Add(this.sbResort);
+            this.groupControl2.Controls.Add(this.sbCommit);
             this.groupControl2.Controls.Add(this.sbOpenFile);
             this.groupControl2.Location = new System.Drawing.Point(12, 12);
             this.groupControl2.Name = "groupControl2";
             this.groupControl2.Size = new System.Drawing.Size(244, 59);
             this.groupControl2.TabIndex = 34;
             this.groupControl2.Text = "Function Selection";
-            // 
-            // sbCommit
-            // 
-            this.sbCommit.Location = new System.Drawing.Point(188, 30);
-            this.sbCommit.Name = "sbCommit";
-            this.sbCommit.Size = new System.Drawing.Size(50, 23);
-            this.sbCommit.TabIndex = 6;
-            this.sbCommit.Text = "Commit";
             // 
             // sbParsing
             // 
@@ -130,14 +130,14 @@
             this.sbParsing.Text = "Parsing";
             this.sbParsing.Click += new System.EventHandler(this.sbParsing_Click);
             // 
-            // sbResort
+            // sbCommit
             // 
-            this.sbResort.Location = new System.Drawing.Point(132, 30);
-            this.sbResort.Name = "sbResort";
-            this.sbResort.Size = new System.Drawing.Size(50, 23);
-            this.sbResort.TabIndex = 4;
-            this.sbResort.Text = "Resort";
-            this.sbResort.Click += new System.EventHandler(this.sbResort_Click);
+            this.sbCommit.Location = new System.Drawing.Point(132, 30);
+            this.sbCommit.Name = "sbCommit";
+            this.sbCommit.Size = new System.Drawing.Size(50, 23);
+            this.sbCommit.TabIndex = 4;
+            this.sbCommit.Text = "Commit";
+            this.sbCommit.Click += new System.EventHandler(this.sbCommit_Click);
             // 
             // sbOpenFile
             // 
@@ -308,9 +308,9 @@
             this.label8.AutoSize = true;
             this.label8.Location = new System.Drawing.Point(3, 348);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(76, 14);
+            this.label8.Size = new System.Drawing.Size(124, 14);
             this.label8.TabIndex = 13;
-            this.label8.Text = "調撥單-A12E";
+            this.label8.Text = "預定調撥單-A12E內容";
             // 
             // treeList5
             // 
@@ -326,18 +326,18 @@
             this.label7.AutoSize = true;
             this.label7.Location = new System.Drawing.Point(3, 180);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(76, 14);
+            this.label7.Size = new System.Drawing.Size(124, 14);
             this.label7.TabIndex = 11;
-            this.label7.Text = "調撥單-A121";
+            this.label7.Text = "預定調撥單-A121內容";
             // 
             // label6
             // 
             this.label6.AutoSize = true;
             this.label6.Location = new System.Drawing.Point(3, 0);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(75, 14);
+            this.label6.Size = new System.Drawing.Size(123, 14);
             this.label6.TabIndex = 9;
-            this.label6.Text = "請購單-3102";
+            this.label6.Text = "預定請購單-3102內容";
             // 
             // treeList4
             // 
@@ -350,9 +350,72 @@
             // 
             // xtraTabPage4
             // 
+            this.xtraTabPage4.Controls.Add(this.groupControl5);
             this.xtraTabPage4.Name = "xtraTabPage4";
             this.xtraTabPage4.Size = new System.Drawing.Size(1294, 517);
             this.xtraTabPage4.Text = "xtraTabPage4";
+            // 
+            // groupControl5
+            // 
+            this.groupControl5.Controls.Add(this.label11);
+            this.groupControl5.Controls.Add(this.txtNoteA121);
+            this.groupControl5.Controls.Add(this.txtNoteA12E);
+            this.groupControl5.Controls.Add(this.label10);
+            this.groupControl5.Controls.Add(this.label9);
+            this.groupControl5.Controls.Add(this.txtNote3102);
+            this.groupControl5.Location = new System.Drawing.Point(4, 3);
+            this.groupControl5.Name = "groupControl5";
+            this.groupControl5.Size = new System.Drawing.Size(305, 129);
+            this.groupControl5.TabIndex = 35;
+            this.groupControl5.Text = "Note Summary";
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(17, 90);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(76, 14);
+            this.label11.TabIndex = 33;
+            this.label11.Text = "調撥單-A12E";
+            // 
+            // txtNoteA121
+            // 
+            this.txtNoteA121.Location = new System.Drawing.Point(99, 62);
+            this.txtNoteA121.Name = "txtNoteA121";
+            this.txtNoteA121.Size = new System.Drawing.Size(172, 22);
+            this.txtNoteA121.TabIndex = 32;
+            // 
+            // txtNoteA12E
+            // 
+            this.txtNoteA12E.Location = new System.Drawing.Point(99, 90);
+            this.txtNoteA12E.Name = "txtNoteA12E";
+            this.txtNoteA12E.Size = new System.Drawing.Size(172, 22);
+            this.txtNoteA12E.TabIndex = 31;
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(17, 62);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(76, 14);
+            this.label10.TabIndex = 30;
+            this.label10.Text = "調撥單-A121";
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(18, 34);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(75, 14);
+            this.label9.TabIndex = 29;
+            this.label9.Text = "請購單-3102";
+            // 
+            // txtNote3102
+            // 
+            this.txtNote3102.Location = new System.Drawing.Point(99, 31);
+            this.txtNote3102.Name = "txtNote3102";
+            this.txtNote3102.Size = new System.Drawing.Size(172, 22);
+            this.txtNote3102.TabIndex = 28;
             // 
             // xtraTabPage5
             // 
@@ -577,6 +640,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.treeList6)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.treeList5)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.treeList4)).EndInit();
+            this.xtraTabPage4.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.groupControl5)).EndInit();
+            this.groupControl5.ResumeLayout(false);
+            this.groupControl5.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.groupControl3)).EndInit();
             this.groupControl3.ResumeLayout(false);
             this.groupControl3.PerformLayout();
@@ -593,9 +660,8 @@
         #endregion
 
         private DevExpress.XtraEditors.GroupControl groupControl2;
-        private DevExpress.XtraEditors.SimpleButton sbCommit;
         private DevExpress.XtraEditors.SimpleButton sbParsing;
-        private DevExpress.XtraEditors.SimpleButton sbResort;
+        private DevExpress.XtraEditors.SimpleButton sbCommit;
         private DevExpress.XtraEditors.SimpleButton sbOpenFile;
         private DevExpress.XtraTab.XtraTabControl xtraTabControl1;
         private DevExpress.XtraTab.XtraTabPage xtraTabPage1;
@@ -641,5 +707,12 @@
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label label6;
         private DevExpress.XtraTreeList.TreeList treeList4;
+        private DevExpress.XtraEditors.GroupControl groupControl5;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.TextBox txtNoteA121;
+        private System.Windows.Forms.TextBox txtNoteA12E;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.TextBox txtNote3102;
     }
 }

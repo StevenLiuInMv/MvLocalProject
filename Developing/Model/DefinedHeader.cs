@@ -43,13 +43,21 @@ namespace MvLocalProject.Model
     }
 
 
-    public enum MvCompany
+    public enum MvCompanySite
     {
         MACHVISION = 1,
         MV_CE = 2,
         MV_CS = 3,
         SIGOLD = 4,
+        GS = 5,
         MVTEST = 99
+    }
+
+    public enum MvDBSource
+    {
+        ERPDB2_MACHVISION = 11,
+        ERPDB2_MVTEST = 12,
+        ERPBK_mvWorkFlow = 22,
     }
 
     public enum ErpTableName
@@ -74,7 +82,7 @@ namespace MvLocalProject.Model
 
     public sealed class MachvisionInfo
     {
-        public static readonly string[] DepartmentNameList = new string[] { "100總經理室", "105文管中心", "111台灣業務部", "210行政部", "220資訊安全部", "310生產部", "410產品研發部", "420研發部光機電", "470專案研發部", "480研發前測中心", "510業務客服部", "610財務部", "720採購部", "730料控中心", "114華南區", "115華東區" };
+        public static readonly string[] DepartmentNameList = new string[] { "100總經理室", "105文管中心", "111台灣業務部", "210行政部", "220資訊安全部", "310生產部", "410產品研發部", "420研發部光機電", "450人工智慧研發中心", "470專案研發部", "480研發前測中心", "510業務客服部", "610財務部", "720採購部", "730料控中心", "114華南區", "115華東區", "117華中區" };
     }
 
     public sealed class DefinedHeader

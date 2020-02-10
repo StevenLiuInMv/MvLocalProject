@@ -42,21 +42,24 @@ namespace MvLocalProject.Model
         public static DataTable cloneExcelPrDtColumn()
         {
             DataTable excelDt = new DataTable();
-            excelDt.Columns.Add("TB043");
-            excelDt.Columns.Add("TA012");
-            excelDt.Columns.Add("TB004");
-            excelDt.Columns.Add("TB005");
-            excelDt.Columns.Add("TB006");
-            excelDt.Columns.Add("TB009");
-            excelDt.Columns.Add("TB008");
-            excelDt.Columns.Add("TB011");
-            excelDt.Columns.Add("TB010");
-            excelDt.Columns.Add("TB012");
-            excelDt.Columns.Add("TB029");
-            excelDt.Columns.Add("TB201");
-            excelDt.Columns.Add("TA202");
+            excelDt.Columns.Add("TB043");   // PURTB
+            excelDt.Columns.Add("TA012");   // PURTA
+            excelDt.Columns.Add("TB004");   // PURTB
+            excelDt.Columns.Add("TB005");   // PURTB
+            excelDt.Columns.Add("TB006");   // PURTB
+            excelDt.Columns.Add("TB009");   // PURTB
+            excelDt.Columns.Add("TB008");   // PURTB
+            excelDt.Columns.Add("TB011");   // PURTB
+            excelDt.Columns.Add("TB010");   // PURTB
+            excelDt.Columns.Add("TB012");   // PURTB
+            excelDt.Columns.Add("TB029");   // PURTB
+            excelDt.Columns.Add("TB201");   // PURTB
+            excelDt.Columns.Add("TA202");   // PURTA
+            excelDt.Columns.Add("MM002");   // INVMM
+            excelDt.Columns.Add("MM003");   // INVMM
+            excelDt.Columns.Add("MB004");   // INVMB
+            excelDt.Columns.Add("TA201");   // MOCTA
             return excelDt;
         }
-        
     }
 }

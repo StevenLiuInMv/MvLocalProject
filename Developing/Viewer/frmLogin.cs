@@ -35,7 +35,8 @@ namespace MvLocalProject.Viewer
             }
 
             // 先parse出company, 以利下面連線判斷
-            GlobalMvVariable.MvAdCompany = (MvCompany)Enum.Parse(typeof(MvCompany), cboCompany.Text, false);
+            GlobalMvVariable.MvAdCompany = (MvCompanySite)Enum.Parse(typeof(MvCompanySite), cboCompany.Text, false);
+            GlobalMvVariable.UserData.CompanySite = (MvCompanySite)Enum.Parse(typeof(MvCompanySite), cboCompany.Text, false);
 
             // 連線至LDAP 確認使用者帳密是否合法
             result = MvAdConnector.validateUser(userName, passWord, domainName);
@@ -70,9 +71,26 @@ namespace MvLocalProject.Viewer
                 return;
             }
 
+            // 取得工號及部門代碼
+            GlobalMvVariable.UserData.AdAccount = userName;
+            GlobalMvVariable.UserData.Password = passWord;
+
+            result = MvDbConnector.getUserInfo(ref GlobalMvVariable.UserData);
+            if (result == false)
+            {
+                MessageBox.Show("該帳號人員無mvWorkFlow系統權限, 請重新輸入");
+                txtAccount.Clear();
+                txtPassWord.Clear();
+                txtAccount.Focus();
+                GlobalMvVariable.UserData.clear();
+                return;
+            }
+
+
             // 存入全域變數
             GlobalMvVariable.MvAdUserName = userName;
             GlobalMvVariable.MvAdPassword = passWord;
+
             // 進入Main頁面
             new frmMainDev().Show();
             this.Hide();
@@ -85,7 +103,7 @@ namespace MvLocalProject.Viewer
         {
             pictureBox1.Image = ResourcePicture.MvPortal;
             txtAccount.Text = Environment.UserName;
-            cboCompany.DataSource = Enum.GetValues(typeof(MvCompany));
+            cboCompany.DataSource = Enum.GetValues(typeof(MvCompanySite));
             cboCompany.SelectedIndex = 0;
         }
 

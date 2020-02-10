@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace MvLocalProject.Controller
 {
@@ -124,8 +127,55 @@ namespace MvLocalProject.Controller
                 mc.Body = ie.Message;
                 Mailer.sendMail(mc);
             }
-
             return true;
+        }
+
+
+        public static void clearTextBox(ref TextBox[] textBoxArray)
+        {
+            foreach(TextBox box in textBoxArray) {
+                box.Clear();
+            }
+        }
+
+        public static long CalculateDirectorySize(string DirRoute)
+        {
+            try
+            {
+                Type tp = Type.GetTypeFromProgID("Scripting.FileSystemObject");
+                object fso = Activator.CreateInstance(tp);
+                object fd = tp.InvokeMember("GetFolder", BindingFlags.InvokeMethod, null, fso, new object[] { DirRoute });
+                long ret = Convert.ToInt64(tp.InvokeMember("Size", BindingFlags.GetProperty, null, fd, null));
+                Marshal.ReleaseComObject(fso);
+                return ret;
+            }
+            catch
+            {
+                return 0;
+            }
+        }
+
+        public static string ShowSubDirectoriesSizeInfo(string diskPath)
+        {
+            long fileSize = 0;
+            StringBuilder sb = new StringBuilder();
+
+            if (diskPath.EndsWith("\\") == false)
+            {
+                diskPath += "\\";
+            }
+
+            if (diskPath.StartsWith("C:") == true) { return "don't support system disk"; }
+
+            string[] dirs = Directory.GetDirectories(diskPath);
+            foreach (var item in dirs)
+            {
+                fileSize = 0;
+                fileSize = Utility.CalculateDirectorySize(item);
+                sb.AppendLine(item.ToString() + " " + fileSize);
+            }
+
+            return sb.ToString();
         }
     }
 

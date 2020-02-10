@@ -1,12 +1,11 @@
 ﻿using System.Configuration;
 using System.Data.SqlClient;
 using System.Data;
-using MvLocalProject.Model;
 using System.Text;
 
-namespace MvLocalProject.Controller
+namespace MvSharedLib.Checker
 {
-    public sealed class MvDbConnector
+    internal sealed class MvDbConnector
     {
         private static string ConnectionString_ERPBK_DEMO
         {
@@ -111,35 +110,7 @@ namespace MvLocalProject.Controller
         }
 
 
-        public static SqlConnection getErpDbConnection(MvCompanySite company, MvDBSource dbSource = MvDBSource.ERPDB2_MACHVISION)
-        {
-            switch (company)
-            {
-                case MvCompanySite.MACHVISION:
-                    if (dbSource == MvDBSource.ERPDB2_MACHVISION)
-                    {
-                        return Connection_ERPDB2_Dot_MACHVISION;
-                    }
-                    else if (dbSource == MvDBSource.ERPBK_mvWorkFlow)
-                    {
-                        return Connection_ERPBK_Dot_MvWorkFlow;
-                    }
-                    else
-                    {
-                        throw new System.Exception("illegal database source");
-                    }
-                case MvCompanySite.MVTEST:
-                    return Connection_ERPDB2_Dot_MVTEST;
-                case MvCompanySite.MV_CE:
-                    return Connection_ERPDB2_Dot_MV_CE;
-                case MvCompanySite.MV_CS:
-                    return Connection_ERPDB2_Dot_MV_CS;
-                case MvCompanySite.SIGOLD:
-                    return Connection_ERPDB2_Dot_SIGOLD;
-                default:
-                    throw new System.Exception("illegal company");
-            }
-        }
+
 
         public static DataTable queryDataBySql(SqlCommand sqlCommand)
         {
@@ -221,23 +192,7 @@ namespace MvLocalProject.Controller
             }
         }
 
-        public static bool validateUserFromErpGP(MvCompanySite company, string account, string password)
-        {
-            // 確認此帳號是否存在ERP GP
-            try
-            {
-                using (SqlConnection conn = MvDbConnector.getErpDbConnection(company))
-                {
-                    string command = string.Format("select * from DSCSYS.dbo.DSCMA WHERE MA001 = '{0}'", account);
-                    conn.Open();
-                    return hasRowsBySq1(conn, command);
-                }
-            }
-            catch (SqlException)
-            {
-                return false;
-            }
-        }
+
 
         public static void closeSqlConnection(ref SqlConnection connection)
         {
@@ -259,40 +214,6 @@ namespace MvLocalProject.Controller
             if (command == null) { return; }
         }
 
-        public static bool getUserInfo(ref UserData userData)
-        {
-            // 確認此帳號是否存在ERP GP
-            try
-            {
-                using (SqlConnection conn = MvDbConnector.getErpDbConnection(userData.CompanySite, MvDBSource.ERPBK_mvWorkFlow))
-                {
-                    StringBuilder sb = new StringBuilder();
-                    sb.Append("SELECT dbo.vwEmployee.EmployeeID, dbo.vwEmployee.Name, dbo.vwEmployee.DepartmentID, dbo.Department.DepartmentName ")
-                        .Append("FROM dbo.vwEmployee LEFT OUTER JOIN ")
-                        .Append(" dbo.Department ON dbo.vwEmployee.DepartmentID = dbo.Department.DepartmentID ")
-                        .Append(string.Format(" WHERE dbo.vwEmployee.ADLoginID = '{0}'", userData.AdAccount));
 
-                    //string command = string.Format("select * from DSCSYS.dbo.DSCMA WHERE MA001 = '{0}'", account);
-                    conn.Open();
-                    // 如果取回的資料不是唯一一筆, 回傳null
-                    DataTable dt = MvDbConnector.queryDataBySql(conn, sb.ToString());
-                    if (dt?.Rows.Count != 1)
-                    {
-                        userData = null;
-                        return false;
-                    }
-                    userData.EmployeeID = dt.Rows[0]["EmployeeID"].ToString();
-                    userData.EmployeeName = dt.Rows[0]["Name"].ToString();
-                    userData.DepartmentID = dt.Rows[0]["DepartmentID"].ToString();
-                    userData.DepartmentName = dt.Rows[0]["DepartmentName"].ToString();
-                }
-                return true;
-            }
-            catch (SqlException)
-            {
-                // 如果取不到資料, 就將帶入的userData元件改為null
-                return false;
-            }
-        }
     }
 }
