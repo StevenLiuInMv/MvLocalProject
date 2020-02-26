@@ -1866,7 +1866,6 @@ namespace MvLocalProject.Controller
             return majorData;
         }
 
-
         public static DataTable collectData_HasStorageLocation(SqlConnection conn, string[] warehosues)
         {
             StringBuilder sb = new StringBuilder();
@@ -1880,6 +1879,41 @@ namespace MvLocalProject.Controller
 
             DataTable tempDt = MvDbConnector.queryDataBySql(conn, sb.ToString());
             return tempDt;
+        }
+
+        public static DataTable CollectData_CustomerOrder(SqlConnection connection, string[] customerOrderTypes, string startDate, string endDate)
+        {
+
+            StringBuilder sb = new StringBuilder();
+            DataTable majorData = null;
+
+            sb.Append("SELECT TC001 單別, TC002 單號, TC003 訂單日期, TC004 客戶代號, MA002 客戶簡稱, TC012 客戶單號, TD003 序號, TD004 品號, TD005 品名, TD008 訂單數量, TD009 已交數量, TD013 預交日 ")
+                .Append("FROM MACHVISION.dbo.COPTC ")
+                .Append("LEFT JOIN MACHVISION.dbo.COPTD ")
+                .Append("  ON TC001 = TD001 ")
+                .Append(" AND TC002 = TD002 ")
+                .Append("LEFT JOIN MACHVISION.dbo.COPMA ")
+                .Append("  ON TC004 = MA001 ");
+            sb.Append(string.Format("WHERE(TC003 >= '{0}' AND TC003 <= '{1}') ", startDate, endDate));
+            sb.Append("   AND TC027 <> 'V' ")
+                .Append(" AND TD008 > TD009 ")
+                .Append(" AND TC003 <> TD013 ")
+                .Append(" AND TC001 IN (");
+            foreach (string customerOrderType in customerOrderTypes)
+            {
+                sb.Append("'").Append(customerOrderType).Append("',");
+            }
+            sb.Remove(sb.Length - 1, 1).Append(")");
+
+            try
+            {
+                majorData = MvDbConnector.queryDataBySql(connection, sb.ToString());
+            }
+            catch (SqlException se)
+            {
+                throw se;
+            }
+            return majorData;
         }
     }
 }

@@ -172,6 +172,12 @@
     <Compile Include="Viewer\frmErpCreatePR.Designer.cs">
       <DependentUpon>frmErpCreatePR.cs</DependentUpon>
     </Compile>
+    <Compile Include="Viewer\frmErpCustomerOrder.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Viewer\frmErpCustomerOrder.Designer.cs">
+      <DependentUpon>frmErpCustomerOrder.cs</DependentUpon>
+    </Compile>
     <Compile Include="Viewer\frmItCisco.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -325,6 +331,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Viewer\frmErpCreatePR.resx">
       <DependentUpon>frmErpCreatePR.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Viewer\frmErpCustomerOrder.resx">
+      <DependentUpon>frmErpCustomerOrder.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Viewer\frmItCisco.resx">
       <DependentUpon>frmItCisco.cs</DependentUpon>

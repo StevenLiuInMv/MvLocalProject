@@ -585,6 +585,7 @@ namespace MvLocalProject.Bo
         {
             exceptionSE = null;
             GC.SuppressFinalize(this);
+
         }
     }
 }

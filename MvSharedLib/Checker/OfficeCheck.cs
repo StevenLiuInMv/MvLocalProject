@@ -308,8 +308,8 @@ namespace MvSharedLib.Checker
             string OutputFileName = string.Empty;
             string[] PstPaths = null;
             List<string> ExistPstPaths = null;
-            
 
+            
             // 執行檢查是否有取到Outlook Version
             OutlookVersion = GetMSOutlookVersion();
             if (OutlookVersion == int.MinValue) { return status; }
@@ -334,7 +334,7 @@ namespace MvSharedLib.Checker
                 ExistPstPaths.Add(string.Format("{0}\t{1}\t{2}", Environment.MachineName, Convert.ToString(fileSize), path)); 
             }
             status = CollectOutlookPSTPathStatus.DoneByGetPstPathList;
-
+            
             // 執行檢查Output檔案到local
             OutputFileName = string.Format("{0}.txt", Environment.MachineName);
             OutputPathAndName = string.Format(@"D:\{0}", OutputFileName);
@@ -362,15 +362,18 @@ namespace MvSharedLib.Checker
 
             status = CollectOutlookPSTPathStatus.DoneByOutputFileToLocalDisk;
             // 回寫路徑到DB
-
+            
             //status = CollectOutlookPSTPathStatus.DoneByInsertIntoDB;
             // 無法回寫路徑時, 是否可上傳檔案到指定的路徑
             File.Copy(OutputPathAndName, @"\\mv2\public\StevenLiu\CollectOutlookPSTPaths\" + OutputFileName, true);
+            // 已複製後
+            File.Delete(OutputPathAndName);
             //File.Copy(OutputPathAndName, @"D:\99_TempArea\" + OutputFileName);
             status = CollectOutlookPSTPathStatus.DoneByUploadFile;
-
+            
             return status;
         }
+
         public static bool ImportOutlookPSTPathsToDB(string destFilePath)
         {
             DirectoryInfo DInfo = new DirectoryInfo(destFilePath);
@@ -390,27 +393,23 @@ namespace MvSharedLib.Checker
             // Clone該資料表的Table Schema
             DataTable majorData = null;
             StringBuilder sb = new StringBuilder();
+            SqlConnection connection = MvDbConnector.Connection_ERPBK_Dot_IT;
 
-            using (TransactionScope scope = new TransactionScope())
+            try
             {
-                SqlConnection connection = MvDbConnector.Connection_ERPBK_Dot_IT;
-
-                try
-                {
-                    connection.Open();
-                    sb.AppendLine(string.Format(@"SELECT TOP 0 * from IT.dbo.CollectOutlookPstFileName"));
-                    majorData = MvDbConnector.queryDataBySql(connection, sb.ToString());
-                }
-                catch (SqlException se)
-                {
-                    // 發生例外時，會自動rollback
-                    throw se;
-                }
-                finally
-                {
-                    connection.Close();
-                    connection.Dispose();
-                }
+                connection.Open();
+                sb.AppendLine(string.Format(@"SELECT TOP 0 * from IT.dbo.CollectOutlookPstFileName"));
+                majorData = MvDbConnector.queryDataBySql(connection, sb.ToString());
+            }
+            catch (SqlException se)
+            {
+                // 發生例外時，會自動rollback
+                throw se;
+            }
+            finally
+            {
+                connection.Close();
+                connection.Dispose();
             }
 
             // 將txt的內容匯入Clone table
@@ -427,26 +426,47 @@ namespace MvSharedLib.Checker
                 majorData.Rows.Add(row);
             }
 
-            // TRUNCATE 資料庫內Table的資料
 
             // 使用SQLBulk將資料塞入
 
 
-            //if (Directory.Exists(destFilePath) == false)
-
-            SqlConnection conn = MvDbConnector.Connection_ERPBK_Dot_IT;
-            conn.Open();
-            using (SqlBulkCopy sbc = new SqlBulkCopy(conn))
+            using (TransactionScope scope = new TransactionScope())
             {
-                // set number of records to be processed
-                sbc.BatchSize = 300;
-                sbc.DestinationTableName = "CollectOutlookPstFileName";
-                // write to server
-                sbc.WriteToServer(majorData);
-            }
-            conn.Close();
-            conn.Dispose();
+                connection = MvDbConnector.Connection_ERPBK_Dot_IT;
 
+                try
+                {
+                    connection.Open();
+                    // TRUNCATE 資料庫內Table的資料
+                    SqlCommand command = null;
+                    command = connection.CreateCommand();
+                    command.CommandText = "Insert into IT.dbo.CollectOutlookPstFileNameHistory Select ComputerName, PstFileName, FileSize, CreateDate From IT.dbo.CollectOutlookPstFileName ";
+                    command.ExecuteNonQuery();
+
+                    command.CommandText = "Truncate Table IT.dbo.CollectOutlookPstFileName";
+                    command.ExecuteNonQuery();
+
+                    using (SqlBulkCopy sbc = new SqlBulkCopy(connection))
+                    {
+                        // set number of records to be processed
+                        sbc.BatchSize = 300;
+                        sbc.DestinationTableName = "CollectOutlookPstFileName";
+                        // write to server
+                        sbc.WriteToServer(majorData);
+                    }
+                    scope.Complete();
+                }
+                catch (SqlException se)
+                {
+                    // 發生例外時，會自動rollback
+                    throw se;
+                }
+                finally
+                {
+                    connection.Close();
+                    connection.Dispose();
+                }
+            }
             return false;
         }
 

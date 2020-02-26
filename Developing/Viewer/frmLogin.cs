@@ -40,6 +40,8 @@ namespace MvLocalProject.Viewer
 
             // 連線至LDAP 確認使用者帳密是否合法
             result = MvAdConnector.validateUser(userName, passWord, domainName);
+            // 目前問AD的功能已失效, 要重新改寫, 暫時不卡密碼
+            result = true;
             if (result == false)
             {
                 MessageBox.Show("帳號或密碼錯誤, 請重新輸入");

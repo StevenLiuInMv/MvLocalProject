@@ -1,6 +1,7 @@
 ﻿using MvSharedLib.Checker;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,9 +12,9 @@ namespace ConsoleDebug
     {
         static void Main(string[] args)
         {
-
+            // 要用的時候再自己打開, 後面要再寫一段, 之後都要用帶參數的方式
             //DebugExceuteCollectOutlookPSTPath();
-            DebugImportOutlookPSTPathsToDB();
+            //DebugImportOutlookPSTPathsToDB();
         }
 
         private static void DebugExceuteCollectOutlookPSTPath()

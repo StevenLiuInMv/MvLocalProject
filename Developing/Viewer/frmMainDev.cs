@@ -83,6 +83,9 @@ namespace MvLocalProject.Viewer
                 case "formMcBatchJob":
                     form = new frmMcBatchJob();
                     break;
+                case "formErpCustomerOrder":
+                    form = new frmERPCustomerOrder();
+                    break;
                 default:
                     break;
             }
@@ -167,6 +170,7 @@ namespace MvLocalProject.Viewer
             nbgErpFoms.Visible = true;
             nbgItTools.Visible = true;
             nbgTesting.Visible = true;
+            // 這個Form預設Visible為False, 因為是舊寫功能, 所以才額外開啟
             formBomCompare.Visible = true;
         }
 
@@ -192,6 +196,7 @@ namespace MvLocalProject.Viewer
             formBomToMocCompare.Visible = false;
             formErpCreatePR.Visible = false;
             formMcBatchJob.Visible = false;
+            formErpCustomerOrder.Visible = false;
         }
 
         private void enableMenuForRd()
@@ -200,7 +205,9 @@ namespace MvLocalProject.Viewer
             nbgErpFoms.Visible = true;
             nbgItTools.Visible = false;
             nbgTesting.Visible = false;
+            // 各別group disable
             formMcBatchJob.Visible = false;
+            formErpCustomerOrder.Visible = false;
         }
 
         private void enableMenuForMc()
@@ -217,6 +224,7 @@ namespace MvLocalProject.Viewer
             formBomToMocCompare.Visible = false;
             formErpCreatePR.Visible = true;
             formMcBatchJob.Visible = true;
+            formErpCustomerOrder.Visible = false;
         }
 
         private void enableMenuForMcSpecial(string adUserName)
@@ -237,6 +245,7 @@ namespace MvLocalProject.Viewer
             formBomToMocCompare.Visible = false;
             formErpCreatePR.Visible = true;
             formMcBatchJob.Visible = true;
+            formErpCustomerOrder.Visible = false;
         }
 
 
@@ -252,8 +261,9 @@ namespace MvLocalProject.Viewer
             formMoc.Visible = false;
             formBomCompare.Visible = false;
             formBomToMocCompare.Visible = false;
-            formErpCreatePR.Visible = true;
+            formErpCreatePR.Visible = false;
             formMcBatchJob.Visible = false;
+            formErpCustomerOrder.Visible = true;
         }
 
 
