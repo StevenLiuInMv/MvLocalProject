@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using MvLocalProject.Controller;
 using DevExpress.XtraSplashScreen;
 using System.Data.SqlClient;
+using MvSharedLib.Controller;
 
 namespace MvLocalProject.Viewer
 {

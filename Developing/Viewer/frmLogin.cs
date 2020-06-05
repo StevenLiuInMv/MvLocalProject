@@ -2,6 +2,7 @@
 using System.Windows.Forms;
 using MvLocalProject.Controller;
 using MvLocalProject.Model;
+using MvSharedLib.Model;
 
 namespace MvLocalProject.Viewer
 {
@@ -52,7 +53,7 @@ namespace MvLocalProject.Viewer
             }
 
             // 連線至mvWorkFlow 確認使用者是否在職
-            result = MvDbConnector.validateUserFromMvWorkFlow(userName, passWord);
+            result = MvDbDao.validateUserFromMvWorkFlow(userName, passWord);
             if (result == false)
             {
                 MessageBox.Show("該帳號人員已離職, 請重新輸入");
@@ -63,7 +64,7 @@ namespace MvLocalProject.Viewer
             }
 
             // 連線至ERP GP 確認使用者是否在職
-            result = MvDbConnector.validateUserFromErpGP(GlobalMvVariable.MvAdCompany, userName, passWord);
+            result = MvDbDao.validateUserFromErpGP(GlobalMvVariable.MvAdCompany, userName, passWord);
             if (result == false)
             {
                 MessageBox.Show("該帳號人員無ERP權限, 請重新輸入");
@@ -77,7 +78,7 @@ namespace MvLocalProject.Viewer
             GlobalMvVariable.UserData.AdAccount = userName;
             GlobalMvVariable.UserData.Password = passWord;
 
-            result = MvDbConnector.getUserInfo(ref GlobalMvVariable.UserData);
+            result = MvDbDao.getUserInfo(ref GlobalMvVariable.UserData);
             if (result == false)
             {
                 MessageBox.Show("該帳號人員無mvWorkFlow系統權限, 請重新輸入");

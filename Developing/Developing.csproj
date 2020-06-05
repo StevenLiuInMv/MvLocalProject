@@ -178,6 +178,12 @@
     <Compile Include="Viewer\frmErpCustomerOrder.Designer.cs">
       <DependentUpon>frmErpCustomerOrder.cs</DependentUpon>
     </Compile>
+    <Compile Include="Viewer\frmErpMultiVendorMailer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Viewer\frmErpMultiVendorMailer.Designer.cs">
+      <DependentUpon>frmErpMultiVendorMailer.cs</DependentUpon>
+    </Compile>
     <Compile Include="Viewer\frmItCisco.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -335,6 +341,9 @@
     <EmbeddedResource Include="Viewer\frmErpCustomerOrder.resx">
       <DependentUpon>frmErpCustomerOrder.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Viewer\frmErpMultiVendorMailer.resx">
+      <DependentUpon>frmErpMultiVendorMailer.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Viewer\frmItCisco.resx">
       <DependentUpon>frmItCisco.cs</DependentUpon>
     </EmbeddedResource>
@@ -475,6 +484,12 @@
     <Content Include="machvision_cup_1.ico" />
     <None Include="Resources\MailServerExample.jpg" />
     <None Include="Resources\machvision.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MvSharedLib\MvSharedLib.csproj">
+      <Project>{263fc75c-34ca-4fae-90da-e879ae67606a}</Project>
+      <Name>MvSharedLib</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

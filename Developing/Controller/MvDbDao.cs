@@ -4,6 +4,8 @@ using System.Text;
 using System.Data;
 using System.Transactions;
 using MvLocalProject.Model;
+using MvSharedLib.Model;
+using MvSharedLib.Controller;
 
 namespace MvLocalProject.Controller
 {
@@ -1554,7 +1556,7 @@ namespace MvLocalProject.Controller
             }
             DataRow dr = dt.NewRow();
             string defaultDate = DateTime.Now.ToString("yyyyMMdd");
-            dr["COMPANY"] = MvCompanySite.MVTEST.ToString();
+            dr["COMPANY"] = MvCompanySite.MV_TEST.ToString();
             dr["CREATOR"] = "MIS_TEST";
             dr["USR_GROUP"] = "220";
             dr["CREATE_DATE"] = defaultDate;
@@ -1623,7 +1625,7 @@ namespace MvLocalProject.Controller
 
             DataRow dr = dt.NewRow();
             string defaultDate = DateTime.Now.ToString("yyyyMMdd");
-            dr["COMPANY"] = MvCompanySite.MVTEST.ToString();
+            dr["COMPANY"] = MvCompanySite.MV_TEST.ToString();
             dr["CREATOR"] = "MIS_TEST";
             dr["USR_GROUP"] = "220";
             dr["CREATE_DATE"] = defaultDate;
@@ -1684,7 +1686,6 @@ namespace MvLocalProject.Controller
 
             return dr;
         }
-
 
         public static DataTable collectData_Invmb(SqlConnection connection, string pattern)
         {
@@ -1915,5 +1916,79 @@ namespace MvLocalProject.Controller
             }
             return majorData;
         }
+
+        public static bool getUserInfo(ref Model.UserData userData)
+        {
+            // 確認此帳號是否存在ERP GP
+            try
+            {
+                using (SqlConnection conn = MvDbConnector.getErpDbConnection(userData.CompanySite, MvDBSource.ERPBK_mvWorkFlow))
+                {
+                    StringBuilder sb = new StringBuilder();
+                    sb.Append("SELECT dbo.vwEmployee.EmployeeID, dbo.vwEmployee.Name, dbo.vwEmployee.DepartmentID, dbo.Department.DepartmentName ")
+                        .Append("FROM dbo.vwEmployee LEFT OUTER JOIN ")
+                        .Append(" dbo.Department ON dbo.vwEmployee.DepartmentID = dbo.Department.DepartmentID ")
+                        .Append(string.Format(" WHERE dbo.vwEmployee.ADLoginID = '{0}'", userData.AdAccount));
+
+                    //string command = string.Format("select * from DSCSYS.dbo.DSCMA WHERE MA001 = '{0}'", account);
+                    conn.Open();
+                    // 如果取回的資料不是唯一一筆, 回傳null
+                    DataTable dt = MvDbConnector.queryDataBySql(conn, sb.ToString());
+                    if (dt?.Rows.Count != 1)
+                    {
+                        userData = null;
+                        return false;
+                    }
+                    userData.EmployeeID = dt.Rows[0]["EmployeeID"].ToString();
+                    userData.EmployeeName = dt.Rows[0]["Name"].ToString();
+                    userData.DepartmentID = dt.Rows[0]["DepartmentID"].ToString();
+                    userData.DepartmentName = dt.Rows[0]["DepartmentName"].ToString();
+                }
+                return true;
+            }
+            catch (SqlException)
+            {
+                // 如果取不到資料, 就將帶入的userData元件改為null
+                return false;
+            }
+        }
+        public static bool validateUserFromErpGP(MvCompanySite company, string account, string password)
+        {
+            // 確認此帳號是否存在ERP GP
+            try
+            {
+                using (SqlConnection conn = MvDbConnector.getErpDbConnection(company))
+                {
+                    string command = string.Format("select * from DSCSYS.dbo.DSCMA WHERE MA001 = '{0}'", account);
+                    conn.Open();
+                    return MvDbConnector.hasRowsBySq1(conn, command);
+                }
+            }
+            catch (SqlException)
+            {
+                return false;
+            }
+        }
+
+
+
+        public static bool validateUserFromMvWorkFlow(string account, string password)
+        {
+            // 確認此帳號是否存在mvWorkFlow
+            try
+            {
+                using (SqlConnection conn = MvDbConnector.Connection_ERPBK_Dot_MvWorkFlow)
+                {
+                    string command = "select * from ERPBK.mvWorkFlow.dbo.vwEmployee";
+                    conn.Open();
+                    return MvDbConnector.hasRowsBySq1(conn, command);
+                }
+            }
+            catch (SqlException)
+            {
+                return false;
+            }
+        }
+
     }
 }

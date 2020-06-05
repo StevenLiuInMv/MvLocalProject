@@ -28,7 +28,7 @@ namespace MvLocalProject
             //var start = new MvLocalProject.Viewer.frmBomToMocCompare();
 
             //var start = new Viewer.frmBomCompareDev();
-            //var start = new Viewer.frmMoc();
+            var start = new Viewer.frmMoc();
             //var start = new Viewer.frmBom();
 
             //var start = new Viewer.frmErpCreatePR();
@@ -38,11 +38,12 @@ namespace MvLocalProject
             //2018/10/05 using
             //var start = new Viewer.frmMcBatchJob();
             //var start = new Viewer.frmTestParser();
-            var start = new Viewer.frmLogin();
+            //var start = new Viewer.frmLogin();
 
             //var start = new Viewer.frmDiskScan();
             //var start = new Viewer.frmItCisco();
             //var start = new Viewer.frmItMxMail();
+            //var start = new Viewer.frmErpMultiVendorMailer();
             start.FormClosed += WindowClosed;
             start.Show();
             Application.Run();

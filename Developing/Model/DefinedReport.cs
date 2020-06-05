@@ -35,6 +35,7 @@ namespace MvLocalProject.Model
     public static class CustomStructure
     {
         public static readonly string[] ExcelPrDtCaption = new string[] { "專案代號", "請購人員", "品號", "品名", "規格/型號", "需求數量", "進貨倉別", "需求日期", "供應商", "備註", "來源單號", "預計儲位", "急件" };
+        public static readonly string[] ExcelErpVendorMailerCaption = new string[] { "機號", "品號", "品名", "規格", "數量", "廠商", "廠商簡稱", "單價", "金額", "優惠價", "備註" };
         /// <summary>
         /// William哥原開立PR使用的Excel格式
         /// </summary>
@@ -59,6 +60,23 @@ namespace MvLocalProject.Model
             excelDt.Columns.Add("MM003");   // INVMM
             excelDt.Columns.Add("MB004");   // INVMB
             excelDt.Columns.Add("TA201");   // MOCTA
+            return excelDt;
+        }
+
+        public static DataTable cloneExcelErpVendorMailerDtColumn()
+        {
+            DataTable excelDt = new DataTable();
+            excelDt.Columns.Add("MachineID");
+            excelDt.Columns.Add("ItemNumber");
+            excelDt.Columns.Add("ItemName");
+            excelDt.Columns.Add("ItemSpec");
+            excelDt.Columns.Add("Amount");
+            excelDt.Columns.Add("VendorID");
+            excelDt.Columns.Add("VendorShortName");
+            excelDt.Columns.Add("UnitPrice");
+            excelDt.Columns.Add("Price");
+            excelDt.Columns.Add("Discount");
+            excelDt.Columns.Add("Remark");
             return excelDt;
         }
     }

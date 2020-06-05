@@ -16,6 +16,7 @@ using System.Net;
 using System.Net.Sockets;
 using MvLocalProject.Model;
 using MvLocalProject.Bo;
+using MvSharedLib.Controller;
 
 namespace MvLocalProject.Viewer
 {
@@ -205,9 +206,6 @@ namespace MvLocalProject.Viewer
 
             return users;
         }
-
- 
-
 
         private void btnGetIPAliveByIpRange_Click(object sender, EventArgs e)
         {

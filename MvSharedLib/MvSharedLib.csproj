@@ -45,10 +45,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Checker\MvDbConnector.cs" />
+    <Compile Include="Controller\MvDbConnector.cs" />
     <Compile Include="Checker\OfficeCheck.cs" />
+    <Compile Include="Controller\MvLogger.cs" />
+    <Compile Include="Model\GlobalEnum.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

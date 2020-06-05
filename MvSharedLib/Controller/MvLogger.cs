@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MvLocalProject.Controller
+namespace MvSharedLib.Controller
 {
-    public class MvLogger_old_20200605
+    public class MvLogger
     {
         public static void write(string format, params object[] arg)
         {

@@ -43,22 +43,22 @@ namespace MvLocalProject.Model
     }
 
 
-    public enum MvCompanySite
-    {
-        MACHVISION = 1,
-        MV_CE = 2,
-        MV_CS = 3,
-        SIGOLD = 4,
-        GS = 5,
-        MVTEST = 99
-    }
+    //public enum MvCompanySite
+    //{
+    //    MACHVISION = 1,
+    //    MV_CE = 2,
+    //    MV_CS = 3,
+    //    SIGOLD = 4,
+    //    GS = 5,
+    //    MVTEST = 99
+    //}
 
-    public enum MvDBSource
-    {
-        ERPDB2_MACHVISION = 11,
-        ERPDB2_MVTEST = 12,
-        ERPBK_mvWorkFlow = 22,
-    }
+    //public enum MvDBSource
+    //{
+    //    ERPDB2_MACHVISION = 11,
+    //    ERPDB2_MVTEST = 12,
+    //    ERPBK_mvWorkFlow = 22,
+    //}
 
     public enum ErpTableName
     {
@@ -92,9 +92,9 @@ namespace MvLocalProject.Model
         public static readonly string[] Bom09SummaryHeaderNameNoPrice = new string[] { "No", "Add", "Delete", "Change", "CompareA8", "A8", "Column4", "OrgMD006", "MD006" };
         public static readonly string[] Bom09SummaryHeaderAliasNameNoPrice = new string[] { "項目", "新增", "刪除", "變更", "原料號", "變更/新增號", "品名", "原數量", "變更需求" };
 
-        public static readonly string[] BomCompareHeaderName = new string[] { "CompareLV", "CompareA8", "CompareMD006", "LV", "A8", "MB025X", "Column4", "MB004", "MD006", "Column9", "ModuleLv1"};
+        public static readonly string[] BomCompareHeaderName = new string[] { "CompareLV", "CompareA8", "CompareMD006", "LV", "A8", "MB025X", "Column4", "MB004", "MD006", "Column9", "ModuleLv1" };
         public static readonly string[] BomCompareHeaderAliasName = new string[] { "比對階層", "比對品號", "比對數量", "階次", "元件品號", "品號屬性", "品名", "單位", "數量", "SOP圖號", "模組" };
-        public static readonly string[] BomCompareReportHeaderName = new string[] { "No", "Add", "Delete", "Change","CompareLV", "OrgA8", "NewA8", "Column4", "OrgMD006", "NewMD006", "IsNewBuid", "RDConfirm", "Owner", "ModuleLv1", "Remark" };
+        public static readonly string[] BomCompareReportHeaderName = new string[] { "No", "Add", "Delete", "Change", "CompareLV", "OrgA8", "NewA8", "Column4", "OrgMD006", "NewMD006", "IsNewBuid", "RDConfirm", "Owner", "ModuleLv1", "Remark" };
         public static readonly string[] BomCompareReportHeaderAliasName = new string[] { "項目", "新增", "刪除", "變更", "階層", "原料號", "變更/新增號", "品名", "原數量", "變更需求", "是否新建", "RD確認文件上傳", "負責人員", "模組", "備註" };
         public static readonly string[] BomCompareReportHeaderAliasNameNoLv = new string[] { "項目", "新增", "刪除", "變更", "原料號", "變更/新增號", "品名", "原數量", "變更需求", "是否新建", "RD確認文件上傳", "負責人員", "模組", "備註" };
         public static readonly int Bom09MaxLv = 7;

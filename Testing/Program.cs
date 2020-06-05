@@ -16,7 +16,9 @@ namespace Testing
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new frmDiskIO());
+            //Application.Run(new frmDiskIO());
+            Application.Run(new frmTestMvDbConnector());
+
         }
     }
 }

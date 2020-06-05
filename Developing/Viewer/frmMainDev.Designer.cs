@@ -56,6 +56,7 @@
             this.formBomToMocCompare = new DevExpress.XtraNavBar.NavBarItem();
             this.formErpCreatePR = new DevExpress.XtraNavBar.NavBarItem();
             this.formMcBatchJob = new DevExpress.XtraNavBar.NavBarItem();
+            this.formErpCustomerOrder = new DevExpress.XtraNavBar.NavBarItem();
             this.nbgItTools = new DevExpress.XtraNavBar.NavBarGroup();
             this.toolItCisco = new DevExpress.XtraNavBar.NavBarItem();
             this.toolItMxMail = new DevExpress.XtraNavBar.NavBarItem();
@@ -63,7 +64,6 @@
             this.dockPanel2_Container = new DevExpress.XtraBars.Docking.ControlContainer();
             this.documentManager1 = new DevExpress.XtraBars.Docking2010.DocumentManager(this.components);
             this.tabbedView1 = new DevExpress.XtraBars.Docking2010.Views.Tabbed.TabbedView(this.components);
-            this.formErpCustomerOrder = new DevExpress.XtraNavBar.NavBarItem();
             ((System.ComponentModel.ISupportInitialize)(this.documentGroup1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.document1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dockManager1)).BeginInit();
@@ -302,6 +302,12 @@
             this.formMcBatchJob.ImageOptions.SmallImage = ((System.Drawing.Image)(resources.GetObject("formMcBatchJob.ImageOptions.SmallImage")));
             this.formMcBatchJob.Name = "formMcBatchJob";
             // 
+            // formErpCustomerOrder
+            // 
+            this.formErpCustomerOrder.Caption = "ErpCustomerOrder";
+            this.formErpCustomerOrder.ImageOptions.SmallImage = ((System.Drawing.Image)(resources.GetObject("formErpCustomerOrder.ImageOptions.SmallImage")));
+            this.formErpCustomerOrder.Name = "formErpCustomerOrder";
+            // 
             // nbgItTools
             // 
             this.nbgItTools.Caption = "ItTools";
@@ -327,10 +333,13 @@
             // dockPanel2
             // 
             this.dockPanel2.Controls.Add(this.dockPanel2_Container);
+            this.dockPanel2.Dock = DevExpress.XtraBars.Docking.DockingStyle.Float;
             this.dockPanel2.DockedAsTabbedDocument = true;
             this.dockPanel2.ID = new System.Guid("3d71af3a-70d5-4251-a1be-4f72f561039a");
+            this.dockPanel2.Location = new System.Drawing.Point(0, 0);
             this.dockPanel2.Name = "dockPanel2";
             this.dockPanel2.OriginalSize = new System.Drawing.Size(200, 200);
+            this.dockPanel2.Size = new System.Drawing.Size(513, 571);
             this.dockPanel2.Text = "Dialog";
             // 
             // dockPanel2_Container
@@ -356,12 +365,6 @@
             dockingContainer1.Element = this.documentGroup1;
             this.tabbedView1.RootContainer.Nodes.AddRange(new DevExpress.XtraBars.Docking2010.Views.Tabbed.DockingContainer[] {
             dockingContainer1});
-            // 
-            // formErpCustomerOrder
-            // 
-            this.formErpCustomerOrder.Caption = "ErpCustomerOrder";
-            this.formErpCustomerOrder.ImageOptions.SmallImage = ((System.Drawing.Image)(resources.GetObject("formErpCustomerOrder.ImageOptions.SmallImage")));
-            this.formErpCustomerOrder.Name = "formErpCustomerOrder";
             // 
             // frmMainDev
             // 

@@ -5,6 +5,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Data.SqlClient;
 using MvLocalProject.Controller;
+using MvSharedLib.Controller;
 
 namespace MvLocalProject.Viewer
 {

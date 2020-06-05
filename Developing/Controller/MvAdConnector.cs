@@ -44,7 +44,6 @@ namespace MvLocalProject.Controller
 
         public static bool validateUser(string account, string password, string domain)
         {
-            //string test1 = "LDAP://mv-dc.machvision.com.tw/DC=office,DC=machvision,DC=com,DC=tw";
             using (DirectoryEntry de = new DirectoryEntry(MvAdConnector.ConnectionString_LDAP, domain + "\\" + account, password, AuthenticationTypes.ServerBind))
             {
                 return true;

@@ -1,11 +1,11 @@
 ﻿using System.Configuration;
 using System.Data.SqlClient;
 using System.Data;
-using System.Text;
+using MvSharedLib.Model;
 
-namespace MvSharedLib.Checker
+namespace MvSharedLib.Controller
 {
-    internal sealed class MvDbConnector
+    public sealed class MvDbConnector
     {
         private static string ConnectionString_ERPBK_DEMO
         {
@@ -110,7 +110,50 @@ namespace MvSharedLib.Checker
         }
 
 
+        public static SqlConnection getErpDbConnection(MvCompanySite company, MvDBSource dbSource = MvDBSource.ERPDB2_MACHVISION)
+        {
+            switch (company)
+            {
+                case MvCompanySite.MACHVISION:
+                    if (dbSource == MvDBSource.ERPDB2_MACHVISION)
+                    {
+                        return Connection_ERPDB2_Dot_MACHVISION;
+                    }
+                    else if (dbSource == MvDBSource.ERPBK_mvWorkFlow)
+                    {
+                        return Connection_ERPBK_Dot_MvWorkFlow;
+                    }
+                    else
+                    {
+                        throw new System.Exception("illegal database source");
+                    }
+                case MvCompanySite.MV_TEST:
+                    return Connection_ERPDB2_Dot_MVTEST;
+                case MvCompanySite.MV_CE:
+                    return Connection_ERPDB2_Dot_MV_CE;
+                case MvCompanySite.MV_CS:
+                    return Connection_ERPDB2_Dot_MV_CS;
+                case MvCompanySite.SIGOLD:
+                    return Connection_ERPDB2_Dot_SIGOLD;
+                default:
+                    throw new System.Exception("illegal company");
+            }
+        }
 
+        public static void closeSqlConnection(ref SqlConnection connection)
+        {
+            if (connection == null) { return; }
+            try
+            {
+                connection.Close();
+                connection.Dispose();
+                connection = null;
+            }
+            catch (SqlException se)
+            {
+                throw se;
+            }
+        }
 
         public static DataTable queryDataBySql(SqlCommand sqlCommand)
         {
@@ -173,47 +216,5 @@ namespace MvSharedLib.Checker
                 return hasRowsBySq1(sqlCommand);
             }
         }
-
-        public static bool validateUserFromMvWorkFlow(string account, string password)
-        {
-            // 確認此帳號是否存在mvWorkFlow
-            try
-            {
-                using (SqlConnection conn = MvDbConnector.Connection_ERPBK_Dot_MvWorkFlow)
-                {
-                    string command = "select * from ERPBK.mvWorkFlow.dbo.vwEmployee";
-                    conn.Open();
-                    return hasRowsBySq1(conn, command);
-                }
-            }
-            catch (SqlException)
-            {
-                return false;
-            }
-        }
-
-
-
-        public static void closeSqlConnection(ref SqlConnection connection)
-        {
-            if (connection == null) { return; }
-            try
-            {
-                connection.Close();
-                connection.Dispose();
-                connection = null;
-            }
-            catch (SqlException se)
-            {
-                throw se;
-            }
-        }
-
-        public static void disposeSqlCommand(ref SqlCommand command)
-        {
-            if (command == null) { return; }
-        }
-
-
     }
 }

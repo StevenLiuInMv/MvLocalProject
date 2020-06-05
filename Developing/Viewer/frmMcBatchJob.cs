@@ -11,6 +11,8 @@ using System.IO;
 using System.Windows.Forms;
 using MvLocalProject.Bo;
 using MvLocalProject.Model;
+using MvSharedLib.Model;
+using MvSharedLib.Controller;
 
 namespace MvLocalProject.Viewer
 {
@@ -1092,7 +1094,7 @@ namespace MvLocalProject.Viewer
             //GlobalMvVariable.MvAdUserName = "stevenliu";
             userGroup = GlobalMvVariable.UserData.DepartmentID;
             //userGroup = "220";
-            connection = MvDbConnector.getErpDbConnection(MvCompanySite.MVTEST);
+            connection = MvDbConnector.getErpDbConnection(MvCompanySite.MV_TEST);
             //connection = MvDbConnector.getErpDbConnection(MvCompany.MACHVISION);
             // ======================
 
