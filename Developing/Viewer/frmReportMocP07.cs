@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using System.Data.SqlClient;
 using MvLocalProject.Controller;
 using MvSharedLib.Controller;
+using MvSharedLib.Model;
 
 namespace MvLocalProject.Viewer
 {
@@ -45,11 +46,12 @@ namespace MvLocalProject.Viewer
             {
                 // get machineTypeName and Type id
                 sb.Clear();
-                sb.Append(@"SELECT DISTINCT(MachTypeID), MachTypeName FROM ERPBK.MVPlanSystem2018.dbo.tblMachManages WHERE OrderType is NULL ");
+                sb.Append(@"SELECT DISTINCT(MachTypeID), MachTypeName FROM [MV-DB01].MVPlanSystem2018.dbo.tblMachManages WHERE OrderType is NULL ");
                 // create connection
                 try
                 {
-                    sqlConnection = MvDbConnector.Connection_ERPBK_Dot_MVPlanSystem2018;
+                    //sqlConnection = MvDbConnector.Connection_MVDB01_Dot_MVPlanSystem2018;
+                    sqlConnection = MvDbConnector.getSystemDbConnection(MvCompanySite.MACHVISION, MvSystem.TW_MVPLAN);
                     sqlConnection.Open();
 
                     // read data from db
@@ -82,14 +84,15 @@ namespace MvLocalProject.Viewer
             sb.Clear();
             sb.Append(@"SELECT MachID,MachSN,MachTypeID,MachTypeName,OrderNumber,Locate,CustomerName,EndCustomerName,OrderType, ")
                 .Append("ShipType,OrderShipDate,ConfirmShipDate,MachNote,MachShip,MachClose,CustomerPONo,ManufactureOrderNo,MDate ")
-                .Append("FROM ERPBK.MVPlanSystem2018.dbo.tblMachManages ")
+                .Append("FROM [MV-DB01].MVPlanSystem2018.dbo.tblMachManages ")
                 .Append("WHERE OrderType is NULL ")
                 .Append(machineType == "" ? "" : " AND  MachTypeID = '" + machineType + "'");
 
             // create connection
             try
             {
-                sqlConnection = MvDbConnector.Connection_ERPBK_Dot_MVPlanSystem2018;
+                //sqlConnection = MvDbConnector.Connection_MVDB01_Dot_MVPlanSystem2018;
+                sqlConnection = MvDbConnector.getSystemDbConnection(MvCompanySite.MACHVISION, MvSystem.TW_MVPLAN);
                 sqlConnection.Open();
 
                 // read data from db
@@ -127,12 +130,13 @@ namespace MvLocalProject.Viewer
             // create sql statement
             StringBuilder sb = new StringBuilder();
             sb.Clear();
-            sb.Append(@"SELECT * FROM ERPBK.DEMO.dbo.ACPMA");
+            sb.Append(@"SELECT * FROM [Attend].[dbo].[FEmployee]");
 
             try
             {
                 // create connection
-                sqlConnection = MvDbConnector.Connection_ERPBK_DEMO;
+                //sqlConnection = MvDbConnector.Connection_MVDB01_Dot_Attend;
+                sqlConnection = MvDbConnector.getSystemDbConnection(MvCompanySite.MACHVISION, MvSystem.TW_HR);
                 sqlConnection.Open();
 
                 // read data from db

@@ -48,6 +48,7 @@
     <Compile Include="Controller\MvDbConnector.cs" />
     <Compile Include="Checker\OfficeCheck.cs" />
     <Compile Include="Controller\MvLogger.cs" />
+    <Compile Include="Controller\MvMailConnector.cs" />
     <Compile Include="Model\GlobalEnum.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

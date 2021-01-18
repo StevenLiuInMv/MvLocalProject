@@ -7,75 +7,55 @@ namespace MvSharedLib.Controller
 {
     public sealed class MvDbConnector
     {
-        private static string ConnectionString_ERPBK_DEMO
-        {
-            get { return ConfigurationManager.ConnectionStrings["ERPBK.DEMO"].ConnectionString; }
-        }
-
-        private static string ConnectionString_ERPBK_Dot_MVPlanSystem2018
-        {
-            get { return ConfigurationManager.ConnectionStrings["ERPBK.MVPlanSystem2018"].ConnectionString; }
-        }
-
-        private static string ConnectionString_ERPBK_Dot_MvWorkFlow
-        {
-            get { return ConfigurationManager.ConnectionStrings["ERPBK.mvWorkFlow"].ConnectionString; }
-        }
-
-        private static string ConnectionString_ERPBK_Dot_IT
-        {
-            get { return ConfigurationManager.ConnectionStrings["ERPBK.IT"].ConnectionString; }
-        }
-
-        private static string ConnectionString_ERPDB2_Dot_TEMP
+        public static string ConnectionString_ERPDB2_Dot_TEMP
         {
             get { return ConfigurationManager.ConnectionStrings["ERPDB2.TEMP"].ConnectionString; }
+            //get { return "Data Source=192.168.222.17;Initial Catalog=TEMP;User ID=sa;Password=Mv1652$;Connection Timeout=15;Persist Security Info=false"; }
         }
 
         private static string ConnectionString_ERPDB2_Dot_MACHVISION
         {
             get { return ConfigurationManager.ConnectionStrings["ERPDB2.MACHVISION"].ConnectionString; }
+            //get { return "Data Source=192.168.222.17;Initial Catalog=MACHVISION;User ID=sa;Password=Mv1652$;Connection Timeout=15;Persist Security Info=false"; }
         }
-        public static string ConnectionString_ERPDB2_Dot_MVTEST
+        private static string ConnectionString_ERPDB2_Dot_MVTEST
         {
             get { return ConfigurationManager.ConnectionStrings["ERPDB2.MVTEST"].ConnectionString; }
+            //get { return "Data Source=192.168.222.17;Initial Catalog=MVTEST;User ID=sa;Password=Mv1652$;Connection Timeout=15;Connection Timeout=15;Persist Security Info=False"; }
         }
 
-        public static string ConnectionString_ERPDB2_Dot_MV_CE
+        private static string ConnectionString_MVDB01_Dot_Attend
         {
-            get { return ConfigurationManager.ConnectionStrings["ERPDB2.MV_CE"].ConnectionString; }
-        }
-        public static string ConnectionString_ERPDB2_Dot_MV_CS
-        {
-            get { return ConfigurationManager.ConnectionStrings["ERPDB2.MV_CS"].ConnectionString; }
-        }
-        public static string ConnectionString_ERPDB2_Dot_SIGOLD
-        {
-            get { return ConfigurationManager.ConnectionStrings["ERPDB2.SIGOLD"].ConnectionString; }
-        }
-        public static string ConnectionString_MV_SOP
-        {
-            get { return ConfigurationManager.ConnectionStrings["MV_SOP"].ConnectionString; }
+            get { return ConfigurationManager.ConnectionStrings["MVDB01.Attend"].ConnectionString; }
+            //get { return "Data Source=192.168.222.24;Initial Catalog=Attend;User ID=sa;Password=Mv27581652$;Connection Timeout=15;Persist Security Info=False"; }
         }
 
-        public static SqlConnection Connection_ERPBK_DEMO
+        private static string ConnectionString_MVDB01_Dot_MvWorkFlow
         {
-            get { return new SqlConnection(ConnectionString_ERPBK_DEMO); }
+            get { return ConfigurationManager.ConnectionStrings["MVDB01.mvWorkFlow"].ConnectionString; }
+            //get { return "Data Source=192.168.222.24;Initial Catalog=mvWorkFlow;User ID=sa;Password=Mv27581652$;Connection Timeout=15;Persist Security Info=False"; }
         }
 
-        public static SqlConnection Connection_ERPBK_Dot_MVPlanSystem2018
+        private static string ConnectionString_MVDB01_Dot_MVPlanSystem2018
         {
-            get { return new SqlConnection(ConnectionString_ERPBK_Dot_MVPlanSystem2018); }
+            get { return ConfigurationManager.ConnectionStrings["MVDB01.MVPlanSystem2018"].ConnectionString; }
+            //get { return "Data Source=192.168.222.24;Initial Catalog=MVPlanSystem2018;User ID=sa;Password=Mv27581652$;Connection Timeout=15;Persist Security Info=False"; }
+        }
+        private static string ConnectionString_MVDB01_Dot_IT
+        {
+            get { return ConfigurationManager.ConnectionStrings["MVDB01.IT"].ConnectionString; }
+            //get { return "Data Source=192.168.222.24;Initial Catalog=IT;User ID=sa;Password=Mv27581652$;Connection Timeout=15;Persist Security Info=False"; }
         }
 
-        public static SqlConnection Connection_ERPBK_Dot_MvWorkFlow
+        private static string ConnectionString_ERPCN_Dot_MV_CE
         {
-            get { return new SqlConnection(ConnectionString_ERPBK_Dot_MvWorkFlow); }
+            get { return ConfigurationManager.ConnectionStrings["ERPCN.MV_CE"].ConnectionString; }
+            //get { return "Data Source=192.168.3.245;Initial Catalog=MV_CE;User ID=sacs;Password=Mv1652$;Connection Timeout=15;Persist Security Info=False"; }
         }
-
-        public static SqlConnection Connection_ERPBK_Dot_IT
+        private static string ConnectionString_ERPCN_Dot_MV_CS
         {
-            get { return new SqlConnection(ConnectionString_ERPBK_Dot_IT); }
+            get { return ConfigurationManager.ConnectionStrings["ERPCN.MV_CS"].ConnectionString; }
+            //get { return "Data Source=192.168.3.245;Initial Catalog=MV_CS;User ID=sacs;Password=Mv1652$;Connection Timeout=15;Persist Security Info=False"; }
         }
 
         public static SqlConnection Connection_ERPDB2_Dot_TEMP
@@ -83,7 +63,7 @@ namespace MvSharedLib.Controller
             get { return new SqlConnection(ConnectionString_ERPDB2_Dot_TEMP); }
         }
 
-        public static SqlConnection Connection_ERPDB2_Dot_MACHVISION
+        private static SqlConnection Connection_ERPDB2_Dot_MACHVISION
         {
             get { return new SqlConnection(ConnectionString_ERPDB2_Dot_MACHVISION); }
         }
@@ -92,51 +72,85 @@ namespace MvSharedLib.Controller
         {
             get { return new SqlConnection(ConnectionString_ERPDB2_Dot_MVTEST); }
         }
-        public static SqlConnection Connection_ERPDB2_Dot_MV_CE
+
+        private static SqlConnection Connection_MVDB01_Dot_Attend
         {
-            get { return new SqlConnection(ConnectionString_ERPDB2_Dot_MV_CE); }
-        }
-        public static SqlConnection Connection_ERPDB2_Dot_MV_CS
-        {
-            get { return new SqlConnection(ConnectionString_ERPDB2_Dot_MV_CS); }
-        }
-        public static SqlConnection Connection_ERPDB2_Dot_SIGOLD
-        {
-            get { return new SqlConnection(ConnectionString_ERPDB2_Dot_SIGOLD); }
-        }
-        public static SqlConnection Connection_MV_SOP
-        {
-            get { return new SqlConnection(ConnectionString_MV_SOP); }
+            get { return new SqlConnection(ConnectionString_MVDB01_Dot_Attend); }
         }
 
+        private static SqlConnection Connection_MVDB01_Dot_MvWorkFlow
+        {
+            get { return new SqlConnection(ConnectionString_MVDB01_Dot_MvWorkFlow); }
+        }
 
-        public static SqlConnection getErpDbConnection(MvCompanySite company, MvDBSource dbSource = MvDBSource.ERPDB2_MACHVISION)
+        private static SqlConnection Connection_MVDB01_Dot_MVPlanSystem2018
+        {
+            get { return new SqlConnection(ConnectionString_MVDB01_Dot_MVPlanSystem2018); }
+        }
+
+        public static SqlConnection Connection_MVDB01_Dot_IT
+        {
+            get { return new SqlConnection(ConnectionString_MVDB01_Dot_IT); }
+        }
+
+        private static SqlConnection Connection_ERPCN_Dot_MV_CE
+        {
+            get { return new SqlConnection(ConnectionString_ERPCN_Dot_MV_CE); }
+        }
+
+        private static SqlConnection Connection_ERPCN_Dot_MV_CS
+        {
+            get { return new SqlConnection(ConnectionString_ERPCN_Dot_MV_CS); }
+        }
+
+        public static SqlConnection getSystemDbConnection(MvCompanySite companySite, MvSystem mvSystem)
+        {
+            if (companySite == MvCompanySite.MACHVISION)
+            {
+                switch (mvSystem)
+                {
+                    case MvSystem.TW_ERP:
+                        return getErpDbConnection(companySite);
+                    case MvSystem.TW_WORKFLOW:
+                        return Connection_MVDB01_Dot_MvWorkFlow;
+                    case MvSystem.TW_MVPLAN:
+                        return Connection_MVDB01_Dot_MVPlanSystem2018;
+                    case MvSystem.TW_HR:
+                        return Connection_MVDB01_Dot_Attend;
+                    default:
+                        throw new System.Exception("unsupported system");
+                }
+            }
+            else if (companySite == MvCompanySite.MV_CS || companySite == MvCompanySite.MV_CE)
+            {
+                switch (mvSystem)
+                {
+                    case MvSystem.CN_ERP:
+                        return getErpDbConnection(companySite);
+                    default:
+                        throw new System.Exception("unsupported system");
+                }
+            }
+            else
+            {
+                throw new System.Exception("unsupported company site");
+            }
+        }
+
+        public static SqlConnection getErpDbConnection(MvCompanySite company)
         {
             switch (company)
             {
                 case MvCompanySite.MACHVISION:
-                    if (dbSource == MvDBSource.ERPDB2_MACHVISION)
-                    {
-                        return Connection_ERPDB2_Dot_MACHVISION;
-                    }
-                    else if (dbSource == MvDBSource.ERPBK_mvWorkFlow)
-                    {
-                        return Connection_ERPBK_Dot_MvWorkFlow;
-                    }
-                    else
-                    {
-                        throw new System.Exception("illegal database source");
-                    }
+                    return Connection_ERPDB2_Dot_MACHVISION;
+                case MvCompanySite.MV_CE:
+                    return Connection_ERPCN_Dot_MV_CE;
+                case MvCompanySite.MV_CS:
+                    return Connection_ERPCN_Dot_MV_CS;
                 case MvCompanySite.MV_TEST:
                     return Connection_ERPDB2_Dot_MVTEST;
-                case MvCompanySite.MV_CE:
-                    return Connection_ERPDB2_Dot_MV_CE;
-                case MvCompanySite.MV_CS:
-                    return Connection_ERPDB2_Dot_MV_CS;
-                case MvCompanySite.SIGOLD:
-                    return Connection_ERPDB2_Dot_SIGOLD;
                 default:
-                    throw new System.Exception("illegal company");
+                    throw new System.Exception("unsupported company site");
             }
         }
 

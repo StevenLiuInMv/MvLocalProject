@@ -64,7 +64,8 @@ namespace MvLocalProject.Viewer
             }
 
             // 連線至ERP GP 確認使用者是否在職
-            result = MvDbDao.validateUserFromErpGP(GlobalMvVariable.MvAdCompany, userName, passWord);
+            //result = MvDbDao.validateUserFromErpGP(GlobalMvVariable.MvAdCompany, userName, passWord);
+            result = true;
             if (result == false)
             {
                 MessageBox.Show("該帳號人員無ERP權限, 請重新輸入");

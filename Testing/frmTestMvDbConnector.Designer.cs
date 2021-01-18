@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.button1 = new System.Windows.Forms.Button();
+            this.button2 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // button1
@@ -41,13 +42,24 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
-            // TestMvDbConnector
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(253, 145);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(84, 61);
+            this.button2.TabIndex = 1;
+            this.button2.Text = "TFG MySql";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
+            // 
+            // frmTestMvDbConnector
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(558, 463);
+            this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
-            this.Name = "TestMvDbConnector";
+            this.Name = "frmTestMvDbConnector";
             this.Text = "TestMvDbConnector";
             this.ResumeLayout(false);
 
@@ -56,5 +68,6 @@
         #endregion
 
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button button2;
     }
 }

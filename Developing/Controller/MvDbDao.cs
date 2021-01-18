@@ -57,7 +57,7 @@ namespace MvLocalProject.Controller
             DataRowCollection tmpDrc = null;
             DataSet sheetsData = new DataSet("SheetsData");
 
-            using (SqlConnection connection = MvDbConnector.Connection_ERPDB2_Dot_MACHVISION)
+            using (SqlConnection connection = MvDbConnector.getErpDbConnection(MvCompanySite.MACHVISION))
             {
 
                 connection.Open();
@@ -343,7 +343,7 @@ namespace MvLocalProject.Controller
             DataTable majorData = null;
             StringBuilder sb = new StringBuilder();
 
-            using (SqlConnection connection = MvDbConnector.Connection_ERPDB2_Dot_MACHVISION)
+            using (SqlConnection connection = MvDbConnector.getErpDbConnection(MvCompanySite.MACHVISION))
             {
 
                 sb.Clear();
@@ -375,7 +375,7 @@ namespace MvLocalProject.Controller
             StringBuilder sb = new StringBuilder();
             DataTable majorData = null;
 
-            using (SqlConnection connection = MvDbConnector.Connection_ERPDB2_Dot_MACHVISION)
+            using (SqlConnection connection = MvDbConnector.getErpDbConnection(MvCompanySite.MACHVISION))
             {
 
                 sb.Clear();
@@ -417,7 +417,7 @@ namespace MvLocalProject.Controller
 
             using (TransactionScope scope = new TransactionScope())
             {
-                SqlConnection connection = MvDbConnector.Connection_ERPDB2_Dot_MACHVISION;
+                SqlConnection connection = MvDbConnector.getErpDbConnection(MvCompanySite.MACHVISION);
                 SqlCommand command = connection.CreateCommand();
                 try
                 {
@@ -656,7 +656,7 @@ namespace MvLocalProject.Controller
             DataTable dt = null;
             try
             {
-                using (SqlConnection connection = MvDbConnector.Connection_ERPDB2_Dot_MACHVISION)
+                using (SqlConnection connection = MvDbConnector.getErpDbConnection(MvCompanySite.MACHVISION))
                 {
                     connection.Open();
                     SqlCommand command = connection.CreateCommand();
@@ -677,7 +677,7 @@ namespace MvLocalProject.Controller
             StringBuilder sb = new StringBuilder();
             try
             {
-                using (SqlConnection connection = MvDbConnector.Connection_ERPDB2_Dot_MACHVISION)
+                using (SqlConnection connection = MvDbConnector.getErpDbConnection(MvCompanySite.MACHVISION))
                 {
                     connection.Open();
                     SqlCommand command = connection.CreateCommand();
@@ -705,7 +705,7 @@ namespace MvLocalProject.Controller
 
             using (TransactionScope scope = new TransactionScope())
             {
-                SqlConnection connection = MvDbConnector.Connection_ERPDB2_Dot_MACHVISION;
+                SqlConnection connection = MvDbConnector.getErpDbConnection(MvCompanySite.MACHVISION);
                 SqlCommand command = connection.CreateCommand();
                 try
                 {
@@ -765,7 +765,7 @@ namespace MvLocalProject.Controller
 
             using (TransactionScope scope = new TransactionScope())
             {
-                SqlConnection connection = MvDbConnector.Connection_ERPDB2_Dot_MACHVISION;
+                SqlConnection connection = MvDbConnector.getErpDbConnection(MvCompanySite.MACHVISION);
                 SqlCommand command = connection.CreateCommand();
                 try
                 {
@@ -858,7 +858,7 @@ namespace MvLocalProject.Controller
 
         public static DataTable collectData_Moc(string parentMocNo)
         {
-            using (SqlConnection connection = MvDbConnector.Connection_ERPDB2_Dot_MACHVISION)
+            using (SqlConnection connection = MvDbConnector.getErpDbConnection(MvCompanySite.MACHVISION))
             {
                 return collectData_Moc(connection, parentMocNo);
             }
@@ -875,7 +875,7 @@ namespace MvLocalProject.Controller
             DataTable majorData = null;
             StringBuilder sb = new StringBuilder();
 
-            SqlConnection connection = MvDbConnector.Connection_ERPDB2_Dot_MACHVISION;
+            SqlConnection connection = MvDbConnector.getErpDbConnection(MvCompanySite.MACHVISION);
             SqlCommand command = connection.CreateCommand();
             try
             {
@@ -915,7 +915,7 @@ namespace MvLocalProject.Controller
                     .Append("END'部門' ")
                     .Append(",'MACHVISION牧德科技' AS'辦公室', ")
                     .Append("'' AS'辦公室電話','' AS'辦公室傳真','' AS'IP電話','' AS'呼叫器','' AS'國家','' AS'郵遞區號','' AS'縣/市','' AS'鄉/鎮/市/區','' AS'街名','' AS'其它' ")
-                    .Append("FROM [EFNETDB].[dbo].[mvhr08] hr , ERPBK.mvWorkFlow.dbo.Department dep , ERPBK.mvWorkFlow.dbo.EmployeeTitle emp , [EFNETDB].[dbo].[resda] da ")
+                    .Append("FROM [EFNETDB].[dbo].[mvhr08] hr , [MV-DB01].mvWorkFlow.dbo.Department dep , [MV-DB01].mvWorkFlow.dbo.EmployeeTitle emp , [EFNETDB].[dbo].[resda] da ")
                     .Append("WHERE hr.select2 = dep.DepartmentID and hr.select3 = emp.TitleCode ")
                     .Append(string.Format("AND (Convert(nvarchar,Convert(datetime,hr.datetime2),111) >= '{0}' and Convert(nvarchar,Convert(datetime,hr.datetime2),111) <= '{1}') ", startDate, endDate))
                     .Append("AND emp.Disable = 0 AND (da.resda021 IN ('1', '2')) AND hr.mvhr08001 = da.resda001 AND hr.mvhr08002 = da.resda002 ")
@@ -956,7 +956,7 @@ namespace MvLocalProject.Controller
             DataTable majorData = null;
             StringBuilder sb = new StringBuilder();
 
-            SqlConnection connection = MvDbConnector.Connection_ERPDB2_Dot_MACHVISION;
+            SqlConnection connection = MvDbConnector.getErpDbConnection(MvCompanySite.MACHVISION);
             SqlCommand command = connection.CreateCommand();
             try
             {
@@ -997,7 +997,7 @@ namespace MvLocalProject.Controller
                     .Append("END'部門' ")
                     .Append(",'MACHVISION牧德科技' AS'辦公室', ")
                     .Append("'' AS'辦公室電話','' AS'辦公室傳真','' AS'IP電話','' AS'呼叫器','' AS'國家','' AS'郵遞區號','' AS'縣/市','' AS'鄉/鎮/市/區','' AS'街名','' AS'其它' ")
-                    .Append("FROM [EFNETDB].[dbo].[mvhr08] hr , ERPBK.mvWorkFlow.dbo.Department dep , ERPBK.mvWorkFlow.dbo.EmployeeTitle emp , [EFNETDB].[dbo].[resda] da ")
+                    .Append("FROM [EFNETDB].[dbo].[mvhr08] hr , [MV-DB01].mvWorkFlow.dbo.Department dep , [MV-DB01].mvWorkFlow.dbo.EmployeeTitle emp , [EFNETDB].[dbo].[resda] da ")
                     .Append("WHERE hr.select2 = dep.DepartmentID and hr.select3 = emp.TitleCode ")
                     .Append(string.Format("AND (Convert(nvarchar,Convert(datetime,hr.datetime2),111) >= '{0}' and Convert(nvarchar,Convert(datetime,hr.datetime2),111) <= '{1}') ", startDate, endDate))
                     .Append("AND emp.Disable = 0 AND (da.resda021 IN ('1', '2')) AND hr.mvhr08001 = da.resda001 AND hr.mvhr08002 = da.resda002 ")
@@ -1068,7 +1068,8 @@ namespace MvLocalProject.Controller
 
             using (TransactionScope scope = new TransactionScope())
             {
-                SqlConnection connection = MvDbConnector.Connection_ERPDB2_Dot_MACHVISION;
+                //SqlConnection connection = MvDbConnector.Connection_ERPDB2_Dot_MACHVISION;
+                SqlConnection connection = MvDbConnector.getErpDbConnection(MvCompanySite.MACHVISION);
                 SqlCommand command = connection.CreateCommand();
                 try
                 {
@@ -1304,7 +1305,8 @@ namespace MvLocalProject.Controller
 
             using (TransactionScope scope = new TransactionScope())
             {
-                SqlConnection connection = MvDbConnector.Connection_ERPDB2_Dot_MACHVISION;
+                //SqlConnection connection = MvDbConnector.Connection_ERPDB2_Dot_MACHVISION;
+                SqlConnection connection = MvDbConnector.getErpDbConnection(MvCompanySite.MACHVISION);
                 SqlCommand command = connection.CreateCommand();
                 try
                 {
@@ -1352,7 +1354,8 @@ namespace MvLocalProject.Controller
             }
             sb.Append("SELECT DISTINCT(MB001) FROM @dtTempTable temp WHERE NOT EXISTS (SELECT MB001 FROM MACHVISION.dbo.INVMB source WHERE source.MB001 = temp.MB001);");
 
-            using (SqlConnection connection = MvDbConnector.Connection_ERPDB2_Dot_MACHVISION)
+            //using (SqlConnection connection = MvDbConnector.Connection_ERPDB2_Dot_MACHVISION)
+            using (SqlConnection connection = MvDbConnector.getErpDbConnection(MvCompanySite.MACHVISION))
             {
                 try
                 {
@@ -1378,7 +1381,8 @@ namespace MvLocalProject.Controller
             }
             sb.Append("SELECT DISTINCT(MB001) FROM @dtTempTable temp WHERE NOT EXISTS (SELECT MB001 FROM MACHVISION.dbo.INVMB source WHERE source.MB001 = temp.MB001);");
 
-            using (SqlConnection connection = MvDbConnector.Connection_ERPDB2_Dot_MACHVISION)
+            //using (SqlConnection connection = MvDbConnector.Connection_ERPDB2_Dot_MACHVISION)
+            using (SqlConnection connection = MvDbConnector.getErpDbConnection(MvCompanySite.MACHVISION))
             {
                 try
                 {
@@ -1402,7 +1406,7 @@ namespace MvLocalProject.Controller
             DataTable majorData = null;
             StringBuilder sb = new StringBuilder();
 
-            using (SqlConnection connection = MvDbConnector.Connection_ERPBK_Dot_IT)
+            using (SqlConnection connection = MvDbConnector.Connection_MVDB01_Dot_IT)
             {
                 sb.Clear();
                 sb.Append("SELECT * FROM IT.dbo.NetworkDevice ");
@@ -1430,7 +1434,8 @@ namespace MvLocalProject.Controller
             DataTable majorData = null;
             StringBuilder sb = new StringBuilder();
 
-            using (SqlConnection connection = MvDbConnector.Connection_ERPDB2_Dot_MACHVISION)
+            //using (SqlConnection connection = MvDbConnector.Connection_ERPDB2_Dot_MACHVISION)
+            using (SqlConnection connection = MvDbConnector.getErpDbConnection(MvCompanySite.MACHVISION))
             {
                 sb.Clear();
                 sb.Append("select * FROM MACHVISION.dbo.CMSMQ ORDER BY MQ001 ");
@@ -1497,7 +1502,8 @@ namespace MvLocalProject.Controller
                 return null;
             }
 
-            using (SqlConnection connection = MvDbConnector.Connection_ERPDB2_Dot_MACHVISION)
+            //using (SqlConnection connection = MvDbConnector.Connection_ERPDB2_Dot_MACHVISION)
+            using (SqlConnection connection = MvDbConnector.getErpDbConnection(MvCompanySite.MACHVISION))
             {
                 try
                 {
@@ -1689,7 +1695,6 @@ namespace MvLocalProject.Controller
 
         public static DataTable collectData_Invmb(SqlConnection connection, string pattern)
         {
-
             StringBuilder sb = new StringBuilder();
             DataTable majorData = null;
 
@@ -1709,7 +1714,7 @@ namespace MvLocalProject.Controller
 
         public static DataTable collectData_InvmbItems(string[] itemList, string columnPattern = "*")
         {
-            using (SqlConnection connection = MvDbConnector.Connection_ERPDB2_Dot_MACHVISION)
+            using (SqlConnection connection = MvDbConnector.getErpDbConnection(MvCompanySite.MACHVISION))
             {
                 try
                 {
@@ -1752,7 +1757,8 @@ namespace MvLocalProject.Controller
 
         public static DataTable collectData_MachineFromMVPlan(string machineNo, bool isIncludeShipped = false)
         {
-            using (SqlConnection connection = MvDbConnector.Connection_ERPBK_Dot_MVPlanSystem2018)
+            //using (SqlConnection connection = MvDbConnector.Connection_MVDB01_Dot_MVPlanSystem2018)
+            using (SqlConnection connection = MvDbConnector.getSystemDbConnection(MvCompanySite.MACHVISION, MvSystem.TW_MVPLAN))
             {
                 try
                 {
@@ -1922,7 +1928,8 @@ namespace MvLocalProject.Controller
             // 確認此帳號是否存在ERP GP
             try
             {
-                using (SqlConnection conn = MvDbConnector.getErpDbConnection(userData.CompanySite, MvDBSource.ERPBK_mvWorkFlow))
+                //using (SqlConnection conn = MvDbConnector.getErpDbConnection(userData.CompanySite, MvDBSource.ERPBK_mvWorkFlow))
+                using (SqlConnection conn = MvDbConnector.getSystemDbConnection(userData.CompanySite, MvSystem.TW_WORKFLOW))
                 {
                     StringBuilder sb = new StringBuilder();
                     sb.Append("SELECT dbo.vwEmployee.EmployeeID, dbo.vwEmployee.Name, dbo.vwEmployee.DepartmentID, dbo.Department.DepartmentName ")
@@ -1977,9 +1984,10 @@ namespace MvLocalProject.Controller
             // 確認此帳號是否存在mvWorkFlow
             try
             {
-                using (SqlConnection conn = MvDbConnector.Connection_ERPBK_Dot_MvWorkFlow)
+                //using (SqlConnection conn = MvDbConnector.Connection_MVDB01_Dot_MvWorkFlow)
+                using (SqlConnection conn = MvDbConnector.getSystemDbConnection(MvCompanySite.MACHVISION, MvSystem.TW_WORKFLOW))
                 {
-                    string command = "select * from ERPBK.mvWorkFlow.dbo.vwEmployee";
+                    string command = string.Format("SELECT * FROM mvWorkFlow.dbo.vwEmployee WHERE ADLoginID = '{0}'", account);
                     conn.Open();
                     return MvDbConnector.hasRowsBySq1(conn, command);
                 }

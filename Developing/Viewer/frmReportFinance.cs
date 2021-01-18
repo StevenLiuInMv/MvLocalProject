@@ -2,6 +2,7 @@
 using DevExpress.XtraTreeList;
 using MvLocalProject.Controller;
 using MvSharedLib.Controller;
+using MvSharedLib.Model;
 using System;
 using System.Data;
 using System.Data.SqlClient;
@@ -37,7 +38,7 @@ namespace MvLocalProject.Viewer
             // 取得內容
             DataTable tempDt = null;
             StringBuilder sb = new StringBuilder();
-            using (SqlConnection conn = MvDbConnector.Connection_ERPDB2_Dot_MACHVISION)
+            using (SqlConnection conn = MvDbConnector.getErpDbConnection(MvCompanySite.MACHVISION))
             {
                 conn.Open();
                 // 取得excel 內容

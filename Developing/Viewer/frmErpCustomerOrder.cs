@@ -1,6 +1,7 @@
 ﻿using DevExpress.XtraGrid.Views.Grid;
 using MvLocalProject.Controller;
 using MvSharedLib.Controller;
+using MvSharedLib.Model;
 using System;
 using System.Data;
 using System.Data.SqlClient;
@@ -53,7 +54,7 @@ namespace MvLocalProject.Viewer
 
             try
             {
-                using (SqlConnection connection = MvDbConnector.Connection_ERPDB2_Dot_MACHVISION)
+                using (SqlConnection connection = MvDbConnector.getErpDbConnection(MvCompanySite.MACHVISION))
                 {
                     connection.Open();
                     //_majorDt = MvDbDao.CollectData_CustomerOrder(connection, _customerOrderTypes, "20200125", "20200523");

@@ -371,10 +371,10 @@ namespace MvLocalProject.Viewer
             {
                 return string.Empty;
             }
-            else
-            {
-                return string.Empty;
-            }
+            //else
+            //{
+            //    return string.Empty;
+            //}
 
             n = int.Parse(deptNo);
 

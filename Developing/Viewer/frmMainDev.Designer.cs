@@ -333,13 +333,10 @@
             // dockPanel2
             // 
             this.dockPanel2.Controls.Add(this.dockPanel2_Container);
-            this.dockPanel2.Dock = DevExpress.XtraBars.Docking.DockingStyle.Float;
             this.dockPanel2.DockedAsTabbedDocument = true;
             this.dockPanel2.ID = new System.Guid("3d71af3a-70d5-4251-a1be-4f72f561039a");
-            this.dockPanel2.Location = new System.Drawing.Point(0, 0);
             this.dockPanel2.Name = "dockPanel2";
             this.dockPanel2.OriginalSize = new System.Drawing.Size(200, 200);
-            this.dockPanel2.Size = new System.Drawing.Size(513, 571);
             this.dockPanel2.Text = "Dialog";
             // 
             // dockPanel2_Container

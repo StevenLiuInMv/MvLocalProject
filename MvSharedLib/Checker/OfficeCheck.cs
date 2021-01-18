@@ -393,7 +393,7 @@ namespace MvSharedLib.Checker
             // Clone該資料表的Table Schema
             DataTable majorData = null;
             StringBuilder sb = new StringBuilder();
-            SqlConnection connection = MvDbConnector.Connection_ERPBK_Dot_IT;
+            SqlConnection connection = MvDbConnector.Connection_MVDB01_Dot_IT;
 
             try
             {
@@ -432,7 +432,7 @@ namespace MvSharedLib.Checker
 
             using (TransactionScope scope = new TransactionScope())
             {
-                connection = MvDbConnector.Connection_ERPBK_Dot_IT;
+                connection = MvDbConnector.Connection_MVDB01_Dot_IT;
 
                 try
                 {

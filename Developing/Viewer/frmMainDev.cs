@@ -201,13 +201,16 @@ namespace MvLocalProject.Viewer
 
         private void enableMenuForRd()
         {
-            nbpErpReport.Visible = true;
+            nbpErpReport.Visible = false;
             nbgErpFoms.Visible = true;
             nbgItTools.Visible = false;
             nbgTesting.Visible = false;
             // 各別group disable
             formMcBatchJob.Visible = false;
             formErpCustomerOrder.Visible = false;
+            formErpCreatePR.Visible = false;
+            formMoc.Visible = false;
+            formBomToMocCompare.Visible = false;
         }
 
         private void enableMenuForMc()
